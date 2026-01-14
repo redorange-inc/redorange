@@ -6,7 +6,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, Laptop, Globe, Network } from 'lucide-react';
+import { ArrowRight, Laptop, Globe, Network, PhoneCall } from 'lucide-react';
 
 type ServiceSlide = {
   id: 'it-technology' | 'digital-web' | 'infra-telecom';
@@ -23,7 +23,6 @@ const clamp01 = (n: number): number => Math.min(1, Math.max(0, n));
 
 export const ServicesScroller: FC = () => {
   const sectionRef = useRef<HTMLElement | null>(null);
-  const rafRef = useRef<number | null>(null);
   const [progress, setProgress] = useState(0);
 
   //  service configuration and destinations
@@ -36,7 +35,7 @@ export const ServicesScroller: FC = () => {
         badge: 'Para operaciones críticas',
         points: [
           'Desarrollo de software y sistemas a medida',
-          'Consultoría TI y transformación digital',
+          'Consultoría TI y automatización de procesos',
           'Administración de servidores, redes y bases de datos',
           'Cloud, backups, monitoreo y seguridad',
           'Mesa de ayuda, soporte y mantenimiento',
@@ -48,9 +47,15 @@ export const ServicesScroller: FC = () => {
       {
         id: 'digital-web',
         title: 'Digital & Web Services',
-        subtitle: 'Web institucional, hosting, correo y e-commerce',
-        badge: 'Para presencia y ventas',
-        points: ['Diseño y desarrollo web institucional', 'Plataformas digitales y e-commerce', 'Hosting, dominios y certificados', 'Correo corporativo y seguridad web', 'Intranet, extranet y soporte'],
+        subtitle: 'Web, hosting, correo y soluciones para ventas',
+        badge: 'Para presencia y crecimiento',
+        points: [
+          'Web institucional moderna y administrable',
+          'Landing pages y campañas de conversión',
+          'E-commerce y catálogos digitales',
+          'Hosting, dominios, certificados y correos',
+          'Seguridad web y soporte continuo',
+        ],
         href: 'https://digital.redorange.net.pe',
         cta: 'Conocer más',
         icon: Globe,
@@ -62,10 +67,10 @@ export const ServicesScroller: FC = () => {
         badge: 'Para infraestructura estable',
         points: [
           'Venta y distribución de equipos y periféricos',
-          'Telecomunicaciones y conectividad',
+          'Conectividad, enlaces y soluciones de telecom',
           'Instalación de redes y cableado estructurado',
           'Mantenimiento, soporte y postventa',
-          'Infraestructura para crecimiento y disponibilidad',
+          'Infraestructura preparada para escalar',
         ],
         href: 'https://infra.redorange.net.pe',
         cta: 'Ver soluciones',
@@ -75,57 +80,51 @@ export const ServicesScroller: FC = () => {
     [],
   );
 
-  //  vertical scroll mapped to horizontal translate
+  //  map y scroll to x progress inside this section
   useEffect(() => {
-    const onScroll = (): void => {
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    const handleScroll = (): void => {
+      const el = sectionRef.current;
+      if (!el) return;
 
-      rafRef.current = requestAnimationFrame(() => {
-        const el = sectionRef.current;
-        if (!el) return;
+      const rect = el.getBoundingClientRect();
+      const viewportH = window.innerHeight;
 
-        const rect = el.getBoundingClientRect();
-        const viewportH = window.innerHeight;
+      //  section top in document coordinates
+      const sectionTop = window.scrollY + rect.top;
+      const sectionHeight = el.offsetHeight;
 
-        //  section top in document coordinates
-        const sectionTop = window.scrollY + rect.top;
-        const sectionHeight = el.offsetHeight;
+      //  range where sticky is active
+      const range = Math.max(1, sectionHeight - viewportH);
+      const y = window.scrollY - sectionTop;
 
-        //  scroll range where sticky is active (height - viewport)
-        const range = Math.max(1, sectionHeight - viewportH);
-        const y = window.scrollY - sectionTop;
-
-        setProgress(clamp01(y / range));
-      });
+      setProgress(clamp01(y / range));
     };
 
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
 
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    };
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const translateXvw = -(progress * (slides.length - 1) * 100);
+  const slideCount = slides.length;
+  const trackWidth = `${slideCount * 100}vw`;
+  const translateXPercent = -(progress * (slideCount - 1) * 100);
 
   return (
-    <section id="services" ref={sectionRef} className="relative" style={{ height: `${slides.length * 100}vh` }}>
+    <section id="services" ref={sectionRef} className="relative" style={{ height: `${slideCount * 100}vh` }}>
       {/*  sticky viewport that turns y scroll into x movement */}
       <div className="sticky top-0 h-screen overflow-hidden">
-        {/*  top label */}
+        {/*  top header */}
         <div className="pointer-events-none absolute left-0 right-0 top-0 z-10">
           <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-6">
             <div className="space-y-1">
-              <p className="font-heading text-sm font-bold text-muted-foreground">Servicios</p>
-              <p className="text-xs text-muted-foreground">Desliza con tu scroll para cambiar de línea</p>
+              <p className="font-heading text-sm font-bold text-muted-foreground">Lineas</p>
+              <p className="text-xs text-muted-foreground">Scroll para avanzar entre servicios</p>
             </div>
 
-            {/*  progress indicator */}
             <div className="flex items-center gap-2">
               {slides.map((s, idx) => {
-                const active = Math.round(progress * (slides.length - 1)) === idx;
+                const active = Math.round(progress * (slideCount - 1)) === idx;
                 return <span key={s.id} className={['h-2 w-2 rounded-full transition-all', active ? 'bg-primary' : 'bg-border'].join(' ')} aria-hidden="true" />;
               })}
             </div>
@@ -133,14 +132,23 @@ export const ServicesScroller: FC = () => {
         </div>
 
         {/*  horizontal track */}
-        <div className="flex h-full w-[300vw] transition-transform duration-75 will-change-transform" style={{ transform: `translateX(${translateXvw}vw)` }}>
+        <div
+          className="flex h-full"
+          style={{
+            width: trackWidth,
+            transform: `translateX(${translateXPercent}%)`,
+            transition: 'transform 60ms linear',
+            willChange: 'transform',
+          }}
+        >
           {slides.map((s) => {
             const Icon = s.icon;
+
             return (
-              <div key={s.id} id={s.id} className="flex h-screen w-screen items-center justify-center px-4">
-                {/*  one slide per full screen */}
-                <div className="mx-auto w-full max-w-6xl">
-                  <div className="grid items-center gap-8 md:grid-cols-2">
+              <div key={s.id} id={s.id} className="h-screen px-4" style={{ flex: '0 0 100vw' }}>
+                {/*  center slide content */}
+                <div className="mx-auto flex h-full max-w-6xl items-center">
+                  <div className="grid w-full items-center gap-8 md:grid-cols-2">
                     <div className="space-y-5">
                       <Badge variant="secondary" className="font-heading">
                         {s.badge}
@@ -160,15 +168,15 @@ export const ServicesScroller: FC = () => {
 
                         <Button asChild size="lg" variant="outline" className="font-heading">
                           <Link href="/#contact">
-                            Solicitar cotización
-                            <ArrowRight className="ml-2 h-5 w-5" />
+                            Contactarnos
+                            <PhoneCall className="ml-2 h-5 w-5" />
                           </Link>
                         </Button>
                       </div>
 
-                      <div className="text-xs text-muted-foreground">
+                      <p className="text-xs text-muted-foreground">
                         Enlace: <span className="font-mono">{s.href}</span>
-                      </div>
+                      </p>
                     </div>
 
                     <Card className="border-border/70">
@@ -183,6 +191,7 @@ export const ServicesScroller: FC = () => {
                           </div>
                         </div>
                       </CardHeader>
+
                       <CardContent className="space-y-4">
                         <ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
                           {s.points.map((p) => (
@@ -193,6 +202,22 @@ export const ServicesScroller: FC = () => {
                         <div className="rounded-xl bg-muted p-4">
                           <p className="font-heading text-sm font-bold text-foreground">Modalidad</p>
                           <p className="mt-1 text-sm text-muted-foreground">Servicio por proyecto, mensual o por demanda, según necesidad y SLA.</p>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <Button asChild variant="secondary" className="font-heading">
+                            <a href={s.href} target="_blank" rel="noreferrer">
+                              Ver más
+                              <ArrowRight className="ml-2 h-4 w-4" />
+                            </a>
+                          </Button>
+
+                          <Button asChild variant="ghost" className="font-heading">
+                            <Link href="/#contact">
+                              Solicitar cotización
+                              <ArrowRight className="ml-2 h-4 w-4" />
+                            </Link>
+                          </Button>
                         </div>
                       </CardContent>
                     </Card>
