@@ -41,7 +41,7 @@ export const HeroSection: FC = () => {
           </div>
 
           <div className="relative">
-            <div className="glass-effect rounded-2xl border border-border/60 p-6 shadow-sm">
+            <div className="glass-effect  rounded-2xl border border-border/60 p-6 shadow-sm">
               <h2 className="text-xl font-extrabold">Atención orientada a proyectos</h2>
               <p className="mt-2 text-sm text-muted-foreground">Preparamos documentación y alcance técnico alineado a requerimientos, TDR y criterios de evaluación.</p>
 
