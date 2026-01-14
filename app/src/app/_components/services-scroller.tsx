@@ -27,9 +27,10 @@ const prefersReducedMotion = (): boolean => typeof window !== 'undefined' && win
 export const ServicesScroller: FC = () => {
   const sectionRef = useRef<HTMLElement | null>(null);
   const snapTimerRef = useRef<number | null>(null);
+  const isUserScrollingRef = useRef(false);
+  const lastScrollTimeRef = useRef(0);
   const [progress, setProgress] = useState(0);
 
-  //  service configuration and destinations
   const slides = useMemo<ServiceSlide[]>(
     () => [
       {
@@ -99,56 +100,62 @@ export const ServicesScroller: FC = () => {
     [],
   );
 
-  //  map y scroll to x progress inside this section
   useEffect(() => {
     const handleScroll = (): void => {
       const el = sectionRef.current;
       if (!el) return;
 
+      const now = Date.now();
+      lastScrollTimeRef.current = now;
+      isUserScrollingRef.current = true;
+
       const rect = el.getBoundingClientRect();
       const viewportH = window.innerHeight;
 
-      //  section top in document coordinates
       const sectionTop = window.scrollY + rect.top;
       const sectionHeight = el.offsetHeight;
 
-      //  range where sticky is active
       const range = Math.max(1, sectionHeight - viewportH);
       const y = window.scrollY - sectionTop;
 
       setProgress(clamp01(y / range));
 
-      //  snap between slides like pages
+      // Limpiar timer anterior
       if (snapTimerRef.current) window.clearTimeout(snapTimerRef.current);
+
+      // Snap más suave y solo cuando el usuario deja de scrollear
       snapTimerRef.current = window.setTimeout(() => {
-        //  only snap while section is active in viewport
+        const timeSinceScroll = Date.now() - lastScrollTimeRef.current;
+
+        // Solo hacer snap si han pasado >400ms sin scroll (usuario detuvo el scroll)
+        if (timeSinceScroll < 400) return;
+
         const stillRect = el.getBoundingClientRect();
         const active = stillRect.top <= 0 && stillRect.bottom >= viewportH;
         if (!active) return;
 
         const count = slides.length;
         const maxIndex = Math.max(1, count - 1);
-        const index = Math.round(clamp01(y / range) * maxIndex);
-        const targetProgress = index / maxIndex;
+        const currentY = window.scrollY - sectionTop;
+        const currentProgress = clamp01(currentY / range);
+
+        // Encontrar el slide más cercano
+        const targetIndex = Math.round(currentProgress * maxIndex);
+        const targetProgress = targetIndex / maxIndex;
+
+        // Solo hacer snap si estamos "cerca" del punto de snap (dentro del 15%)
+        const distance = Math.abs(currentProgress - targetProgress);
+        if (distance > 0.15) return;
+
         const targetY = sectionTop + targetProgress * range;
+
+        isUserScrollingRef.current = false;
 
         window.scrollTo({
           top: targetY,
           behavior: prefersReducedMotion() ? 'auto' : 'smooth',
         });
-
-        //  when finishing last slide, jump to about (avoid empty end)
-        if (index === maxIndex) {
-          const about = document.getElementById('about');
-          if (about) {
-            const aboutTop = window.scrollY + about.getBoundingClientRect().top - 88;
-            window.scrollTo({
-              top: aboutTop,
-              behavior: prefersReducedMotion() ? 'auto' : 'smooth',
-            });
-          }
-        }
-      }, 140);
+      }, 450); // Aumentado de 140ms a 450ms para dar más tiempo al usuario
     };
 
     handleScroll();
@@ -166,37 +173,36 @@ export const ServicesScroller: FC = () => {
 
   return (
     <section id="services" ref={sectionRef} className="relative" style={{ height: `${slideCount * 100}vh` }}>
-      {/*  sticky viewport that turns y scroll into x movement */}
       <div className="sticky top-0 h-screen overflow-hidden">
-        {/*  subtle background */}
+        {/* Backgrounds */}
         <div className="pointer-events-none absolute inset-0 opacity-60 bg-pattern" aria-hidden="true" />
         <div className="pointer-events-none absolute -right-20 top-24 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
         <div className="pointer-events-none absolute -left-20 bottom-24 h-72 w-72 rounded-full bg-accent/10 blur-3xl" />
 
-        {/*  top header */}
+        {/* Header con indicadores */}
         <div className="pointer-events-none absolute left-0 right-0 top-0 z-10">
           <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6 md:px-10">
             <div className="space-y-1">
-              <p className="font-heading text-sm font-bold text-muted-foreground">Lineas</p>
-              <p className="text-xs text-muted-foreground">Scroll para avanzar como páginas</p>
+              <p className="font-heading text-sm font-bold text-muted-foreground">Líneas</p>
+              <p className="text-xs text-muted-foreground">Scroll para explorar</p>
             </div>
 
             <div className="flex items-center gap-2">
               {slides.map((s, idx) => {
                 const active = Math.round(progress * (slideCount - 1)) === idx;
-                return <span key={s.id} className={['h-2 w-2 rounded-full transition-all', active ? 'bg-primary' : 'bg-border'].join(' ')} aria-hidden="true" />;
+                return <span key={s.id} className={['h-2 rounded-full transition-all duration-300', active ? 'w-8 bg-primary' : 'w-2 bg-border'].join(' ')} aria-hidden="true" />;
               })}
             </div>
           </div>
         </div>
 
-        {/*  horizontal track */}
+        {/* Horizontal track con transición más suave */}
         <div
           className="flex h-full"
           style={{
             width: trackWidth,
             transform: `translateX(${translateXPercent}%)`,
-            transition: 'transform 80ms linear',
+            transition: 'transform 180ms cubic-bezier(0.33, 1, 0.68, 1)',
             willChange: 'transform',
           }}
         >
@@ -205,10 +211,9 @@ export const ServicesScroller: FC = () => {
 
             return (
               <div key={s.id} id={s.id} className="h-screen" style={{ flex: '0 0 100vw' }}>
-                {/*  full screen layout */}
                 <div className="mx-auto flex h-full max-w-7xl items-center px-6 md:px-10">
                   <div className="grid w-full items-center gap-10 md:grid-cols-2 md:gap-16">
-                    {/*  left */}
+                    {/* Left column */}
                     <div className="space-y-6">
                       <Badge variant="secondary" className="font-heading">
                         {s.badge}
@@ -248,7 +253,7 @@ export const ServicesScroller: FC = () => {
                       </p>
                     </div>
 
-                    {/*  right interactive */}
+                    {/* Right column - interactive */}
                     <div className="rounded-2xl border border-border/70 bg-background/60 p-6 shadow-sm backdrop-blur">
                       <div className="mb-5 flex items-center gap-3">
                         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-muted">
