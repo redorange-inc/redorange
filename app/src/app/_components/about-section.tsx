@@ -8,7 +8,7 @@ interface FeatureCard {
   icon: FC<{ className?: string }>;
   title: string;
   description: string;
-  color: string;
+  iconColor: string;
   items: Array<{ icon: FC<{ className?: string }>; text: string }>;
 }
 
@@ -18,7 +18,7 @@ export const AboutSection: FC = () => {
       icon: Target,
       title: 'Claridad en alcance',
       description: 'Definimos objetivos, criterios de aceptación y entregables para asegurar resultados medibles y evitar ambigüedades.',
-      color: 'from-blue-500 to-cyan-500',
+      iconColor: 'text-blue-500',
       items: [
         { icon: ClipboardCheck, text: 'Levantamiento de requerimientos y diagnóstico' },
         { icon: Calendar, text: 'Plan de trabajo con cronograma y responsables' },
@@ -30,7 +30,7 @@ export const AboutSection: FC = () => {
       icon: Shield,
       title: 'Ejecución y soporte',
       description: 'Implementamos con buenas prácticas y acompañamos con soporte, mantenimiento y mejora continua.',
-      color: 'from-purple-500 to-pink-500',
+      iconColor: 'text-purple-500',
       items: [
         { icon: HeadphonesIcon, text: 'Mesa de ayuda y atención por niveles' },
         { icon: Wrench, text: 'Mantenimiento preventivo y correctivo' },
@@ -42,7 +42,7 @@ export const AboutSection: FC = () => {
       icon: Rocket,
       title: 'Escalabilidad',
       description: 'Diseñamos pensando en crecimiento: rendimiento, seguridad, monitoreo y continuidad operativa.',
-      color: 'from-orange-500 to-red-500',
+      iconColor: 'text-orange-500',
       items: [
         { icon: Lightbulb, text: 'Arquitecturas escalables y mantenibles' },
         { icon: BookOpen, text: 'Estandarización y documentación' },
@@ -82,8 +82,8 @@ export const AboutSection: FC = () => {
             >
               {/* Icon header */}
               <div className="mb-6 flex items-start gap-4">
-                <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-linear-to-br ${feature.color} shadow-lg`}>
-                  <MainIcon className="h-7 w-7 text-white" />
+                <div className="flex h-14 w-14 shrink-0 items-center justify-center">
+                  <MainIcon className={`h-9 w-9 ${feature.iconColor}`} />
                 </div>
                 <div className="flex-1">
                   <h3 className="mb-2 font-heading text-xl font-extrabold">{feature.title}</h3>
@@ -98,8 +98,8 @@ export const AboutSection: FC = () => {
 
                   return (
                     <div key={item.text} className="flex items-start gap-3 rounded-lg bg-muted/50 p-3 transition-colors hover:bg-muted">
-                      <div className={`mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-linear-to-br ${feature.color}`}>
-                        <ItemIcon className="h-4 w-4 text-white" />
+                      <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center">
+                        <ItemIcon className={`h-5 w-5 ${feature.iconColor}`} />
                       </div>
                       <span className="text-sm leading-relaxed text-foreground">{item.text}</span>
                     </div>
@@ -121,21 +121,15 @@ export const AboutSection: FC = () => {
           <p className="text-muted-foreground">Cada proyecto se aborda con transparencia, comunicación constante y un enfoque iterativo que garantiza resultados tangibles y continuidad operativa.</p>
           <div className="flex flex-wrap items-center justify-center gap-6 pt-4">
             <div className="flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500/10">
-                <Target className="h-5 w-5 text-blue-500" />
-              </div>
+              <Target className="h-7 w-7 text-blue-500" />
               <span className="text-sm font-semibold">Orientado a resultados</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-500/10">
-                <Shield className="h-5 w-5 text-purple-500" />
-              </div>
+              <Shield className="h-7 w-7 text-purple-500" />
               <span className="text-sm font-semibold">Soporte continuo</span>
             </div>
             <div className="flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-500/10">
-                <Rocket className="h-5 w-5 text-orange-500" />
-              </div>
+              <Rocket className="h-7 w-7 text-orange-500" />
               <span className="text-sm font-semibold">Preparado para escalar</span>
             </div>
           </div>
