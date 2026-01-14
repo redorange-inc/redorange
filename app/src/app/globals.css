@@ -302,25 +302,6 @@ samp {
   }
 }
 
-.no-scrollbar {
-  -ms-overflow-style: none; /* IE y Edge */
-  scrollbar-width: none; /* Firefox */
-}
-
-.no-scrollbar::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera, nuevos Edge */
-}
-
-/* Opcional: mejorar el snap en mobile/touch */
-@supports (scroll-snap-type: y mandatory) {
-  .scroll-snap-y-mandatory {
-    scroll-snap-type: y mandatory;
-  }
-  .scroll-snap-start {
-    scroll-snap-align: start;
-  }
-}
-
 .animate-fade-in-up {
   animation: fadeInUp 0.6s ease-out forwards;
 }
