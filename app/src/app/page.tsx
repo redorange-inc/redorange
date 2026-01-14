@@ -1,4 +1,5 @@
-// app/page.tsx
+'use client';
+
 import type { FC } from 'react';
 import { Navbar } from './_components/navbar';
 import { HeroSection } from './_components/hero-section';

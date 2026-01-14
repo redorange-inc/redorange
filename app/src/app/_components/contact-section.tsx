@@ -1,4 +1,3 @@
-// app/_components/contact-section.tsx
 'use client';
 
 import type { FC } from 'react';
@@ -20,7 +19,7 @@ export const ContactSection: FC = () => {
   }, []);
 
   return (
-    <section id="contact" className="mx-auto max-w-6xl px-4 pb-20 scroll-mt-28">
+    <section id="contact" className="mx-auto max-w-7xl px-6 pb-24 pt-20 md:px-10 md:pb-28 md:pt-24 min-h-screen scroll-mt-28">
       {/*  section header */}
       <div className="mb-10 flex flex-col gap-3">
         <h2 className="text-2xl font-extrabold md:text-3xl">Contacto y cotizaciones</h2>
@@ -63,6 +62,7 @@ export const ContactSection: FC = () => {
               </Button>
 
               <Button type="button" variant="secondary" className="font-heading" asChild>
+                {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
                 <a href="/#services">
                   Ver servicios
                   <ArrowRight className="ml-2 h-5 w-5" />
