@@ -20,7 +20,6 @@ export const ContactSection: FC = () => {
 
   return (
     <section id="contact" className="mx-auto max-w-7xl px-6 pb-24 pt-20 md:px-10 md:pb-28 md:pt-24 min-h-screen scroll-mt-28">
-      {/*  section header */}
       <div className="mb-10 flex flex-col gap-3">
         <h2 className="text-2xl font-extrabold md:text-3xl">Contacto y cotizaciones</h2>
         <p className="max-w-3xl text-muted-foreground">Compártenos tu requerimiento y te enviamos una propuesta con alcance y opciones de servicio.</p>

@@ -54,11 +54,9 @@ export const AboutSection: FC = () => {
 
   return (
     <section id="about" className="relative mx-auto max-w-7xl px-6 py-20 md:px-10 md:py-28 min-h-screen scroll-mt-28">
-      {/* Decorative background elements */}
       <div className="pointer-events-none absolute -right-20 top-20 h-96 w-96 rounded-full bg-blue-500/5 blur-3xl" />
       <div className="pointer-events-none absolute -left-20 bottom-20 h-96 w-96 rounded-full bg-purple-500/5 blur-3xl" />
 
-      {/* Header */}
       <div className="mb-16 text-center">
         <Badge variant="secondary" className="mb-4 font-heading">
           <Users className="mr-1.5 h-3.5 w-3.5" />
@@ -70,7 +68,6 @@ export const AboutSection: FC = () => {
         </p>
       </div>
 
-      {/* Feature cards grid */}
       <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {features.map((feature) => {
           const MainIcon = feature.icon;
@@ -80,7 +77,6 @@ export const AboutSection: FC = () => {
               key={feature.title}
               className="group relative overflow-hidden rounded-2xl border border-border/70 bg-background/60 p-6 shadow-sm backdrop-blur transition-all hover:shadow-lg hover:scale-[1.02]"
             >
-              {/* Icon header */}
               <div className="mb-6 flex items-start gap-4">
                 <div className="flex h-14 w-14 shrink-0 items-center justify-center">
                   <MainIcon className={`h-9 w-9 ${feature.iconColor}`} />
@@ -91,7 +87,6 @@ export const AboutSection: FC = () => {
                 </div>
               </div>
 
-              {/* Items list */}
               <div className="space-y-3">
                 {feature.items.map((item) => {
                   const ItemIcon = item.icon;
@@ -111,7 +106,6 @@ export const AboutSection: FC = () => {
         })}
       </div>
 
-      {/* Bottom CTA section */}
       <div className="mt-16 rounded-2xl border border-border/70 bg-linear-to-br from-primary/5 via-background/60 to-accent/5 p-8 text-center backdrop-blur">
         <div className="mx-auto max-w-2xl space-y-4">
           <div className="flex items-center justify-center gap-2">

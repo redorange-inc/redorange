@@ -1,18 +1,16 @@
 import type { FC } from 'react';
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
+import Image from 'next/image';
 
 export const Footer: FC = () => {
   return (
     <footer className="border-t border-border/70">
       <div className="mx-auto max-w-6xl px-4 py-12">
-        {/*  footer grid */}
         <div className="grid gap-10 md:grid-cols-4">
-          {/*  brand */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src="/img/logo.webp" alt="Red Orange" className="h-10 w-10 rounded-md" />
+              <Image src="/img/logo.webp" alt="Red Orange" width={40} height={40} className="rounded-md" />
               <div className="leading-none">
                 <p className="font-heading text-sm font-extrabold">Red Orange</p>
                 <p className="text-xs text-muted-foreground">E.I.R.L.</p>
@@ -24,7 +22,6 @@ export const Footer: FC = () => {
             <p className="text-xs text-muted-foreground">RUC: 20611656891</p>
           </div>
 
-          {/*  links */}
           <div className="space-y-3">
             <p className="font-heading text-sm font-bold">Navegación</p>
             <div className="flex flex-col gap-2 text-sm">
@@ -43,7 +40,6 @@ export const Footer: FC = () => {
             </div>
           </div>
 
-          {/*  services */}
           <div className="space-y-3">
             <p className="font-heading text-sm font-bold">Lineas</p>
             <div className="flex flex-col gap-2 text-sm">
@@ -59,7 +55,6 @@ export const Footer: FC = () => {
             </div>
           </div>
 
-          {/*  contact */}
           <div className="space-y-3">
             <p className="font-heading text-sm font-bold">Contacto</p>
             <div className="space-y-2 text-sm text-muted-foreground">
@@ -74,7 +69,6 @@ export const Footer: FC = () => {
 
         <Separator className="my-8" />
 
-        {/*  footer bottom */}
         <div className="flex flex-col gap-2 text-xs text-muted-foreground md:flex-row md:items-center md:justify-between">
           <p>© {new Date().getFullYear()} Red Orange E.I.R.L. Todos los derechos reservados.</p>
           <p>redorange.net.pe</p>

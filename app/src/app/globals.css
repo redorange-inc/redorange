@@ -118,62 +118,63 @@
 }
 
 .dark {
-  /* surfaces */
-  --background: #160f0c;
-  --foreground: #fff3ea;
+  /* surfaces - más contraste y profundidad */
+  --background: #0a0605;
+  --foreground: #fffbf7;
 
-  --card: #221612;
-  --card-foreground: #fff3ea;
+  --card: #1a1210;
+  --card-foreground: #fffbf7;
 
-  --popover: #1d1410;
-  --popover-foreground: #fff3ea;
+  --popover: #1a1210;
+  --popover-foreground: #fffbf7;
 
-  /* brand */
-  --primary: #fa661d;
+  /* brand - colores más vibrantes y visibles */
+  --primary: #ff7733;
   --primary-foreground: #ffffff;
 
-  --secondary: #fcaf34;
-  --secondary-foreground: #160f0c;
+  --secondary: #ffbb44;
+  --secondary-foreground: #0a0605;
 
-  /* support */
-  --muted: #2a1c16;
-  --muted-foreground: #cdbfb6;
+  /* support - mejor contraste */
+  --muted: #2d2220;
+  --muted-foreground: #e0d5cc;
 
-  --accent: #6bc039;
-  --accent-foreground: #071b0a;
+  --accent: #7dd34f;
+  --accent-foreground: #ffffff;
 
-  --destructive: #ff3b30;
+  --destructive: #ff4d4d;
   --destructive-foreground: #ffffff;
 
-  --border: #ffffff1a;
-  --input: #ffffff26;
-  --input-background: #1a120f;
-  --switch-background: #3a2a22;
+  /* borders e inputs más visibles */
+  --border: #ffffff20;
+  --input: #ffffff30;
+  --input-background: #1a1210;
+  --switch-background: #3d3330;
 
-  /* focus ring */
-  --ring: #fc9129;
+  /* focus ring más brillante */
+  --ring: #ff9944;
 
-  /* charts */
-  --chart-1: #fc9129;
-  --chart-2: #fcaf34;
-  --chart-3: #6bc039;
-  --chart-4: #f74e15;
-  --chart-5: #c44412;
+  /* charts - tonos más brillantes */
+  --chart-1: #ff7733;
+  --chart-2: #ffbb44;
+  --chart-3: #7dd34f;
+  --chart-4: #ff5522;
+  --chart-5: #dd5522;
 
   /* sidebar */
-  --sidebar: #1b120f;
-  --sidebar-foreground: #fff3ea;
-  --sidebar-primary: #fa661d;
+  --sidebar: #120d0b;
+  --sidebar-foreground: #fffbf7;
+  --sidebar-primary: #ff7733;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #2a1c16;
-  --sidebar-accent-foreground: #fff3ea;
-  --sidebar-border: #ffffff1a;
-  --sidebar-ring: #fc9129;
+  --sidebar-accent: #2d2220;
+  --sidebar-accent-foreground: #fffbf7;
+  --sidebar-border: #ffffff20;
+  --sidebar-ring: #ff9944;
 
   /* compat */
   --color-text-primary: var(--foreground);
   --color-surface-elevated: var(--card);
-  --color-primary-dark: #fc9129;
+  --color-primary-dark: #ff9944;
   --color-primary: var(--primary);
   --color-secondary: var(--secondary);
 }
@@ -295,10 +296,21 @@ samp {
   opacity: 0.03;
 }
 
+/* Dark mode - patrón más visible */
+.dark .bg-pattern {
+  opacity: 0.08;
+}
+
 .glass-effect {
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+}
+
+/* Dark mode glass effect */
+.dark .glass-effect {
+  background: rgba(26, 18, 16, 0.8);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
 /* animaciones */
@@ -357,6 +369,12 @@ samp {
 .delay-500 {
   animation-delay: 500ms;
 }
+.delay-1000 {
+  animation-delay: 1000ms;
+}
+.delay-2000 {
+  animation-delay: 2000ms;
+}
 
 /* scrollbar personalizada */
 ::-webkit-scrollbar {
@@ -377,8 +395,57 @@ samp {
   background: var(--color-primary-dark);
 }
 
+/* Dark mode scrollbar */
+.dark ::-webkit-scrollbar-track {
+  background: #1a1210;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-dark);
+}
+
 /* focus visible para accesibilidad */
 :focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
+}
+
+/* Mejoras para dark mode - textos más visibles */
+.dark h1,
+.dark h2,
+.dark h3,
+.dark h4,
+.dark h5,
+.dark h6 {
+  color: #fffbf7;
+}
+
+.dark p,
+.dark span,
+.dark label {
+  color: #e0d5cc;
+}
+
+/* Badges y tags más visibles en dark mode */
+.dark [class*='bg-muted'] {
+  background-color: #2d2220;
+  color: #e0d5cc;
+}
+
+.dark [class*='border-border'] {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Cards más visibles en dark mode */
+.dark [class*='bg-background'] {
+  background-color: #1a1210;
+}
+
+.dark [class*='bg-card'] {
+  background-color: #1a1210;
+  border-color: rgba(255, 255, 255, 0.1);
 }

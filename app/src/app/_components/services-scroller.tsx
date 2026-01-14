@@ -174,12 +174,10 @@ export const ServicesScroller: FC = () => {
   return (
     <section id="services" ref={sectionRef} className="relative" style={{ height: `${slideCount * 100}vh` }}>
       <div className="sticky top-0 h-screen overflow-hidden">
-        {/* Backgrounds */}
         <div className="pointer-events-none absolute inset-0 opacity-60 bg-pattern" aria-hidden="true" />
         <div className="pointer-events-none absolute -right-20 top-24 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
         <div className="pointer-events-none absolute -left-20 bottom-24 h-72 w-72 rounded-full bg-accent/10 blur-3xl" />
 
-        {/* Header con indicadores */}
         <div className="pointer-events-none absolute left-0 right-0 top-0 z-10">
           <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6 md:px-10">
             <div className="space-y-1">
@@ -196,7 +194,6 @@ export const ServicesScroller: FC = () => {
           </div>
         </div>
 
-        {/* Horizontal track con transición más suave */}
         <div
           className="flex h-full"
           style={{
@@ -213,7 +210,6 @@ export const ServicesScroller: FC = () => {
               <div key={s.id} id={s.id} className="h-screen" style={{ flex: '0 0 100vw' }}>
                 <div className="mx-auto flex h-full max-w-7xl items-center px-6 md:px-10">
                   <div className="grid w-full items-center gap-10 md:grid-cols-2 md:gap-16">
-                    {/* Left column */}
                     <div className="space-y-6">
                       <Badge variant="secondary" className="font-heading">
                         {s.badge}
@@ -253,7 +249,6 @@ export const ServicesScroller: FC = () => {
                       </p>
                     </div>
 
-                    {/* Right column - interactive */}
                     <div className="rounded-2xl border border-border/70 bg-background/60 p-6 shadow-sm backdrop-blur">
                       <div className="mb-5 flex items-center gap-3">
                         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-muted">

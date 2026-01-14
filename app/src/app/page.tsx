@@ -12,15 +12,10 @@ const Page: FC = () => {
   return (
     <main className="relative">
       <Navbar />
-
       <HeroSection />
-
       <ServicesScroller />
-
       <AboutSection />
-
       <ContactSection />
-
       <Footer />
     </main>
   );
