@@ -1,3 +1,4 @@
+// app/_components/footer.tsx
 import type { FC } from 'react';
 import Link from 'next/link';
 import { Separator } from '@/components/ui/separator';
@@ -18,14 +19,11 @@ export const Footer: FC = () => {
           </div>
 
           <div className="flex flex-wrap gap-3 text-sm">
-            <Link className="text-muted-foreground hover:text-foreground" href="/#it-technology">
-              TI y Software
+            <Link className="text-muted-foreground hover:text-foreground" href="/#services">
+              Servicios
             </Link>
-            <Link className="text-muted-foreground hover:text-foreground" href="/#digital-web">
-              Web y Digital
-            </Link>
-            <Link className="text-muted-foreground hover:text-foreground" href="/#infra-telecom">
-              Infra y Telecom
+            <Link className="text-muted-foreground hover:text-foreground" href="/#about">
+              Nosotros
             </Link>
             <Link className="text-muted-foreground hover:text-foreground" href="/#contact">
               Contacto
@@ -38,7 +36,7 @@ export const Footer: FC = () => {
         {/*  footer bottom */}
         <div className="flex flex-col gap-2 text-xs text-muted-foreground md:flex-row md:items-center md:justify-between">
           <p>© {new Date().getFullYear()} Red Orange E.I.R.L. Todos los derechos reservados.</p>
-          <p>Soluciones para sector público y privado (SIGA, SIAF, SEACE).</p>
+          <p>IT, digital e infraestructura tecnológica.</p>
         </div>
       </div>
     </footer>

@@ -6,9 +6,8 @@ import { ThemeToggle } from '@/components/theme/theme-toggle';
 import { Button } from '@/components/ui/button';
 
 const navItems = [
-  { href: '/#it-technology', label: 'TI y Software' },
-  { href: '/#digital-web', label: 'Web y Digital' },
-  { href: '/#infra-telecom', label: 'Infra y Telecom' },
+  { href: '/#services', label: 'Servicios' },
+  { href: '/#about', label: 'Nosotros' },
   { href: '/#contact', label: 'Contacto' },
 ] as const;
 
@@ -28,8 +27,8 @@ export const Navbar: FC = () => {
 
         {/*  desktop nav */}
         <nav className="hidden items-center gap-1 md:flex">
-          {navItems.slice(0, 3).map((item) => (
-            <Button key={item.href} asChild variant="ghost" className="px-3">
+          {navItems.map((item) => (
+            <Button key={item.href} asChild variant="ghost" className="px-3 font-heading">
               <Link href={item.href}>{item.label}</Link>
             </Button>
           ))}
