@@ -4,7 +4,27 @@ import type { FC } from 'react';
 import { useEffect, useMemo, useRef } from 'react';
 import { animate } from 'animejs';
 import { Badge } from '@/components/ui/badge';
-import { Target, Shield, Rocket, ClipboardCheck, Calendar, FileText, CheckSquare, HeadphonesIcon, Wrench, Database, TrendingUp, BookOpen, Zap, RefreshCw, Users, Lightbulb } from 'lucide-react';
+import {
+  Target,
+  Shield,
+  Rocket,
+  ClipboardCheck,
+  Calendar,
+  FileText,
+  CheckSquare,
+  HeadphonesIcon,
+  Wrench,
+  Database,
+  TrendingUp,
+  BookOpen,
+  Zap,
+  RefreshCw,
+  Users,
+  Lightbulb,
+  MessageSquareText,
+  BadgeCheck,
+  Timer,
+} from 'lucide-react';
 
 interface FeatureCard {
   icon: FC<{ className?: string }>;
@@ -20,7 +40,7 @@ export const AboutSection: FC = () => {
   const sectionRef = useRef<HTMLElement | null>(null);
   const headerRef = useRef<HTMLDivElement | null>(null);
   const cardsRef = useRef<HTMLDivElement | null>(null);
-  const highlightRef = useRef<HTMLDivElement | null>(null);
+  const footerRef = useRef<HTMLDivElement | null>(null);
 
   const features = useMemo<FeatureCard[]>(
     () => [
@@ -67,15 +87,14 @@ export const AboutSection: FC = () => {
   useEffect(() => {
     const root = sectionRef.current;
     if (!root) return;
-
-    //  reduced motion
     if (prefersReducedMotion()) return;
 
+    //  selectors
     const headerEls = headerRef.current?.querySelectorAll('[data-about="header"]') ?? [];
     const cardEls = cardsRef.current?.querySelectorAll('[data-about="card"]') ?? [];
-    const highlightEls = highlightRef.current?.querySelectorAll('[data-about="highlight"]') ?? [];
+    const footerWrapEls = footerRef.current?.querySelectorAll('[data-about="footer-wrap"]') ?? [];
+    const footerEls = footerRef.current?.querySelectorAll('[data-about="footer"]') ?? [];
 
-    //  helper: animate once when entering viewport
     const io = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
@@ -100,13 +119,22 @@ export const AboutSection: FC = () => {
             delay: (el, i) => 220 + i * 120,
           });
 
-          //  highlight
-          animate(highlightEls, {
+          //  footer wrap reveal (container)
+          animate(footerWrapEls, {
             opacity: [0, 1],
-            translateY: [16, 0],
+            translateY: [14, 0],
             duration: 850,
             easing: 'easeOutExpo',
-            delay: (el, i) => 520 + i * 90,
+            delay: 520,
+          });
+
+          //  footer children reveal
+          animate(footerEls, {
+            opacity: [0, 1],
+            translateY: [10, 0],
+            duration: 700,
+            easing: 'easeOutExpo',
+            delay: (el, i) => 640 + i * 90,
           });
 
           io.disconnect();
@@ -137,16 +165,16 @@ export const AboutSection: FC = () => {
       <div data-about="glow" className="pointer-events-none absolute -left-20 bottom-20 h-96 w-96 rounded-full bg-purple-500/5 blur-3xl" />
 
       <div ref={headerRef} className="mb-16 text-center">
-        <Badge variant="secondary" className="mb-4 font-heading opacity-0 animate-in fade-in duration-700" data-about="header">
+        <Badge variant="secondary" className="mb-4 font-heading opacity-0" data-about="header">
           <Users className="mr-1.5 h-3.5 w-3.5" />
           Nosotros
         </Badge>
 
-        <h2 className="mb-4 text-4xl font-extrabold md:text-5xl opacity-0 animate-in fade-in duration-700" data-about="header">
+        <h2 className="mb-4 text-4xl font-extrabold md:text-5xl opacity-0" data-about="header">
           REDORANGE E.I.R.L.
         </h2>
 
-        <p className="mx-auto max-w-3xl text-lg text-muted-foreground md:text-xl opacity-0 animate-in fade-in duration-700" data-about="header">
+        <p className="mx-auto max-w-3xl text-lg text-muted-foreground md:text-xl opacity-0" data-about="header">
           Somos un equipo orientado a resolver necesidades reales con soluciones tecnológicas integrales: desde el diseño y la implementación hasta el soporte y la continuidad.
         </p>
       </div>
@@ -159,12 +187,7 @@ export const AboutSection: FC = () => {
             <div
               key={feature.title}
               data-about="card"
-              className={[
-                'group relative overflow-hidden rounded-2xl border border-border/70 bg-background/60 p-6 shadow-sm backdrop-blur',
-                'transition-all hover:shadow-lg hover:scale-[1.02]',
-                'opacity-0',
-                'animate-in fade-in duration-700',
-              ].join(' ')}
+              className="group relative overflow-hidden rounded-2xl border border-border/70 bg-background/60 p-6 shadow-sm backdrop-blur transition-all hover:shadow-lg hover:scale-[1.02] opacity-0"
             >
               <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                 <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-primary/10 blur-2xl" />
@@ -185,10 +208,7 @@ export const AboutSection: FC = () => {
                   const ItemIcon = item.icon;
 
                   return (
-                    <div
-                      key={item.text}
-                      className={['flex items-start gap-3 rounded-lg bg-muted/50 p-3', 'transition-all hover:bg-muted hover:-translate-y-px', 'animate-in fade-in slide-in-from-bottom-1 duration-700'].join(' ')}
-                    >
+                    <div key={item.text} className="flex items-start gap-3 rounded-lg bg-muted/50 p-3 transition-all hover:bg-muted hover:-translate-y-px">
                       <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center">
                         <ItemIcon className={`h-5 w-5 ${feature.iconColor}`} />
                       </div>
@@ -202,33 +222,60 @@ export const AboutSection: FC = () => {
         })}
       </div>
 
-      <div
-        ref={highlightRef}
-        className="mt-16 rounded-2xl border border-border/70 bg-linear-to-br from-primary/5 via-background/60 to-accent/5 p-8 text-center backdrop-blur opacity-0 animate-in fade-in duration-700"
-        data-about="highlight"
-      >
-        <div className="mx-auto max-w-2xl space-y-4">
-          <div className="flex items-center justify-center gap-2" data-about="highlight">
-            <Lightbulb className="h-6 w-6 text-primary" />
-            <h3 className="font-heading text-2xl font-extrabold">Trabajamos alineados a tus objetivos</h3>
-          </div>
-
-          <p className="text-muted-foreground" data-about="highlight">
-            Cada proyecto se aborda con transparencia, comunicación constante y un enfoque iterativo que garantiza resultados tangibles y continuidad operativa.
-          </p>
-
-          <div className="flex flex-wrap items-center justify-center gap-6 pt-4" data-about="highlight">
-            <div className="flex items-center gap-2">
-              <Target className="h-7 w-7 text-blue-500" />
-              <span className="text-sm font-semibold">Orientado a resultados</span>
+      <div ref={footerRef} className="mt-16">
+        <div
+          data-about="footer-wrap"
+          className={['overflow-hidden rounded-2xl border border-border/70', 'bg-linear-to-br from-primary/5 via-background/60 to-accent/5', 'p-8 md:p-10 text-center backdrop-blur', 'opacity-0'].join(' ')}
+        >
+          <div className="mx-auto max-w-3xl space-y-5">
+            <div className="flex items-center justify-center gap-2 opacity-0" data-about="footer">
+              <Lightbulb className="h-6 w-6 text-primary" />
+              <h3 className="font-heading text-2xl font-extrabold md:text-3xl">Trabajamos alineados a tus objetivos</h3>
             </div>
-            <div className="flex items-center gap-2">
-              <Shield className="h-7 w-7 text-purple-500" />
-              <span className="text-sm font-semibold">Soporte continuo</span>
+
+            <p className="text-muted-foreground md:text-base opacity-0" data-about="footer">
+              Cada proyecto se aborda con transparencia, comunicación constante y un enfoque iterativo que garantiza resultados tangibles y continuidad operativa.
+            </p>
+
+            <div className="flex flex-wrap items-center justify-center gap-6 pt-2 opacity-0" data-about="footer">
+              <div className="flex items-center gap-2">
+                <Target className="h-7 w-7 text-blue-500" />
+                <span className="text-sm font-semibold">Orientado a resultados</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Shield className="h-7 w-7 text-purple-500" />
+                <span className="text-sm font-semibold">Soporte continuo</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Rocket className="h-7 w-7 text-orange-500" />
+                <span className="text-sm font-semibold">Preparado para escalar</span>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <Rocket className="h-7 w-7 text-orange-500" />
-              <span className="text-sm font-semibold">Preparado para escalar</span>
+
+            <div className="mx-auto mt-6 grid max-w-4xl gap-3 md:grid-cols-3 opacity-0" data-about="footer">
+              <div className="rounded-xl border border-border/70 bg-background/60 p-4 text-left">
+                <div className="flex items-center gap-2">
+                  <MessageSquareText className="h-5 w-5 text-primary" />
+                  <p className="font-heading text-sm font-extrabold">Comunicación clara</p>
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground">Estado, avances y acuerdos documentados para asegurar trazabilidad y control.</p>
+              </div>
+
+              <div className="rounded-xl border border-border/70 bg-background/60 p-4 text-left">
+                <div className="flex items-center gap-2">
+                  <BadgeCheck className="h-5 w-5 text-accent" />
+                  <p className="font-heading text-sm font-extrabold">Calidad en entregables</p>
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground">Criterios definidos, revisión y mejora continua en cada iteración.</p>
+              </div>
+
+              <div className="rounded-xl border border-border/70 bg-background/60 p-4 text-left">
+                <div className="flex items-center gap-2">
+                  <Timer className="h-5 w-5 text-secondary" />
+                  <p className="font-heading text-sm font-extrabold">Continuidad operativa</p>
+                </div>
+                <p className="mt-2 text-xs text-muted-foreground">Soporte, mantenimiento y evolución para sostener la operación en el tiempo.</p>
+              </div>
             </div>
           </div>
         </div>
