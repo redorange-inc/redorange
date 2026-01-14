@@ -1,0 +1,20 @@
+# -- enforce consistent line endings (good for windows + vercel)
+* text=auto eol=lf
+
+# -- types
+*.astro text eol=lf
+*.ts    text eol=lf
+*.tsx   text eol=lf
+*.js    text eol=lf
+*.mjs   text eol=lf
+*.json  text eol=lf
+*.css   text eol=lf
+*.md    text eol=lf
+
+# -- binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.svg text eol=lf
