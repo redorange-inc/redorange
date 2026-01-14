@@ -2,7 +2,7 @@
 
 import type { FC } from 'react';
 import Link from 'next/link';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { animate } from 'animejs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -22,11 +22,20 @@ type ServiceSlide = {
   gradient: string;
 };
 
+const clamp = (n: number, min: number, max: number): number => Math.min(max, Math.max(min, n));
+
+const prefersReducedMotion = (): boolean => typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 export const ServicesScroller: FC = () => {
   const sectionRef = useRef<HTMLElement | null>(null);
   const trackRef = useRef<HTMLDivElement | null>(null);
+
   const [currentSlide, setCurrentSlide] = useState(0);
   const isAnimatingRef = useRef(false);
+
+  //  wheel accumulator (trackpad + mouse)
+  const accRef = useRef(0);
+  const debounceRef = useRef<number | null>(null);
 
   const slides = useMemo<ServiceSlide[]>(
     () => [
@@ -50,7 +59,7 @@ export const ServicesScroller: FC = () => {
           { title: 'Implementación y configuración', content: 'Despliegue, parametrización, hardening, backups y monitoreo.' },
           { title: 'Soporte y mantenimiento', content: 'Mesa de ayuda, correctivos, preventivos y mejora continua según SLA.' },
         ],
-        gradient: 'from-blue-500/10 via-transparent to-cyan-500/5',
+        gradient: 'rgba(59,130,246,0.10), rgba(6,182,212,0.06)',
       },
       {
         id: 'digital-web',
@@ -72,7 +81,7 @@ export const ServicesScroller: FC = () => {
           { title: 'Desarrollo y publicación', content: 'Implementación, optimización, SEO base, deployment y analítica.' },
           { title: 'Operación y soporte', content: 'Mantenimiento, seguridad, backups y mejoras por iteraciones.' },
         ],
-        gradient: 'from-purple-500/10 via-transparent to-pink-500/5',
+        gradient: 'rgba(168,85,247,0.10), rgba(236,72,153,0.06)',
       },
       {
         id: 'infra-telecom',
@@ -94,7 +103,7 @@ export const ServicesScroller: FC = () => {
           { title: 'Instalación y puesta en marcha', content: 'Redes, cableado, pruebas, etiquetado y documentación técnica.' },
           { title: 'Soporte y postventa', content: 'Mantenimiento, diagnósticos, reposiciones y continuidad del servicio.' },
         ],
-        gradient: 'from-orange-500/10 via-transparent to-red-500/5',
+        gradient: 'rgba(249,115,22,0.12), rgba(239,68,68,0.07)',
       },
     ],
     [],
@@ -102,92 +111,163 @@ export const ServicesScroller: FC = () => {
 
   const slideCount = slides.length;
 
-  const animateToSlide = (targetSlide: number) => {
-    if (!trackRef.current || isAnimatingRef.current) return;
+  const scrollToAbout = useCallback(() => {
+    const about = document.getElementById('about');
+    if (!about) return;
+    const top = window.scrollY + about.getBoundingClientRect().top - 88;
+    window.scrollTo({ top, behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+  }, []);
 
-    isAnimatingRef.current = true;
-    const targetX = -targetSlide * 100;
+  const animateToSlide = useCallback(
+    (targetSlide: number) => {
+      if (!trackRef.current || isAnimatingRef.current) return;
 
-    animate(trackRef.current, {
-      translateX: `${targetX}vw`,
-      duration: 900,
-      easing: 'easeOutExpo',
-      complete: () => {
-        isAnimatingRef.current = false;
-        setCurrentSlide(targetSlide);
-      },
-    });
-  };
+      const next = clamp(targetSlide, 0, slideCount - 1);
 
+      isAnimatingRef.current = true;
+      const targetX = -next * 100;
+
+      animate(trackRef.current, {
+        translateX: `${targetX}vw`,
+        duration: prefersReducedMotion() ? 0 : 850,
+        easing: 'easeOutExpo',
+        complete: () => {
+          isAnimatingRef.current = false;
+          setCurrentSlide(next);
+        },
+      });
+    },
+    [slideCount],
+  );
+
+  //  convert vertical scroll inside section to slide index (real horizontal feel)
   useEffect(() => {
-    let accumulatedDelta = 0;
-    let rafPending = false;
-    let timeoutId: NodeJS.Timeout | null = null;
+    const onScroll = (): void => {
+      const el = sectionRef.current;
+      if (!el) return;
 
-    const THRESHOLD = 55; // Ajusta según sensibilidad deseada (40–80)
-    const DEBOUNCE = 90; // ms para resetear acumulado
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight;
 
-    const handleWheel = (e: WheelEvent) => {
-      const section = sectionRef.current;
-      if (!section) return;
+      //  active when sticky region is on screen
+      const active = rect.top <= 0 && rect.bottom >= vh;
+      if (!active) return;
 
-      const rect = section.getBoundingClientRect();
-      const isSectionActive = rect.top <= 10 && rect.bottom >= window.innerHeight - 10;
+      const sectionTop = window.scrollY + rect.top;
+      const range = Math.max(1, el.offsetHeight - vh);
+      const y = window.scrollY - sectionTop;
 
-      if (!isSectionActive) return;
+      const maxIndex = Math.max(1, slideCount - 1);
+      const idx = Math.round((y / range) * maxIndex);
 
-      // Permitir salir de la sección en los extremos
-      const atTop = currentSlide === 0 && e.deltaY < 0;
-      const atBottom = currentSlide === slideCount - 1 && e.deltaY > 0;
+      if (idx !== currentSlide && !isAnimatingRef.current) {
+        animateToSlide(idx);
+      }
+    };
 
-      if (atTop || atBottom) {
-        return; // deja que el navegador maneje el scroll normal
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [animateToSlide, currentSlide, slideCount]);
+
+  //  wheel: horizontal paging inside the section (mouse + trackpad)
+  useEffect(() => {
+    const THRESHOLD = 60;
+    const DEBOUNCE = 90;
+
+    const onWheel = (e: WheelEvent): void => {
+      const el = sectionRef.current;
+      if (!el) return;
+
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const active = rect.top <= 0 && rect.bottom >= vh;
+
+      if (!active) return;
+
+      //  allow leaving section at extremes
+      const atFirstAndUp = currentSlide === 0 && e.deltaY < 0;
+      const atLastAndDown = currentSlide === slideCount - 1 && e.deltaY > 0;
+
+      if (atFirstAndUp) return;
+      if (atLastAndDown) {
+        //  when trying to go down after last slide, jump to about to avoid emptiness
+        e.preventDefault();
+        scrollToAbout();
+        return;
       }
 
+      //  lock vertical scroll while active -> feels horizontal
       e.preventDefault();
 
-      accumulatedDelta += e.deltaY;
+      //  trackpads often use deltaX; prioritize it if significant
+      const primaryDelta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
 
-      if (!rafPending) {
-        rafPending = true;
-        requestAnimationFrame(() => {
-          rafPending = false;
+      accRef.current += primaryDelta;
 
-          if (Math.abs(accumulatedDelta) >= THRESHOLD && !isAnimatingRef.current) {
-            if (accumulatedDelta > 0 && currentSlide < slideCount - 1) {
-              animateToSlide(currentSlide + 1);
-            } else if (accumulatedDelta < 0 && currentSlide > 0) {
-              animateToSlide(currentSlide - 1);
-            }
-            accumulatedDelta = 0;
-          }
-        });
+      if (debounceRef.current) window.clearTimeout(debounceRef.current);
+      debounceRef.current = window.setTimeout(() => {
+        accRef.current = 0;
+      }, DEBOUNCE);
+
+      if (Math.abs(accRef.current) < THRESHOLD) return;
+      if (isAnimatingRef.current) return;
+
+      const dir = accRef.current > 0 ? 1 : -1;
+      accRef.current = 0;
+
+      animateToSlide(currentSlide + dir);
+    };
+
+    window.addEventListener('wheel', onWheel, { passive: false });
+    return () => {
+      window.removeEventListener('wheel', onWheel);
+      if (debounceRef.current) window.clearTimeout(debounceRef.current);
+    };
+  }, [animateToSlide, currentSlide, slideCount, scrollToAbout]);
+
+  //  keyboard support
+  useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent): void => {
+      const el = sectionRef.current;
+      if (!el) return;
+
+      const rect = el.getBoundingClientRect();
+      const vh = window.innerHeight;
+      const active = rect.top <= 0 && rect.bottom >= vh;
+
+      if (!active) return;
+
+      const key = e.key;
+      const nextKeys = ['ArrowRight', 'PageDown'];
+      const prevKeys = ['ArrowLeft', 'PageUp'];
+      const downKeys = ['ArrowDown', ' '];
+      const upKeys = ['ArrowUp'];
+
+      if (nextKeys.includes(key) || downKeys.includes(key)) {
+        e.preventDefault();
+        if (currentSlide === slideCount - 1) {
+          scrollToAbout();
+          return;
+        }
+        animateToSlide(currentSlide + 1);
       }
 
-      // Reset acumulado si pasa tiempo sin rueda
-      if (timeoutId) clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => {
-        accumulatedDelta = 0;
-      }, DEBOUNCE);
+      if (prevKeys.includes(key) || upKeys.includes(key)) {
+        e.preventDefault();
+        animateToSlide(currentSlide - 1);
+      }
     };
 
-    window.addEventListener('wheel', handleWheel, { passive: false });
+    window.addEventListener('keydown', onKeyDown, { passive: false });
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [animateToSlide, currentSlide, slideCount, scrollToAbout]);
 
-    return () => {
-      window.removeEventListener('wheel', handleWheel);
-      if (timeoutId) clearTimeout(timeoutId);
-    };
-  }, [currentSlide, slideCount]);
-
+  //  important: give the section real scroll length so sticky works and no empty end
   return (
-    <section id="services" ref={sectionRef} className="relative min-h-screen">
+    <section id="services" ref={sectionRef} className="relative" style={{ height: `${slideCount * 100}vh` }}>
       <div className="sticky top-0 h-screen overflow-hidden">
-        <div
-          className="pointer-events-none absolute inset-0 transition-all duration-1200"
-          style={{
-            background: `linear-gradient(135deg, ${slides[currentSlide]?.gradient || 'from-gray-500/5 via-transparent to-gray-500/5'})`,
-          }}
-        />
+        <div className={`absolute inset-0 bg-linear-to-br ${slides[currentSlide].gradient}`} />
 
         <div className="absolute left-0 right-0 top-6 z-20 pointer-events-auto">
           <div className="mx-auto flex max-w-7xl justify-center gap-3 px-6">
@@ -196,35 +276,35 @@ export const ServicesScroller: FC = () => {
                 key={s.id}
                 type="button"
                 onClick={() => !isAnimatingRef.current && animateToSlide(idx)}
-                className={`h-2.5 rounded-full transition-all duration-500 ${currentSlide === idx ? 'w-10 bg-primary shadow-md' : 'w-2.5 bg-white/40 hover:bg-white/70'}`}
+                className={['h-2.5 rounded-full transition-all duration-500', currentSlide === idx ? 'w-10 bg-primary shadow-md' : 'w-2.5 bg-foreground/15 hover:bg-foreground/25'].join(' ')}
                 aria-label={`Ir a ${s.title}`}
               />
             ))}
           </div>
         </div>
 
-        <div ref={trackRef} className="flex h-full will-change-transform" style={{ width: `${slideCount * 100}vw` }}>
+        <div ref={trackRef} className="flex h-full will-change-transform" style={{ width: `${slideCount * 100}vw`, transform: `translateX(${-currentSlide * 100}vw)` }}>
           {slides.map((slide, idx) => {
             const isActive = currentSlide === idx;
             const Icon = slide.icon;
 
             return (
-              <div key={slide.id} className="h-screen shrink-0" style={{ width: '100vw' }}>
+              <div key={slide.id} id={slide.id} className="h-screen shrink-0" style={{ width: '100vw' }}>
                 <div className="mx-auto flex h-full max-w-7xl items-center px-6 md:px-10">
-                  <div className={`grid w-full gap-10 md:grid-cols-2 md:gap-16 transition-all duration-800 ${isActive ? 'opacity-100 scale-100' : 'opacity-35 scale-95 pointer-events-none'}`}>
+                  <div className={['grid w-full gap-10 md:grid-cols-2 md:gap-16', 'transition-all duration-700', isActive ? 'opacity-100 scale-100' : 'opacity-40 scale-[0.98] pointer-events-none'].join(' ')}>
                     <div className="space-y-6">
                       <Badge variant="secondary" className="font-heading">
                         {slide.badge}
                       </Badge>
 
                       <div className="space-y-3">
-                        <h2 className="text-4xl font-extrabold tracking-tight md:text-5xl lg:text-6xl">{slide.title}</h2>
-                        <p className="text-lg md:text-xl text-muted-foreground">{slide.subtitle}</p>
+                        <h2 className="text-4xl font-extrabold tracking-tight md:text-5xl lg:text-6xl animate-in fade-in slide-in-from-bottom-2 duration-700">{slide.title}</h2>
+                        <p className="text-lg md:text-xl text-muted-foreground animate-in fade-in slide-in-from-bottom-2 duration-700">{slide.subtitle}</p>
                       </div>
 
                       <div className="flex flex-wrap gap-2">
                         {slide.bullets.map((bullet) => (
-                          <span key={bullet} className="rounded-full bg-muted/70 px-3 py-1 text-xs text-muted-foreground">
+                          <span key={bullet} className="rounded-full bg-muted/70 px-3 py-1 text-xs text-muted-foreground animate-in fade-in duration-700">
                             {bullet}
                           </span>
                         ))}
@@ -251,7 +331,7 @@ export const ServicesScroller: FC = () => {
                       </p>
                     </div>
 
-                    <div className="rounded-2xl border border-border/60 bg-background/60 p-6 shadow-sm backdrop-blur-md">
+                    <div className="rounded-2xl border border-border/60 bg-background/60 p-6 shadow-sm backdrop-blur-md animate-in fade-in slide-in-from-bottom-2 duration-700">
                       <div className="mb-6 flex items-center gap-4">
                         <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
                           <Icon className="h-6 w-6 text-primary" />

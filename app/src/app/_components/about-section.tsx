@@ -1,6 +1,8 @@
 'use client';
 
 import type { FC } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
+import { animate } from 'animejs';
 import { Badge } from '@/components/ui/badge';
 import { Target, Shield, Rocket, ClipboardCheck, Calendar, FileText, CheckSquare, HeadphonesIcon, Wrench, Database, TrendingUp, BookOpen, Zap, RefreshCw, Users, Lightbulb } from 'lucide-react';
 
@@ -12,71 +14,162 @@ interface FeatureCard {
   items: Array<{ icon: FC<{ className?: string }>; text: string }>;
 }
 
+const prefersReducedMotion = (): boolean => typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 export const AboutSection: FC = () => {
-  const features: FeatureCard[] = [
-    {
-      icon: Target,
-      title: 'Claridad en alcance',
-      description: 'Definimos objetivos, criterios de aceptación y entregables para asegurar resultados medibles y evitar ambigüedades.',
-      iconColor: 'text-blue-500',
-      items: [
-        { icon: ClipboardCheck, text: 'Levantamiento de requerimientos y diagnóstico' },
-        { icon: Calendar, text: 'Plan de trabajo con cronograma y responsables' },
-        { icon: FileText, text: 'Documentación y trazabilidad de cambios' },
-        { icon: CheckSquare, text: 'Criterios de aceptación por entrega' },
-      ],
-    },
-    {
-      icon: Shield,
-      title: 'Ejecución y soporte',
-      description: 'Implementamos con buenas prácticas y acompañamos con soporte, mantenimiento y mejora continua.',
-      iconColor: 'text-purple-500',
-      items: [
-        { icon: HeadphonesIcon, text: 'Mesa de ayuda y atención por niveles' },
-        { icon: Wrench, text: 'Mantenimiento preventivo y correctivo' },
-        { icon: Database, text: 'Monitoreo, backups y seguridad' },
-        { icon: TrendingUp, text: 'Gestión de incidencias y mejoras' },
-      ],
-    },
-    {
-      icon: Rocket,
-      title: 'Escalabilidad',
-      description: 'Diseñamos pensando en crecimiento: rendimiento, seguridad, monitoreo y continuidad operativa.',
-      iconColor: 'text-orange-500',
-      items: [
-        { icon: Lightbulb, text: 'Arquitecturas escalables y mantenibles' },
-        { icon: BookOpen, text: 'Estandarización y documentación' },
-        { icon: Zap, text: 'Automatización y optimización' },
-        { icon: RefreshCw, text: 'Mejora continua por iteraciones' },
-      ],
-    },
-  ];
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const headerRef = useRef<HTMLDivElement | null>(null);
+  const cardsRef = useRef<HTMLDivElement | null>(null);
+  const highlightRef = useRef<HTMLDivElement | null>(null);
+
+  const features = useMemo<FeatureCard[]>(
+    () => [
+      {
+        icon: Target,
+        title: 'Claridad en alcance',
+        description: 'Definimos objetivos, criterios de aceptación y entregables para asegurar resultados medibles y evitar ambigüedades.',
+        iconColor: 'text-blue-500',
+        items: [
+          { icon: ClipboardCheck, text: 'Levantamiento de requerimientos y diagnóstico' },
+          { icon: Calendar, text: 'Plan de trabajo con cronograma y responsables' },
+          { icon: FileText, text: 'Documentación y trazabilidad de cambios' },
+          { icon: CheckSquare, text: 'Criterios de aceptación por entrega' },
+        ],
+      },
+      {
+        icon: Shield,
+        title: 'Ejecución y soporte',
+        description: 'Implementamos con buenas prácticas y acompañamos con soporte, mantenimiento y mejora continua.',
+        iconColor: 'text-purple-500',
+        items: [
+          { icon: HeadphonesIcon, text: 'Mesa de ayuda y atención por niveles' },
+          { icon: Wrench, text: 'Mantenimiento preventivo y correctivo' },
+          { icon: Database, text: 'Monitoreo, backups y seguridad' },
+          { icon: TrendingUp, text: 'Gestión de incidencias y mejoras' },
+        ],
+      },
+      {
+        icon: Rocket,
+        title: 'Escalabilidad',
+        description: 'Diseñamos pensando en crecimiento: rendimiento, seguridad, monitoreo y continuidad operativa.',
+        iconColor: 'text-orange-500',
+        items: [
+          { icon: Lightbulb, text: 'Arquitecturas escalables y mantenibles' },
+          { icon: BookOpen, text: 'Estandarización y documentación' },
+          { icon: Zap, text: 'Automatización y optimización' },
+          { icon: RefreshCw, text: 'Mejora continua por iteraciones' },
+        ],
+      },
+    ],
+    [],
+  );
+
+  useEffect(() => {
+    const root = sectionRef.current;
+    if (!root) return;
+
+    //  reduced motion
+    if (prefersReducedMotion()) return;
+
+    const headerEls = headerRef.current?.querySelectorAll('[data-about="header"]') ?? [];
+    const cardEls = cardsRef.current?.querySelectorAll('[data-about="card"]') ?? [];
+    const highlightEls = highlightRef.current?.querySelectorAll('[data-about="highlight"]') ?? [];
+
+    //  helper: animate once when entering viewport
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+
+          //  header reveal
+          animate(headerEls, {
+            opacity: [0, 1],
+            translateY: [14, 0],
+            duration: 800,
+            easing: 'easeOutExpo',
+            delay: (el, i) => i * 90,
+          });
+
+          //  cards stagger
+          animate(cardEls, {
+            opacity: [0, 1],
+            translateY: [18, 0],
+            scale: [0.98, 1],
+            duration: 900,
+            easing: 'easeOutExpo',
+            delay: (el, i) => 220 + i * 120,
+          });
+
+          //  highlight
+          animate(highlightEls, {
+            opacity: [0, 1],
+            translateY: [16, 0],
+            duration: 850,
+            easing: 'easeOutExpo',
+            delay: (el, i) => 520 + i * 90,
+          });
+
+          io.disconnect();
+        }
+      },
+      { threshold: 0.22 },
+    );
+
+    io.observe(root);
+
+    //  ambient glow drift
+    const glows = root.querySelectorAll('[data-about="glow"]');
+    animate(glows, {
+      translateY: [0, 10],
+      direction: 'alternate',
+      loop: true,
+      easing: 'easeInOutSine',
+      duration: 4200,
+      delay: (el, i) => i * 300,
+    });
+
+    return () => io.disconnect();
+  }, []);
 
   return (
-    <section id="about" className="relative mx-auto max-w-7xl px-6 py-20 md:px-10 md:py-28 min-h-screen scroll-mt-28">
-      <div className="pointer-events-none absolute -right-20 top-20 h-96 w-96 rounded-full bg-blue-500/5 blur-3xl" />
-      <div className="pointer-events-none absolute -left-20 bottom-20 h-96 w-96 rounded-full bg-purple-500/5 blur-3xl" />
+    <section id="about" ref={sectionRef} className="relative mx-auto max-w-7xl px-6 py-20 md:px-10 md:py-28 min-h-screen scroll-mt-28">
+      <div data-about="glow" className="pointer-events-none absolute -right-20 top-20 h-96 w-96 rounded-full bg-blue-500/5 blur-3xl" />
+      <div data-about="glow" className="pointer-events-none absolute -left-20 bottom-20 h-96 w-96 rounded-full bg-purple-500/5 blur-3xl" />
 
-      <div className="mb-16 text-center">
-        <Badge variant="secondary" className="mb-4 font-heading">
+      <div ref={headerRef} className="mb-16 text-center">
+        <Badge variant="secondary" className="mb-4 font-heading opacity-0 animate-in fade-in duration-700" data-about="header">
           <Users className="mr-1.5 h-3.5 w-3.5" />
           Nosotros
         </Badge>
-        <h2 className="mb-4 text-4xl font-extrabold md:text-5xl">REDORANGE E.I.R.L.</h2>
-        <p className="mx-auto max-w-3xl text-lg text-muted-foreground md:text-xl">
+
+        <h2 className="mb-4 text-4xl font-extrabold md:text-5xl opacity-0 animate-in fade-in duration-700" data-about="header">
+          REDORANGE E.I.R.L.
+        </h2>
+
+        <p className="mx-auto max-w-3xl text-lg text-muted-foreground md:text-xl opacity-0 animate-in fade-in duration-700" data-about="header">
           Somos un equipo orientado a resolver necesidades reales con soluciones tecnológicas integrales: desde el diseño y la implementación hasta el soporte y la continuidad.
         </p>
       </div>
 
-      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+      <div ref={cardsRef} className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
         {features.map((feature) => {
           const MainIcon = feature.icon;
 
           return (
             <div
               key={feature.title}
-              className="group relative overflow-hidden rounded-2xl border border-border/70 bg-background/60 p-6 shadow-sm backdrop-blur transition-all hover:shadow-lg hover:scale-[1.02]"
+              data-about="card"
+              className={[
+                'group relative overflow-hidden rounded-2xl border border-border/70 bg-background/60 p-6 shadow-sm backdrop-blur',
+                'transition-all hover:shadow-lg hover:scale-[1.02]',
+                'opacity-0',
+                'animate-in fade-in duration-700',
+              ].join(' ')}
             >
+              <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-primary/10 blur-2xl" />
+              </div>
+
               <div className="mb-6 flex items-start gap-4">
                 <div className="flex h-14 w-14 shrink-0 items-center justify-center">
                   <MainIcon className={`h-9 w-9 ${feature.iconColor}`} />
@@ -92,7 +185,10 @@ export const AboutSection: FC = () => {
                   const ItemIcon = item.icon;
 
                   return (
-                    <div key={item.text} className="flex items-start gap-3 rounded-lg bg-muted/50 p-3 transition-colors hover:bg-muted">
+                    <div
+                      key={item.text}
+                      className={['flex items-start gap-3 rounded-lg bg-muted/50 p-3', 'transition-all hover:bg-muted hover:-translate-y-px', 'animate-in fade-in slide-in-from-bottom-1 duration-700'].join(' ')}
+                    >
                       <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center">
                         <ItemIcon className={`h-5 w-5 ${feature.iconColor}`} />
                       </div>
@@ -106,14 +202,22 @@ export const AboutSection: FC = () => {
         })}
       </div>
 
-      <div className="mt-16 rounded-2xl border border-border/70 bg-linear-to-br from-primary/5 via-background/60 to-accent/5 p-8 text-center backdrop-blur">
+      <div
+        ref={highlightRef}
+        className="mt-16 rounded-2xl border border-border/70 bg-linear-to-br from-primary/5 via-background/60 to-accent/5 p-8 text-center backdrop-blur opacity-0 animate-in fade-in duration-700"
+        data-about="highlight"
+      >
         <div className="mx-auto max-w-2xl space-y-4">
-          <div className="flex items-center justify-center gap-2">
+          <div className="flex items-center justify-center gap-2" data-about="highlight">
             <Lightbulb className="h-6 w-6 text-primary" />
             <h3 className="font-heading text-2xl font-extrabold">Trabajamos alineados a tus objetivos</h3>
           </div>
-          <p className="text-muted-foreground">Cada proyecto se aborda con transparencia, comunicación constante y un enfoque iterativo que garantiza resultados tangibles y continuidad operativa.</p>
-          <div className="flex flex-wrap items-center justify-center gap-6 pt-4">
+
+          <p className="text-muted-foreground" data-about="highlight">
+            Cada proyecto se aborda con transparencia, comunicación constante y un enfoque iterativo que garantiza resultados tangibles y continuidad operativa.
+          </p>
+
+          <div className="flex flex-wrap items-center justify-center gap-6 pt-4" data-about="highlight">
             <div className="flex items-center gap-2">
               <Target className="h-7 w-7 text-blue-500" />
               <span className="text-sm font-semibold">Orientado a resultados</span>
