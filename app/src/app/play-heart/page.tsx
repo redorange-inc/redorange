@@ -217,7 +217,6 @@ export default function Page() {
   const boardW = GRID * CELL + (GRID - 1) * GAP;
   const boardH = boardW;
 
-  // ✅ animación cuando la flecha se va (snake + movimiento)
   function snakeExit(el: HTMLElement, dir: Dir) {
     const distance = 680; // un poco más para que salga claro de pantalla
     const { dx, dy } = dirToVector(dir);
@@ -346,7 +345,6 @@ export default function Page() {
 
           <section className="relative">
             <div ref={boardRef} className="relative mx-auto" style={{ width: boardW, height: boardH }}>
-              {/* Ghosts gris */}
               {ghosts.map((a) => (
                 <div
                   key={`ghost-${a.id}`}
@@ -364,7 +362,6 @@ export default function Page() {
                 </div>
               ))}
 
-              {/* Flechas rojas */}
               {alive.map((a) => {
                 const free = isFree(a);
                 return (
@@ -385,7 +382,6 @@ export default function Page() {
                       left: a.x * step,
                       top: a.y * step,
                       transform: `rotate(${dirToRotation(a.dir)}deg)`,
-                      // mini padding visual para que no corte el head por bordes
                       padding: 2,
                     }}
                     aria-label={`Arrow ${a.dir}`}
@@ -412,9 +408,7 @@ export default function Page() {
 function MazeArrow({ colorClass }: { colorClass: string }) {
   return (
     <svg viewBox="0 0 28 28" className={['h-full w-full', colorClass].join(' ')} fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="square" strokeLinejoin="miter">
-      {/* shaft */}
       <path data-shaft="1" d="M4 14H18" />
-      {/* head */}
       <path data-head="1" d="M16 8l8 6-8 6" />
     </svg>
   );
