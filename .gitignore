@@ -1,0 +1,103 @@
+# -- VARIABLES DE ENTORNO
+.env
+.env.*
+!.env.example
+!.env.template
+
+# -- SISTEMA OPERATIVO
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*~
+
+# -- IDEs / EDITORES
+.vscode/
+.idea/
+*.sublime-*
+*.code-workspace
+
+# -- LOGS
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# -- NODE.JS / NEXT.JS / REACT
+node_modules/
+.next/
+out/
+build/
+dist/
+.turbo/
+.vercel/
+.eslintcache
+.cache/
+*.tsbuildinfo
+next-env.d.ts
+
+# -- PYTHON
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+*.pyd
+.venv/
+venv/
+ENV/
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+
+# -- Testing / Coverage
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# -- RUST
+target/
+**/*.rs.bk
+*.rlib
+*.rmeta
+.cargo/
+!.cargo/config.toml
+
+# -- GO
+bin/
+vendor/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+go.sum.old
+
+# -- Air (hot reload)
+tmp/
+.air/
+
+# -- DOCKER
+docker-data/
+.docker/
+docker-compose.override.yml
+
+# -- TESTING / COVERAGE (GENERAL)
+coverage/
+*.coverprofile
+*.prof
+*.bench
+*.tmp
+*.pid
+*.pid.lock
+
+# -- license
+*.license
