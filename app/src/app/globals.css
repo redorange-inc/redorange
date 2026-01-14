@@ -45,17 +45,11 @@
 }
 
 :root {
-  /* Base */
+  /* base */
   --font-size: 14px;
   --radius: 0.65rem;
 
-  /* === Palette basada en el logo (naranja/ámbar + verde) ===
-     Naranja: #FA661D / #FC9129
-     Ámbar:   #FCAF34
-     Verde:   #6BC039
-  */
-
-  /* Surfaces */
+  /* palette basada en el logo (naranja ambar + verde) */
   --background: #fff7f0;
   --foreground: #221a15;
 
@@ -65,18 +59,18 @@
   --popover: #fff1e6;
   --popover-foreground: #221a15;
 
-  /* Brand */
-  --primary: #fa661d; /* naranja principal */
+  /* brand */
+  --primary: #fa661d;
   --primary-foreground: #ffffff;
 
-  --secondary: #fcaf34; /* ámbar */
+  --secondary: #fcaf34;
   --secondary-foreground: #221a15;
 
-  /* Support */
+  /* support */
   --muted: #fff0e1;
   --muted-foreground: #6b625c;
 
-  --accent: #6bc039; /* verde hoja */
+  --accent: #6bc039;
   --accent-foreground: #0f2a12;
 
   --destructive: #e0342f;
@@ -90,17 +84,17 @@
   --font-weight-medium: 500;
   --font-weight-normal: 400;
 
-  /* Focus / ring */
+  /* focus ring */
   --ring: #fc9129;
 
-  /* Charts (coherentes con logo) */
+  /* charts */
   --chart-1: #fa661d;
   --chart-2: #fcaf34;
   --chart-3: #6bc039;
   --chart-4: #f74e15;
   --chart-5: #c44412;
 
-  /* Sidebar */
+  /* sidebar */
   --sidebar: #fff4ea;
   --sidebar-foreground: #221a15;
   --sidebar-primary: #fa661d;
@@ -110,16 +104,21 @@
   --sidebar-border: #f0dfcf;
   --sidebar-ring: #fc9129;
 
-  /* --- Compat: vars antiguas usadas abajo --- */
+  /* compat vars usadas abajo */
   --color-text-primary: var(--foreground);
   --color-surface-elevated: var(--card);
-  --color-primary-dark: #c44412; /* fallback para hover del scrollbar */
+  --color-primary-dark: #c44412;
   --color-primary: var(--primary);
   --color-secondary: var(--secondary);
+
+  /* fonts */
+  --font-body: var(--font-poppins);
+  --font-heading: var(--font-montserrat);
+  --font-mono: var(--font-jetbrains);
 }
 
 .dark {
-  /* Surfaces */
+  /* surfaces */
   --background: #160f0c;
   --foreground: #fff3ea;
 
@@ -129,14 +128,14 @@
   --popover: #1d1410;
   --popover-foreground: #fff3ea;
 
-  /* Brand */
+  /* brand */
   --primary: #fa661d;
   --primary-foreground: #ffffff;
 
   --secondary: #fcaf34;
   --secondary-foreground: #160f0c;
 
-  /* Support */
+  /* support */
   --muted: #2a1c16;
   --muted-foreground: #cdbfb6;
 
@@ -151,17 +150,17 @@
   --input-background: #1a120f;
   --switch-background: #3a2a22;
 
-  /* Focus / ring */
+  /* focus ring */
   --ring: #fc9129;
 
-  /* Charts */
+  /* charts */
   --chart-1: #fc9129;
   --chart-2: #fcaf34;
   --chart-3: #6bc039;
   --chart-4: #f74e15;
   --chart-5: #c44412;
 
-  /* Sidebar */
+  /* sidebar */
   --sidebar: #1b120f;
   --sidebar-foreground: #fff3ea;
   --sidebar-primary: #fa661d;
@@ -171,7 +170,7 @@
   --sidebar-border: #ffffff1a;
   --sidebar-ring: #fc9129;
 
-  /* Compat */
+  /* compat */
   --color-text-primary: var(--foreground);
   --color-surface-elevated: var(--card);
   --color-primary-dark: #fc9129;
@@ -180,63 +179,61 @@
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-
-  body {
-    @apply bg-background text-foreground;
-  }
-}
-
-@layer base {
   :where(:not(:has([class*=' text-']), :not(:has([class^='text-'])))) {
     h1 {
       font-size: var(--text-2xl);
       font-weight: var(--font-weight-medium);
-      line-height: 1.5;
+      line-height: 1.2;
+      font-family: var(--font-heading), system-ui, sans-serif;
     }
 
     h2 {
       font-size: var(--text-xl);
       font-weight: var(--font-weight-medium);
-      line-height: 1.5;
+      line-height: 1.2;
+      font-family: var(--font-heading), system-ui, sans-serif;
     }
 
     h3 {
       font-size: var(--text-lg);
       font-weight: var(--font-weight-medium);
-      line-height: 1.5;
+      line-height: 1.2;
+      font-family: var(--font-heading), system-ui, sans-serif;
     }
 
     h4 {
       font-size: var(--text-base);
       font-weight: var(--font-weight-medium);
-      line-height: 1.5;
+      line-height: 1.2;
+      font-family: var(--font-heading), system-ui, sans-serif;
     }
 
     p {
       font-size: var(--text-base);
       font-weight: var(--font-weight-normal);
       line-height: 1.6;
+      font-family: var(--font-body), system-ui, sans-serif;
     }
 
     label {
       font-size: var(--text-base);
       font-weight: var(--font-weight-medium);
       line-height: 1.5;
+      font-family: var(--font-body), system-ui, sans-serif;
     }
 
     button {
       font-size: var(--text-base);
       font-weight: var(--font-weight-medium);
-      line-height: 1.5;
+      line-height: 1.2;
+      font-family: var(--font-heading), system-ui, sans-serif;
     }
 
     input {
       font-size: var(--text-base);
       font-weight: var(--font-weight-normal);
       line-height: 1.5;
+      font-family: var(--font-body), system-ui, sans-serif;
     }
   }
 }
@@ -249,26 +246,42 @@ html {
 body {
   background-color: var(--color-background);
   color: var(--color-text-primary);
-  font-family: 'DM Sans', system-ui, sans-serif;
+  font-family: var(--font-body), system-ui, sans-serif;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Tipografía */
+/* tipografia */
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: var(--font-heading), system-ui, sans-serif;
   font-weight: 700;
   line-height: 1.2;
   color: var(--color-text-primary);
 }
 
-/* Utilidades personalizadas */
+/* buttons y elementos interactivos */
+button,
+[role='button'],
+input[type='submit'],
+input[type='button'] {
+  font-family: var(--font-heading), system-ui, sans-serif;
+}
+
+/* code */
+code,
+pre,
+kbd,
+samp {
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+}
+
+/* utilidades personalizadas */
 .text-gradient {
   background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
   -webkit-background-clip: text;
@@ -279,17 +292,16 @@ h6 {
 .bg-pattern {
   background-image: radial-gradient(circle at 25% 25%, var(--color-primary) 1px, transparent 1px), radial-gradient(circle at 75% 75%, var(--color-secondary) 1px, transparent 1px);
   background-size: 50px 50px;
-  opacity: 0.035;
+  opacity: 0.03;
 }
 
 .glass-effect {
-  background: color-mix(in srgb, var(--card) 78%, transparent);
+  background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
 }
 
-/* Animaciones */
+/* animaciones */
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -319,7 +331,7 @@ h6 {
   animation: float 3s ease-in-out infinite;
 }
 
-/* Delay de animaciones */
+/* delay de animaciones */
 .delay-100 {
   animation-delay: 100ms;
 }
@@ -336,7 +348,7 @@ h6 {
   animation-delay: 500ms;
 }
 
-/* Scrollbar personalizada */
+/* scrollbar personalizada */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -355,7 +367,7 @@ h6 {
   background: var(--color-primary-dark);
 }
 
-/* Focus visible para accesibilidad */
+/* focus visible para accesibilidad */
 :focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
