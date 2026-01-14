@@ -3,6 +3,7 @@
 import type { FC } from 'react';
 import Link from 'next/link';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { animate } from 'animejs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -21,16 +22,12 @@ type ServiceSlide = {
   gradient: string;
 };
 
-const clamp01 = (n: number): number => Math.min(1, Math.max(0, n));
-
-const prefersReducedMotion = (): boolean => typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
 export const ServicesScroller: FC = () => {
   const sectionRef = useRef<HTMLElement | null>(null);
-  const snapTimerRef = useRef<number | null>(null);
-  const isUserScrollingRef = useRef(false);
-  const lastScrollTimeRef = useRef(0);
-  const [progress, setProgress] = useState(0);
+  const trackRef = useRef<HTMLDivElement | null>(null);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const isAnimatingRef = useRef(false);
+  const scrollLockRef = useRef(false);
 
   const slides = useMemo<ServiceSlide[]>(
     () => [
@@ -104,87 +101,106 @@ export const ServicesScroller: FC = () => {
     [],
   );
 
+  const slideCount = slides.length;
+
+  // Función para animar al slide específico
+  const animateToSlide = (targetSlide: number) => {
+    if (!trackRef.current || isAnimatingRef.current) return;
+
+    isAnimatingRef.current = true;
+    const targetX = -(targetSlide * 100);
+
+    animate(trackRef.current, {
+      translateX: `${targetX}vw`,
+      duration: 800,
+      easing: 'easeInOutQuart',
+      complete: () => {
+        isAnimatingRef.current = false;
+        setCurrentSlide(targetSlide);
+      },
+    });
+  };
+
   useEffect(() => {
-    const handleScroll = (): void => {
-      const el = sectionRef.current;
-      if (!el) return;
+    let wheelTimeout: NodeJS.Timeout;
+    let accumulatedDelta = 0;
+    const SCROLL_THRESHOLD = 100; // Umbral para cambiar de slide
 
-      const now = Date.now();
-      lastScrollTimeRef.current = now;
-      isUserScrollingRef.current = true;
+    const handleWheel = (e: WheelEvent) => {
+      const section = sectionRef.current;
+      if (!section) return;
 
-      const rect = el.getBoundingClientRect();
-      const viewportH = window.innerHeight;
+      const rect = section.getBoundingClientRect();
+      const isInSection = rect.top <= 0 && rect.bottom >= window.innerHeight;
 
-      const sectionTop = window.scrollY + rect.top;
-      const sectionHeight = el.offsetHeight;
+      if (!isInSection) {
+        scrollLockRef.current = false;
+        return;
+      }
 
-      const range = Math.max(1, sectionHeight - viewportH);
-      const y = window.scrollY - sectionTop;
+      // Detectar si estamos al inicio o final de la sección
+      const atStart = rect.top >= -10 && currentSlide === 0 && e.deltaY < 0;
+      const atEnd = rect.bottom <= window.innerHeight + 10 && currentSlide === slideCount - 1 && e.deltaY > 0;
 
-      const newProgress = clamp01(y / range);
-      setProgress(newProgress);
+      if (atStart || atEnd) {
+        scrollLockRef.current = false;
+        return; // Permitir scroll normal
+      }
 
-      // Limpiar timer anterior
-      if (snapTimerRef.current) window.clearTimeout(snapTimerRef.current);
+      // Prevenir scroll de página mientras estamos en la sección
+      e.preventDefault();
+      scrollLockRef.current = true;
 
-      // Snap más suave y solo cuando el usuario deja de scrollear
-      snapTimerRef.current = window.setTimeout(() => {
-        const timeSinceScroll = Date.now() - lastScrollTimeRef.current;
+      // Acumular delta para suavizar
+      accumulatedDelta += e.deltaY;
 
-        // Solo hacer snap si han pasado >400ms sin scroll
-        if (timeSinceScroll < 400) return;
-
-        const stillRect = el.getBoundingClientRect();
-        const active = stillRect.top <= 0 && stillRect.bottom >= viewportH;
-        if (!active) return;
-
-        const count = slides.length;
-        const maxIndex = Math.max(1, count - 1);
-        const currentY = window.scrollY - sectionTop;
-        const currentProgress = clamp01(currentY / range);
-
-        // Encontrar el slide más cercano
-        const targetIndex = Math.round(currentProgress * maxIndex);
-        const targetProgress = targetIndex / maxIndex;
-
-        // Solo hacer snap si estamos "cerca" del punto de snap (dentro del 20%)
-        const distance = Math.abs(currentProgress - targetProgress);
-        if (distance > 0.2) return;
-
-        const targetY = sectionTop + targetProgress * range;
-
-        isUserScrollingRef.current = false;
-
-        window.scrollTo({
-          top: targetY,
-          behavior: prefersReducedMotion() ? 'auto' : 'smooth',
-        });
-      }, 450);
+      clearTimeout(wheelTimeout);
+      wheelTimeout = setTimeout(() => {
+        if (Math.abs(accumulatedDelta) >= SCROLL_THRESHOLD && !isAnimatingRef.current) {
+          if (accumulatedDelta > 0 && currentSlide < slideCount - 1) {
+            // Scroll hacia abajo = siguiente slide
+            animateToSlide(currentSlide + 1);
+          } else if (accumulatedDelta < 0 && currentSlide > 0) {
+            // Scroll hacia arriba = slide anterior
+            animateToSlide(currentSlide - 1);
+          }
+        }
+        accumulatedDelta = 0;
+      }, 50);
     };
 
-    handleScroll();
+    const handleScroll = () => {
+      const section = sectionRef.current;
+      if (!section) return;
+
+      const rect = section.getBoundingClientRect();
+
+      // Si salimos completamente de la sección, resetear
+      if (rect.bottom < 0 || rect.top > window.innerHeight) {
+        scrollLockRef.current = false;
+      }
+    };
+
+    // Agregar listeners
+    window.addEventListener('wheel', handleWheel, { passive: false });
     window.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
+      window.removeEventListener('wheel', handleWheel);
       window.removeEventListener('scroll', handleScroll);
-      if (snapTimerRef.current) window.clearTimeout(snapTimerRef.current);
+      clearTimeout(wheelTimeout);
     };
-  }, [slides.length]);
-
-  const slideCount = slides.length;
-  const trackWidth = `${slideCount * 100}vw`;
-  const translateXPercent = -(progress * (slideCount - 1) * 100);
-  const currentIndex = Math.round(progress * (slideCount - 1));
+  }, [currentSlide, slideCount]);
 
   return (
-    <section id="services" ref={sectionRef} className="relative" style={{ height: `${slideCount * 100}vh` }}>
+    <section id="services" ref={sectionRef} className="relative min-h-screen">
       <div className="sticky top-0 h-screen overflow-hidden">
         {/* Background gradient que cambia según el slide */}
         <div
           className="pointer-events-none absolute inset-0 transition-all duration-1000"
           style={{
-            background: `linear-gradient(135deg, ${slides[currentIndex]?.gradient || 'from-primary/5 via-transparent to-secondary/5'})`,
+            // Nota: esto no aplica clases Tailwind; es un string. Lo dejo como lo tenías.
+            background: `linear-gradient(135deg, ${slides[currentSlide]?.gradient || 'from-primary/5 via-transparent to-secondary/5'})`,
           }}
         />
 
@@ -194,41 +210,75 @@ export const ServicesScroller: FC = () => {
         <div className="pointer-events-none absolute -left-20 bottom-24 h-72 w-72 rounded-full bg-accent/10 blur-3xl" />
 
         {/* Header con indicadores */}
-        <div className="pointer-events-none absolute left-0 right-0 top-0 z-10">
+        <div className="pointer-events-auto absolute left-0 right-0 top-0 z-10">
           <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6 md:px-10">
             <div className="space-y-1">
               <p className="font-heading text-sm font-bold uppercase tracking-wide text-muted-foreground">Líneas de servicio</p>
-              <p className="text-xs text-muted-foreground">Desliza para explorar</p>
+              <p className="text-xs text-muted-foreground">Usa scroll o las flechas</p>
             </div>
 
             <div className="flex items-center gap-2">
               {slides.map((s, idx) => {
-                const active = currentIndex === idx;
-                return <span key={s.id} className={['h-2 rounded-full transition-all duration-300', active ? 'w-8 bg-primary' : 'w-2 bg-border'].join(' ')} aria-hidden="true" />;
+                const active = currentSlide === idx;
+                return (
+                  <button
+                    key={s.id}
+                    type="button"
+                    onClick={() => animateToSlide(idx)}
+                    className={['h-2 rounded-full transition-all duration-300 cursor-pointer', active ? 'w-8 bg-primary' : 'w-2 bg-border hover:bg-border/80'].join(' ')}
+                    aria-label={`Ir a ${s.title}`}
+                  />
+                );
               })}
             </div>
           </div>
         </div>
 
-        {/* Horizontal track con transición más suave */}
+        {/* Navigation arrows */}
+        <div className="pointer-events-auto absolute left-0 right-0 top-1/2 z-10 -translate-y-1/2">
+          <div className="mx-auto flex max-w-7xl items-center justify-between px-6 md:px-10">
+            {currentSlide > 0 && (
+              <button
+                type="button"
+                onClick={() => animateToSlide(currentSlide - 1)}
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-background/80 backdrop-blur-sm border border-border/50 shadow-lg transition-all hover:scale-110 hover:bg-background"
+                aria-label="Anterior"
+              >
+                <ArrowRight className="h-6 w-6 rotate-180" />
+              </button>
+            )}
+            <div className="flex-1" />
+            {currentSlide < slideCount - 1 && (
+              <button
+                type="button"
+                onClick={() => animateToSlide(currentSlide + 1)}
+                className="flex h-12 w-12 items-center justify-center rounded-full bg-background/80 backdrop-blur-sm border border-border/50 shadow-lg transition-all hover:scale-110 hover:bg-background"
+                aria-label="Siguiente"
+              >
+                <ArrowRight className="h-6 w-6" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Horizontal track */}
         <div
+          ref={trackRef}
           className="flex h-full"
           style={{
-            width: trackWidth,
-            transform: `translateX(${translateXPercent}%)`,
-            // eslint-disable-next-line react-hooks/refs
-            transition: isUserScrollingRef.current ? 'transform 120ms cubic-bezier(0.33, 1, 0.68, 1)' : 'transform 180ms cubic-bezier(0.33, 1, 0.68, 1)',
-            willChange: 'transform',
+            width: `${slideCount * 100}vw`,
           }}
         >
           {slides.map((s, idx) => {
             const Icon = s.icon;
-            const isActive = currentIndex === idx;
+            const isActive = currentSlide === idx;
 
             return (
               <div key={s.id} id={s.id} className="h-screen" style={{ flex: '0 0 100vw' }}>
                 <div className="mx-auto flex h-full max-w-7xl items-center px-6 md:px-10">
-                  <div className={`grid w-full items-center gap-10 md:grid-cols-2 md:gap-16 transition-all duration-500 ${isActive ? 'opacity-100 scale-100' : 'opacity-50 scale-95'}`}>
+                  <div
+                    className={['grid w-full items-center gap-10 md:grid-cols-2 md:gap-16 transition-all duration-500', isActive ? 'opacity-100 scale-100' : 'opacity-40 scale-95 pointer-events-none'].join(' ')}
+                  >
                     {/* Left column */}
                     <div className="space-y-6">
                       <Badge variant="secondary" className="font-heading">
@@ -282,8 +332,8 @@ export const ServicesScroller: FC = () => {
                       </div>
 
                       <Accordion type="single" collapsible defaultValue="item-0" className="w-full">
-                        {s.deliverables.map((d, idx) => (
-                          <AccordionItem key={d.title} value={`item-${idx}`}>
+                        {s.deliverables.map((d, i) => (
+                          <AccordionItem key={d.title} value={`item-${i}`}>
                             <AccordionTrigger className="text-left font-heading">{d.title}</AccordionTrigger>
                             <AccordionContent className="text-sm text-muted-foreground">{d.content}</AccordionContent>
                           </AccordionItem>
