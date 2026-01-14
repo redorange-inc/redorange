@@ -27,7 +27,6 @@ export const ServicesScroller: FC = () => {
   const trackRef = useRef<HTMLDivElement | null>(null);
   const [currentSlide, setCurrentSlide] = useState(0);
   const isAnimatingRef = useRef(false);
-  const scrollLockRef = useRef(false);
 
   const slides = useMemo<ServiceSlide[]>(
     () => [
@@ -103,17 +102,16 @@ export const ServicesScroller: FC = () => {
 
   const slideCount = slides.length;
 
-  // Función para animar al slide específico
   const animateToSlide = (targetSlide: number) => {
     if (!trackRef.current || isAnimatingRef.current) return;
 
     isAnimatingRef.current = true;
-    const targetX = -(targetSlide * 100);
+    const targetX = -targetSlide * 100;
 
     animate(trackRef.current, {
       translateX: `${targetX}vw`,
-      duration: 800,
-      easing: 'easeInOutQuart',
+      duration: 900,
+      easing: 'easeOutExpo',
       complete: () => {
         isAnimatingRef.current = false;
         setCurrentSlide(targetSlide);
@@ -122,186 +120,120 @@ export const ServicesScroller: FC = () => {
   };
 
   useEffect(() => {
-    let wheelTimeout: NodeJS.Timeout;
     let accumulatedDelta = 0;
-    const SCROLL_THRESHOLD = 100; // Umbral para cambiar de slide
+    let rafPending = false;
+    let timeoutId: NodeJS.Timeout | null = null;
+
+    const THRESHOLD = 55; // Ajusta según sensibilidad deseada (40–80)
+    const DEBOUNCE = 90; // ms para resetear acumulado
 
     const handleWheel = (e: WheelEvent) => {
       const section = sectionRef.current;
       if (!section) return;
 
       const rect = section.getBoundingClientRect();
-      const isInSection = rect.top <= 0 && rect.bottom >= window.innerHeight;
+      const isSectionActive = rect.top <= 10 && rect.bottom >= window.innerHeight - 10;
 
-      if (!isInSection) {
-        scrollLockRef.current = false;
-        return;
+      if (!isSectionActive) return;
+
+      // Permitir salir de la sección en los extremos
+      const atTop = currentSlide === 0 && e.deltaY < 0;
+      const atBottom = currentSlide === slideCount - 1 && e.deltaY > 0;
+
+      if (atTop || atBottom) {
+        return; // deja que el navegador maneje el scroll normal
       }
 
-      // Detectar si estamos al inicio o final de la sección
-      const atStart = rect.top >= -10 && currentSlide === 0 && e.deltaY < 0;
-      const atEnd = rect.bottom <= window.innerHeight + 10 && currentSlide === slideCount - 1 && e.deltaY > 0;
-
-      if (atStart || atEnd) {
-        scrollLockRef.current = false;
-        return; // Permitir scroll normal
-      }
-
-      // Prevenir scroll de página mientras estamos en la sección
       e.preventDefault();
-      scrollLockRef.current = true;
 
-      // Acumular delta para suavizar
       accumulatedDelta += e.deltaY;
 
-      clearTimeout(wheelTimeout);
-      wheelTimeout = setTimeout(() => {
-        if (Math.abs(accumulatedDelta) >= SCROLL_THRESHOLD && !isAnimatingRef.current) {
-          if (accumulatedDelta > 0 && currentSlide < slideCount - 1) {
-            // Scroll hacia abajo = siguiente slide
-            animateToSlide(currentSlide + 1);
-          } else if (accumulatedDelta < 0 && currentSlide > 0) {
-            // Scroll hacia arriba = slide anterior
-            animateToSlide(currentSlide - 1);
+      if (!rafPending) {
+        rafPending = true;
+        requestAnimationFrame(() => {
+          rafPending = false;
+
+          if (Math.abs(accumulatedDelta) >= THRESHOLD && !isAnimatingRef.current) {
+            if (accumulatedDelta > 0 && currentSlide < slideCount - 1) {
+              animateToSlide(currentSlide + 1);
+            } else if (accumulatedDelta < 0 && currentSlide > 0) {
+              animateToSlide(currentSlide - 1);
+            }
+            accumulatedDelta = 0;
           }
-        }
-        accumulatedDelta = 0;
-      }, 50);
-    };
-
-    const handleScroll = () => {
-      const section = sectionRef.current;
-      if (!section) return;
-
-      const rect = section.getBoundingClientRect();
-
-      // Si salimos completamente de la sección, resetear
-      if (rect.bottom < 0 || rect.top > window.innerHeight) {
-        scrollLockRef.current = false;
+        });
       }
+
+      // Reset acumulado si pasa tiempo sin rueda
+      if (timeoutId) clearTimeout(timeoutId);
+      timeoutId = setTimeout(() => {
+        accumulatedDelta = 0;
+      }, DEBOUNCE);
     };
 
-    // Agregar listeners
     window.addEventListener('wheel', handleWheel, { passive: false });
-    window.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => {
       window.removeEventListener('wheel', handleWheel);
-      window.removeEventListener('scroll', handleScroll);
-      clearTimeout(wheelTimeout);
+      if (timeoutId) clearTimeout(timeoutId);
     };
   }, [currentSlide, slideCount]);
 
   return (
     <section id="services" ref={sectionRef} className="relative min-h-screen">
       <div className="sticky top-0 h-screen overflow-hidden">
-        {/* Background gradient que cambia según el slide */}
         <div
-          className="pointer-events-none absolute inset-0 transition-all duration-1000"
+          className="pointer-events-none absolute inset-0 transition-all duration-1200"
           style={{
-            // Nota: esto no aplica clases Tailwind; es un string. Lo dejo como lo tenías.
-            background: `linear-gradient(135deg, ${slides[currentSlide]?.gradient || 'from-primary/5 via-transparent to-secondary/5'})`,
+            background: `linear-gradient(135deg, ${slides[currentSlide]?.gradient || 'from-gray-500/5 via-transparent to-gray-500/5'})`,
           }}
         />
 
-        {/* Subtle background */}
-        <div className="pointer-events-none absolute inset-0 opacity-60 bg-pattern" aria-hidden="true" />
-        <div className="pointer-events-none absolute -right-20 top-24 h-72 w-72 rounded-full bg-primary/10 blur-3xl" />
-        <div className="pointer-events-none absolute -left-20 bottom-24 h-72 w-72 rounded-full bg-accent/10 blur-3xl" />
-
-        {/* Header con indicadores */}
-        <div className="pointer-events-auto absolute left-0 right-0 top-0 z-10">
-          <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6 md:px-10">
-            <div className="space-y-1">
-              <p className="font-heading text-sm font-bold uppercase tracking-wide text-muted-foreground">Líneas de servicio</p>
-              <p className="text-xs text-muted-foreground">Usa scroll o las flechas</p>
-            </div>
-
-            <div className="flex items-center gap-2">
-              {slides.map((s, idx) => {
-                const active = currentSlide === idx;
-                return (
-                  <button
-                    key={s.id}
-                    type="button"
-                    onClick={() => animateToSlide(idx)}
-                    className={['h-2 rounded-full transition-all duration-300 cursor-pointer', active ? 'w-8 bg-primary' : 'w-2 bg-border hover:bg-border/80'].join(' ')}
-                    aria-label={`Ir a ${s.title}`}
-                  />
-                );
-              })}
-            </div>
+        <div className="absolute left-0 right-0 top-6 z-20 pointer-events-auto">
+          <div className="mx-auto flex max-w-7xl justify-center gap-3 px-6">
+            {slides.map((s, idx) => (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => !isAnimatingRef.current && animateToSlide(idx)}
+                className={`h-2.5 rounded-full transition-all duration-500 ${currentSlide === idx ? 'w-10 bg-primary shadow-md' : 'w-2.5 bg-white/40 hover:bg-white/70'}`}
+                aria-label={`Ir a ${s.title}`}
+              />
+            ))}
           </div>
         </div>
 
-        {/* Navigation arrows */}
-        <div className="pointer-events-auto absolute left-0 right-0 top-1/2 z-10 -translate-y-1/2">
-          <div className="mx-auto flex max-w-7xl items-center justify-between px-6 md:px-10">
-            {currentSlide > 0 && (
-              <button
-                type="button"
-                onClick={() => animateToSlide(currentSlide - 1)}
-                className="flex h-12 w-12 items-center justify-center rounded-full bg-background/80 backdrop-blur-sm border border-border/50 shadow-lg transition-all hover:scale-110 hover:bg-background"
-                aria-label="Anterior"
-              >
-                <ArrowRight className="h-6 w-6 rotate-180" />
-              </button>
-            )}
-            <div className="flex-1" />
-            {currentSlide < slideCount - 1 && (
-              <button
-                type="button"
-                onClick={() => animateToSlide(currentSlide + 1)}
-                className="flex h-12 w-12 items-center justify-center rounded-full bg-background/80 backdrop-blur-sm border border-border/50 shadow-lg transition-all hover:scale-110 hover:bg-background"
-                aria-label="Siguiente"
-              >
-                <ArrowRight className="h-6 w-6" />
-              </button>
-            )}
-          </div>
-        </div>
-
-        {/* Horizontal track */}
-        <div
-          ref={trackRef}
-          className="flex h-full"
-          style={{
-            width: `${slideCount * 100}vw`,
-          }}
-        >
-          {slides.map((s, idx) => {
-            const Icon = s.icon;
+        <div ref={trackRef} className="flex h-full will-change-transform" style={{ width: `${slideCount * 100}vw` }}>
+          {slides.map((slide, idx) => {
             const isActive = currentSlide === idx;
+            const Icon = slide.icon;
 
             return (
-              <div key={s.id} id={s.id} className="h-screen" style={{ flex: '0 0 100vw' }}>
+              <div key={slide.id} className="h-screen shrink-0" style={{ width: '100vw' }}>
                 <div className="mx-auto flex h-full max-w-7xl items-center px-6 md:px-10">
-                  <div
-                    className={['grid w-full items-center gap-10 md:grid-cols-2 md:gap-16 transition-all duration-500', isActive ? 'opacity-100 scale-100' : 'opacity-40 scale-95 pointer-events-none'].join(' ')}
-                  >
-                    {/* Left column */}
+                  <div className={`grid w-full gap-10 md:grid-cols-2 md:gap-16 transition-all duration-800 ${isActive ? 'opacity-100 scale-100' : 'opacity-35 scale-95 pointer-events-none'}`}>
                     <div className="space-y-6">
                       <Badge variant="secondary" className="font-heading">
-                        {s.badge}
+                        {slide.badge}
                       </Badge>
 
                       <div className="space-y-3">
-                        <h2 className="text-4xl font-extrabold tracking-tight md:text-6xl">{s.title}</h2>
-                        <p className="text-base text-muted-foreground md:text-xl">{s.subtitle}</p>
+                        <h2 className="text-4xl font-extrabold tracking-tight md:text-5xl lg:text-6xl">{slide.title}</h2>
+                        <p className="text-lg md:text-xl text-muted-foreground">{slide.subtitle}</p>
                       </div>
 
                       <div className="flex flex-wrap gap-2">
-                        {s.bullets.map((b) => (
-                          <span key={b} className="rounded-full bg-muted px-3 py-1 text-xs text-muted-foreground">
-                            {b}
+                        {slide.bullets.map((bullet) => (
+                          <span key={bullet} className="rounded-full bg-muted/70 px-3 py-1 text-xs text-muted-foreground">
+                            {bullet}
                           </span>
                         ))}
                       </div>
 
                       <div className="flex flex-col gap-3 sm:flex-row">
                         <Button asChild size="lg" className="font-heading">
-                          <a href={s.href} target="_blank" rel="noreferrer">
-                            {s.cta}
+                          <a href={slide.href} target="_blank" rel="noreferrer">
+                            {slide.cta}
                             <ArrowRight className="ml-2 h-5 w-5" />
                           </a>
                         </Button>
@@ -314,40 +246,39 @@ export const ServicesScroller: FC = () => {
                         </Button>
                       </div>
 
-                      <p className="text-xs text-muted-foreground">
-                        Enlace: <span className="font-mono">{s.href}</span>
+                      <p className="text-xs text-muted-foreground/70">
+                        Enlace: <span className="font-mono">{slide.href}</span>
                       </p>
                     </div>
 
-                    {/* Right column - interactive */}
-                    <div className="rounded-2xl border border-border/70 bg-background/60 p-6 shadow-sm backdrop-blur">
-                      <div className="mb-5 flex items-center gap-3">
-                        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-muted">
-                          <Icon className="h-6 w-6 text-foreground" />
+                    <div className="rounded-2xl border border-border/60 bg-background/60 p-6 shadow-sm backdrop-blur-md">
+                      <div className="mb-6 flex items-center gap-4">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+                          <Icon className="h-6 w-6 text-primary" />
                         </div>
                         <div>
-                          <p className="font-heading text-sm font-bold text-muted-foreground">Qué incluye</p>
-                          <p className="text-lg font-extrabold">Alcance típico y entregables</p>
+                          <p className="font-heading text-sm font-semibold text-muted-foreground">Qué incluye</p>
+                          <p className="text-lg font-bold">Alcance típico y entregables</p>
                         </div>
                       </div>
 
                       <Accordion type="single" collapsible defaultValue="item-0" className="w-full">
-                        {s.deliverables.map((d, i) => (
+                        {slide.deliverables.map((d, i) => (
                           <AccordionItem key={d.title} value={`item-${i}`}>
-                            <AccordionTrigger className="text-left font-heading">{d.title}</AccordionTrigger>
+                            <AccordionTrigger className="text-left font-heading text-base">{d.title}</AccordionTrigger>
                             <AccordionContent className="text-sm text-muted-foreground">{d.content}</AccordionContent>
                           </AccordionItem>
                         ))}
                       </Accordion>
 
-                      <div className="mt-6 rounded-xl bg-muted p-4">
-                        <p className="font-heading text-sm font-bold text-foreground">Modalidad</p>
+                      <div className="mt-6 rounded-xl bg-muted/50 p-4">
+                        <p className="font-heading text-sm font-semibold">Modalidad</p>
                         <p className="mt-1 text-sm text-muted-foreground">Servicio por proyecto, mensual o por demanda, según necesidad y SLA.</p>
                       </div>
 
-                      <div className="mt-5 flex flex-wrap items-center gap-2">
+                      <div className="mt-6 flex flex-wrap gap-3">
                         <Button asChild variant="secondary" className="font-heading">
-                          <a href={s.href} target="_blank" rel="noreferrer">
+                          <a href={slide.href} target="_blank" rel="noreferrer">
                             Ver más
                             <ArrowRight className="ml-2 h-4 w-4" />
                           </a>
