@@ -5,7 +5,7 @@ FROM base AS deps
 WORKDIR /app
 
 # Copiar archivos de dependencias
-COPY package.json bun.lockb* ./
+COPY package.json bun.lock* ./
 
 # Instalar dependencias
 RUN bun install --frozen-lockfile
@@ -32,8 +32,8 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # Crear usuario no-root para seguridad
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+RUN groupadd --system --gid 1001 nodejs
+RUN useradd --system --uid 1001 --gid nodejs nextjs
 
 # Copiar archivos públicos
 COPY --from=builder /app/public ./public
