@@ -52,4 +52,4 @@ ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
 # Comando para iniciar la aplicación
-CMD ["bun", "server.js"]
+CMD ["bun", "start"]
