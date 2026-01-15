@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
+@import 'tailwind-animations';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -49,7 +50,7 @@
   --font-size: 14px;
   --radius: 0.65rem;
 
-  /* palette basada en el logo (naranja ambar + verde) */
+  /* palette */
   --background: #fff7f0;
   --foreground: #221a15;
 
@@ -59,14 +60,12 @@
   --popover: #fff1e6;
   --popover-foreground: #221a15;
 
-  /* brand */
   --primary: #fa661d;
   --primary-foreground: #ffffff;
 
   --secondary: #fcaf34;
   --secondary-foreground: #221a15;
 
-  /* support */
   --muted: #fff0e1;
   --muted-foreground: #6b625c;
 
@@ -81,20 +80,14 @@
   --input-background: #fffaf5;
   --switch-background: #e6d3c1;
 
-  --font-weight-medium: 500;
-  --font-weight-normal: 400;
-
-  /* focus ring */
   --ring: #fc9129;
 
-  /* charts */
   --chart-1: #fa661d;
   --chart-2: #fcaf34;
   --chart-3: #6bc039;
   --chart-4: #f74e15;
   --chart-5: #c44412;
 
-  /* sidebar */
   --sidebar: #fff4ea;
   --sidebar-foreground: #221a15;
   --sidebar-primary: #fa661d;
@@ -104,138 +97,72 @@
   --sidebar-border: #f0dfcf;
   --sidebar-ring: #fc9129;
 
-  /* compat vars usadas abajo */
+  /* fonts */
+  --font-body: var(--font-poppins);
+  --font-heading: var(--font-montserrat);
+  --font-mono: var(--font-jetbrains);
+
+  /* compat */
   --color-text-primary: var(--foreground);
   --color-surface-elevated: var(--card);
   --color-primary-dark: #c44412;
   --color-primary: var(--primary);
   --color-secondary: var(--secondary);
-
-  /* fonts */
-  --font-body: var(--font-poppins);
-  --font-heading: var(--font-montserrat);
-  --font-mono: var(--font-jetbrains);
 }
 
 .dark {
-  /* surfaces */
-  --background: #160f0c;
-  --foreground: #fff3ea;
+  --background: #0a0605;
+  --foreground: #fffbf7;
 
-  --card: #221612;
-  --card-foreground: #fff3ea;
+  --card: #1a1210;
+  --card-foreground: #fffbf7;
 
-  --popover: #1d1410;
-  --popover-foreground: #fff3ea;
+  --popover: #1a1210;
+  --popover-foreground: #fffbf7;
 
-  /* brand */
-  --primary: #fa661d;
+  --primary: #ff7733;
   --primary-foreground: #ffffff;
 
-  --secondary: #fcaf34;
-  --secondary-foreground: #160f0c;
+  --secondary: #ffbb44;
+  --secondary-foreground: #0a0605;
 
-  /* support */
-  --muted: #2a1c16;
-  --muted-foreground: #cdbfb6;
+  --muted: #2d2220;
+  --muted-foreground: #e0d5cc;
 
-  --accent: #6bc039;
-  --accent-foreground: #071b0a;
+  --accent: #7dd34f;
+  --accent-foreground: #061b08;
 
-  --destructive: #ff3b30;
+  --destructive: #ff4d4d;
   --destructive-foreground: #ffffff;
 
-  --border: #ffffff1a;
-  --input: #ffffff26;
-  --input-background: #1a120f;
-  --switch-background: #3a2a22;
+  --border: #ffffff20;
+  --input: #ffffff30;
+  --input-background: #1a1210;
+  --switch-background: #3d3330;
 
-  /* focus ring */
-  --ring: #fc9129;
+  --ring: #ff9944;
 
-  /* charts */
-  --chart-1: #fc9129;
-  --chart-2: #fcaf34;
-  --chart-3: #6bc039;
-  --chart-4: #f74e15;
-  --chart-5: #c44412;
+  --chart-1: #ff7733;
+  --chart-2: #ffbb44;
+  --chart-3: #7dd34f;
+  --chart-4: #ff5522;
+  --chart-5: #dd5522;
 
-  /* sidebar */
-  --sidebar: #1b120f;
-  --sidebar-foreground: #fff3ea;
-  --sidebar-primary: #fa661d;
+  --sidebar: #120d0b;
+  --sidebar-foreground: #fffbf7;
+  --sidebar-primary: #ff7733;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #2a1c16;
-  --sidebar-accent-foreground: #fff3ea;
-  --sidebar-border: #ffffff1a;
-  --sidebar-ring: #fc9129;
+  --sidebar-accent: #2d2220;
+  --sidebar-accent-foreground: #fffbf7;
+  --sidebar-border: #ffffff20;
+  --sidebar-ring: #ff9944;
 
   /* compat */
   --color-text-primary: var(--foreground);
   --color-surface-elevated: var(--card);
-  --color-primary-dark: #fc9129;
+  --color-primary-dark: #ff9944;
   --color-primary: var(--primary);
   --color-secondary: var(--secondary);
-}
-
-@layer base {
-  :where(:not(:has([class*=' text-']), :not(:has([class^='text-'])))) {
-    h1 {
-      font-size: var(--text-2xl);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.2;
-      font-family: var(--font-heading), system-ui, sans-serif;
-    }
-
-    h2 {
-      font-size: var(--text-xl);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.2;
-      font-family: var(--font-heading), system-ui, sans-serif;
-    }
-
-    h3 {
-      font-size: var(--text-lg);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.2;
-      font-family: var(--font-heading), system-ui, sans-serif;
-    }
-
-    h4 {
-      font-size: var(--text-base);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.2;
-      font-family: var(--font-heading), system-ui, sans-serif;
-    }
-
-    p {
-      font-size: var(--text-base);
-      font-weight: var(--font-weight-normal);
-      line-height: 1.6;
-      font-family: var(--font-body), system-ui, sans-serif;
-    }
-
-    label {
-      font-size: var(--text-base);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.5;
-      font-family: var(--font-body), system-ui, sans-serif;
-    }
-
-    button {
-      font-size: var(--text-base);
-      font-weight: var(--font-weight-medium);
-      line-height: 1.2;
-      font-family: var(--font-heading), system-ui, sans-serif;
-    }
-
-    input {
-      font-size: var(--text-base);
-      font-weight: var(--font-weight-normal);
-      line-height: 1.5;
-      font-family: var(--font-body), system-ui, sans-serif;
-    }
-  }
 }
 
 html {
@@ -252,7 +179,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* tipografia */
+/* typography */
 h1,
 h2,
 h3,
@@ -260,12 +187,12 @@ h4,
 h5,
 h6 {
   font-family: var(--font-heading), system-ui, sans-serif;
-  font-weight: 700;
-  line-height: 1.2;
+  font-weight: 800;
+  line-height: 1.1;
   color: var(--color-text-primary);
 }
 
-/* buttons y elementos interactivos */
+/* buttons and interactive */
 button,
 [role='button'],
 input[type='submit'],
@@ -281,7 +208,7 @@ samp {
   font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
 }
 
-/* utilidades personalizadas */
+/* utilities */
 .text-gradient {
   background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%);
   -webkit-background-clip: text;
@@ -295,60 +222,22 @@ samp {
   opacity: 0.03;
 }
 
+.dark .bg-pattern {
+  opacity: 0.08;
+}
+
 .glass-effect {
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
 
-/* animaciones */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.dark .glass-effect {
+  background: rgba(26, 18, 16, 0.75);
+  border-color: rgba(255, 255, 255, 0.12);
 }
 
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-.animate-fade-in-up {
-  animation: fadeInUp 0.6s ease-out forwards;
-}
-
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-/* delay de animaciones */
-.delay-100 {
-  animation-delay: 100ms;
-}
-.delay-200 {
-  animation-delay: 200ms;
-}
-.delay-300 {
-  animation-delay: 300ms;
-}
-.delay-400 {
-  animation-delay: 400ms;
-}
-.delay-500 {
-  animation-delay: 500ms;
-}
-
-/* scrollbar personalizada */
+/* scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -367,8 +256,13 @@ samp {
   background: var(--color-primary-dark);
 }
 
-/* focus visible para accesibilidad */
 :focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
+}
+
+/* prevent horizontal overflow issues on animated tracks */
+html,
+body {
+  overflow-x: hidden;
 }
