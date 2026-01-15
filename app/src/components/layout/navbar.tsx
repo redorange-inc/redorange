@@ -8,14 +8,14 @@ import { Button } from '@/components/ui/button';
 
 const navItems = [
   { href: '/#home', label: 'Inicio' },
-  { href: '/#services', label: 'Lineas' },
+  { href: '/#services', label: 'Líneas' },
   { href: '/#about', label: 'Sobre Nosotros' },
   { href: '/#contact', label: 'Contactarnos' },
 ] as const;
 
 export const Navbar: FC = () => {
   return (
-    <header className="fixed top-0 left-0 right-0 z-999 w-full border-b border-border/70 bg-background/80 backdrop-blur supports-backdrop-filter:bg-background/60">
+    <header className="fixed top-0 left-0 right-0 z-50 w-full border-b border-border/70 bg-background/80 backdrop-blur supports-backdrop-filter:bg-background/60">
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-3">
         <Link href="/#home" className="flex items-center gap-2">
           <Image src="/img/logo.webp" alt="Red Orange" width={36} height={36} className="rounded-md" priority />
