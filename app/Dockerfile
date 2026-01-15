@@ -40,7 +40,6 @@ COPY --from=builder /app/public ./public
 
 # Copiar archivos de build
 # Next.js genera archivos standalone automáticamente
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 # Cambiar al usuario no-root
