@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next';
 import { Poppins, Montserrat, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme/theme-provider';
+import { Navbar } from '@/components/layout/navbar';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -144,9 +145,12 @@ const RootLayout: FC<RootLayoutProps> = ({ children }): JSX.Element => {
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
       </head>
+
       <body className="min-h-screen bg-background font-sans antialiased" style={{ fontFamily: 'var(--font-poppins), system-ui, sans-serif' }}>
-        {/*  theme provider para soportar dark mode y preferencias */}
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <Navbar />
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
