@@ -89,53 +89,56 @@ export const AboutSection: FC = () => {
     if (!root) return;
     if (prefersReducedMotion()) return;
 
-    // Selectors
-    const headerEls = headerRef.current?.querySelectorAll('[data-about="header"]') ?? [];
-    const cardEls = cardsRef.current?.querySelectorAll('[data-about="card"]') ?? [];
-    const footerWrapEls = footerRef.current?.querySelectorAll('[data-about="footer-wrap"]') ?? [];
-    const footerEls = footerRef.current?.querySelectorAll('[data-about="footer"]') ?? [];
+    const headerEls = headerRef.current?.querySelectorAll('[data-about="header"]');
+    const cardEls = cardsRef.current?.querySelectorAll('[data-about="card"]');
+    const footerWrapEls = footerRef.current?.querySelectorAll('[data-about="footer-wrap"]');
+    const footerEls = footerRef.current?.querySelectorAll('[data-about="footer"]');
 
     const io = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (!entry.isIntersecting) continue;
 
-          // Header reveal
-          animate(headerEls, {
-            opacity: [0, 1],
-            translateY: [14, 0],
-            duration: 800,
-            easing: 'easeOutExpo',
-            delay: (_, i) => i * 90,
-          });
+          if (headerEls && headerEls.length > 0) {
+            animate(headerEls, {
+              opacity: [0, 1],
+              translateY: [14, 0],
+              duration: 800,
+              easing: 'easeOutExpo',
+              delay: (_, i) => i * 90,
+            });
+          }
 
-          // Cards stagger
-          animate(cardEls, {
-            opacity: [0, 1],
-            translateY: [18, 0],
-            scale: [0.98, 1],
-            duration: 900,
-            easing: 'easeOutExpo',
-            delay: (_, i) => 220 + i * 120,
-          });
+          if (cardEls && cardEls.length > 0) {
+            animate(cardEls, {
+              opacity: [0, 1],
+              translateY: [18, 0],
+              scale: [0.98, 1],
+              duration: 900,
+              easing: 'easeOutExpo',
+              delay: (_, i) => 220 + i * 120,
+            });
+          }
 
-          // Footer wrap reveal
-          animate(footerWrapEls, {
-            opacity: [0, 1],
-            translateY: [14, 0],
-            duration: 850,
-            easing: 'easeOutExpo',
-            delay: 520,
-          });
+          if (footerWrapEls && footerWrapEls.length > 0) {
+            animate(footerWrapEls, {
+              opacity: [0, 1],
+              translateY: [14, 0],
+              duration: 850,
+              easing: 'easeOutExpo',
+              delay: 520,
+            });
+          }
 
-          // Footer children reveal
-          animate(footerEls, {
-            opacity: [0, 1],
-            translateY: [10, 0],
-            duration: 700,
-            easing: 'easeOutExpo',
-            delay: (_, i) => 640 + i * 90,
-          });
+          if (footerEls && footerEls.length > 0) {
+            animate(footerEls, {
+              opacity: [0, 1],
+              translateY: [10, 0],
+              duration: 700,
+              easing: 'easeOutExpo',
+              delay: (_, i) => 640 + i * 90,
+            });
+          }
 
           io.disconnect();
         }
@@ -145,27 +148,26 @@ export const AboutSection: FC = () => {
 
     io.observe(root);
 
-    // Ambient glow drift
     const glows = root.querySelectorAll('[data-about="glow"]');
-    animate(glows, {
-      translateY: [0, 10],
-      direction: 'alternate',
-      loop: true,
-      easing: 'easeInOutSine',
-      duration: 4200,
-      delay: (_, i) => i * 300,
-    });
+    if (glows.length > 0) {
+      animate(glows, {
+        translateY: [0, 10],
+        direction: 'alternate',
+        loop: true,
+        easing: 'easeInOutSine',
+        duration: 4200,
+        delay: (_, i) => i * 300,
+      });
+    }
 
     return () => io.disconnect();
   }, []);
 
   return (
     <section id="about" ref={sectionRef} className="relative mx-auto max-w-7xl px-6 py-16 md:px-10 md:py-24 min-h-screen scroll-mt-0">
-      {/* Ambient glows */}
       <div data-about="glow" className="pointer-events-none absolute -right-20 top-20 h-96 w-96 rounded-full bg-blue-500/5 blur-3xl" />
       <div data-about="glow" className="pointer-events-none absolute -left-20 bottom-20 h-96 w-96 rounded-full bg-purple-500/5 blur-3xl" />
 
-      {/* Header */}
       <div ref={headerRef} className="mb-12 text-center md:mb-16">
         <Badge variant="secondary" className="mb-4 font-heading opacity-0" data-about="header">
           <Users className="mr-1.5 h-3.5 w-3.5" />
@@ -181,7 +183,6 @@ export const AboutSection: FC = () => {
         </p>
       </div>
 
-      {/* Feature Cards */}
       <div ref={cardsRef} className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 md:gap-8">
         {features.map((feature) => {
           const MainIcon = feature.icon;
@@ -192,7 +193,6 @@ export const AboutSection: FC = () => {
               data-about="card"
               className="group relative overflow-hidden rounded-2xl border border-border/70 bg-background/60 p-5 shadow-sm backdrop-blur transition-all hover:shadow-lg hover:scale-[1.02] opacity-0 md:p-6"
             >
-              {/* Hover glow effect */}
               <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                 <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-primary/10 blur-2xl" />
               </div>
@@ -226,7 +226,6 @@ export const AboutSection: FC = () => {
         })}
       </div>
 
-      {/* Footer CTA */}
       <div ref={footerRef} className="mt-12 md:mt-16">
         <div
           data-about="footer-wrap"

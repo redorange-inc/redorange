@@ -59,9 +59,8 @@ const departmentConfig: Record<TeamMember['department'], { icon: FC<{ className?
 
 const getInitials = (name: string): string => {
   const words = name.split(' ').filter((word) => word.length > 0);
-  if (words.length >= 2) {
-    return `${words[0][0]}${words[1][0]}`.toUpperCase();
-  }
+  if (words.length >= 2) return `${words[0][0]}${words[1][0]}`.toUpperCase();
+
   return words[0]?.substring(0, 2).toUpperCase() || '??';
 };
 
@@ -95,9 +94,7 @@ const AnimatedNumber: FC<{ value: string; delay?: number; isVisible: boolean }> 
 
         setDisplayValue(`${current}${suffix}`);
 
-        if (progress < 1) {
-          requestAnimationFrame(updateNumber);
-        }
+        if (progress < 1) requestAnimationFrame(updateNumber);
       };
 
       requestAnimationFrame(updateNumber);
@@ -128,14 +125,7 @@ const MemberCard: FC<{ member: TeamMember; index: number }> = ({ member, index }
     const ringElement = avatarRef.current?.querySelector('[data-avatar-ring]');
     if (!ringElement) return;
 
-    const animation = animate(ringElement, {
-      scale: [1, 1.08, 1],
-      opacity: [0.4, 0.7, 0.4],
-      duration: 3000,
-      easing: 'easeInOutSine',
-      loop: true,
-      delay: index * 200,
-    });
+    const animation = animate(ringElement, { scale: [1, 1.08, 1], opacity: [0.4, 0.7, 0.4], duration: 3000, easing: 'easeInOutSine', loop: true, delay: index * 200 });
 
     return () => {
       animation.pause();
@@ -156,26 +146,20 @@ const MemberCard: FC<{ member: TeamMember; index: number }> = ({ member, index }
     const tags = cardRef.current.querySelectorAll('[data-tag]');
     if (tags.length === 0) return;
 
-    animate(tags, {
-      translateY: [5, 0],
-      opacity: [0.7, 1],
-      duration: 300,
-      easing: 'easeOutExpo',
-      delay: stagger(30),
-    });
+    animate(tags, { translateY: [5, 0], opacity: [0.7, 1], duration: 300, easing: 'easeOutExpo', delay: stagger(30) });
   }, [isHovered]);
 
   return (
     <div ref={cardRef} data-team="card" className="group relative opacity-0" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
       <div className="absolute inset-0 rounded-2xl bg-linear-to-br from-primary/20 via-transparent to-secondary/20 opacity-0 blur-xl transition-opacity duration-700 group-hover:opacity-100" />
 
-      <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-background/80 backdrop-blur-xl transition-all duration-500 hover:border-primary/30">
+      <div className="relative h-full overflow-hidden rounded-2xl border border-border/50 bg-background/80 backdrop-blur-xl transition-all duration-500 hover:border-primary/30">
         <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-muted/30" />
 
         <div className="absolute -right-16 -top-16 h-32 w-32 rounded-full bg-linear-to-br from-primary/10 to-transparent blur-2xl transition-transform duration-700 group-hover:scale-150" />
         <div className="absolute -left-16 -bottom-16 h-32 w-32 rounded-full bg-linear-to-tr from-secondary/10 to-transparent blur-2xl transition-transform duration-700 group-hover:scale-150" />
 
-        <div className="relative px-4 py-5 md:px-5 md:py-6">
+        <div className="relative flex h-full flex-col px-4 py-5 md:px-5 md:py-6">
           <div className="flex flex-col items-center text-center">
             <div ref={avatarRef} className="relative mb-3">
               <div data-avatar-ring className={`absolute inset-0 -m-2 rounded-full bg-linear-to-r ${config.gradient} opacity-40 blur-md`} />
@@ -204,10 +188,10 @@ const MemberCard: FC<{ member: TeamMember; index: number }> = ({ member, index }
 
             <p className="mb-2 text-[10px] font-semibold text-primary md:text-xs">{member.role}</p>
 
-            <p className="mb-3 line-clamp-2 text-[10px] leading-relaxed text-muted-foreground md:text-xs">{member.bio}</p>
+            <p className="mb-3 text-[10px] leading-relaxed text-muted-foreground md:text-xs">{member.bio}</p>
 
             <div className="mb-3 flex flex-wrap justify-center gap-1">
-              {member.tags.slice(0, 3).map((tag) => (
+              {member.tags.map((tag) => (
                 <span
                   key={tag}
                   data-tag
@@ -216,11 +200,6 @@ const MemberCard: FC<{ member: TeamMember; index: number }> = ({ member, index }
                   {tag}
                 </span>
               ))}
-              {member.tags.length > 3 && (
-                <span data-tag className="rounded-full border border-border/50 bg-muted/30 px-2 py-0.5 text-[9px] font-medium text-muted-foreground">
-                  +{member.tags.length - 3}
-                </span>
-              )}
             </div>
 
             <div className="mb-4 flex items-center justify-center gap-4">
@@ -247,7 +226,7 @@ const MemberCard: FC<{ member: TeamMember; index: number }> = ({ member, index }
               </div>
             </div>
 
-            <div className="flex items-center gap-1.5">
+            <div className="mt-auto flex items-center gap-1.5">
               {member.socials.map((social) => {
                 const SocialIcon = socialIcons[social.platform];
                 return (
@@ -290,51 +269,22 @@ export const TeamGrid: FC<TeamGridProps> = ({ members }) => {
 
     const glowEls = container.querySelectorAll('[data-team="glow"]');
     if (glowEls.length > 0) {
-      animate(glowEls, {
-        translateY: [0, 20, 0],
-        translateX: [0, 10, 0],
-        scale: [1, 1.1, 1],
-        direction: 'alternate',
-        loop: true,
-        easing: 'easeInOutSine',
-        duration: 6000,
-        delay: stagger(1000),
-      });
+      animate(glowEls, { translateY: [0, 20, 0], translateX: [0, 10, 0], scale: [1, 1.1, 1], direction: 'alternate', loop: true, easing: 'easeInOutSine', duration: 6000, delay: stagger(1000) });
     }
 
     const headerEls = headerRef.current?.querySelectorAll('[data-team="header"]');
     if (headerEls && headerEls.length > 0) {
-      animate(headerEls, {
-        opacity: [0, 1],
-        translateY: [30, 0],
-        duration: 1000,
-        easing: 'easeOutExpo',
-        delay: stagger(100),
-      });
+      animate(headerEls, { opacity: [0, 1], translateY: [30, 0], duration: 1000, easing: 'easeOutExpo', delay: stagger(100) });
     }
 
     const cardEls = gridRef.current?.querySelectorAll('[data-team="card"]');
     if (cardEls && cardEls.length > 0) {
-      animate(cardEls, {
-        opacity: [0, 1],
-        translateY: [50, 0],
-        rotateX: [10, 0],
-        duration: 1200,
-        easing: 'easeOutExpo',
-        delay: stagger(150, { start: 400 }),
-      });
+      animate(cardEls, { opacity: [0, 1], translateY: [50, 0], rotateX: [10, 0], duration: 1200, easing: 'easeOutExpo', delay: stagger(150, { start: 400 }) });
     }
 
     const ctaEls = container.querySelectorAll('[data-team="cta"]');
     if (ctaEls.length > 0) {
-      animate(ctaEls, {
-        opacity: [0, 1],
-        translateY: [30, 0],
-        scale: [0.9, 1],
-        duration: 1000,
-        easing: 'easeOutExpo',
-        delay: 1200,
-      });
+      animate(ctaEls, { opacity: [0, 1], translateY: [30, 0], scale: [0.9, 1], duration: 1000, easing: 'easeOutExpo', delay: 1200 });
     }
   }, []);
 
@@ -348,10 +298,10 @@ export const TeamGrid: FC<TeamGridProps> = ({ members }) => {
 
       <div className="relative mx-auto max-w-6xl px-6 md:px-10">
         <div ref={headerRef} className="mb-10 text-center md:mb-14">
-          <div data-team="header" className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 opacity-0">
-            <Users className="h-4 w-4 text-primary-foreground" />
-            <span className="text-sm font-medium text-primary-foreground">Conoce a nuestro equipo</span>
-          </div>
+          <Badge variant="secondary" className="mb-4 font-heading opacity-0" data-team="header">
+            <Users className="mr-1.5 h-3.5 w-3.5" />
+            Conoce a nuestro equipo
+          </Badge>
 
           <h1 data-team="header" className="mb-3 text-2xl font-black tracking-tight md:text-3xl lg:text-4xl opacity-0">
             El talento detrás de <span className="bg-linear-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">REDORANGE</span>
