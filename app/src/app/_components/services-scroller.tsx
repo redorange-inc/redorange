@@ -25,7 +25,6 @@ type ServiceSlide = {
 };
 
 const clamp = (n: number, min: number, max: number): number => Math.min(max, Math.max(min, n));
-
 const prefersReducedMotion = (): boolean => typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 export const ServicesScroller: FC = () => {
@@ -242,20 +241,14 @@ export const ServicesScroller: FC = () => {
 
       if (nextKeys.includes(e.key)) {
         e.preventDefault();
-        if (currentSlide < slideCount - 1) {
-          animateToSlide(currentSlide + 1);
-        } else {
-          scrollToSection('about');
-        }
+        if (currentSlide < slideCount - 1) animateToSlide(currentSlide + 1);
+        else scrollToSection('about');
       }
 
       if (prevKeys.includes(e.key)) {
         e.preventDefault();
-        if (currentSlide > 0) {
-          animateToSlide(currentSlide - 1);
-        } else {
-          scrollToSection('home');
-        }
+        if (currentSlide > 0) animateToSlide(currentSlide - 1);
+        else scrollToSection('home');
       }
     };
 
@@ -283,17 +276,11 @@ export const ServicesScroller: FC = () => {
       if (Math.abs(delta) < threshold) return;
 
       if (delta > 0) {
-        if (currentSlide < slideCount - 1) {
-          animateToSlide(currentSlide + 1);
-        } else {
-          scrollToSection('about');
-        }
+        if (currentSlide < slideCount - 1) animateToSlide(currentSlide + 1);
+        else scrollToSection('about');
       } else {
-        if (currentSlide > 0) {
-          animateToSlide(currentSlide - 1);
-        } else {
-          scrollToSection('home');
-        }
+        if (currentSlide > 0) animateToSlide(currentSlide - 1);
+        else scrollToSection('home');
       }
     };
 
