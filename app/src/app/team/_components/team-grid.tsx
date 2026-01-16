@@ -1,7 +1,7 @@
 'use client';
 
 import type { FC } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { animate, stagger } from 'animejs';
@@ -65,13 +65,16 @@ const getInitials = (name: string): string => {
   return words[0]?.substring(0, 2).toUpperCase() || '??';
 };
 
-const AnimatedNumber: FC<{ value: string; delay?: number }> = ({ value, delay = 0 }) => {
-  const ref = useRef<HTMLSpanElement>(null);
+const AnimatedNumber: FC<{ value: string; delay?: number; isVisible: boolean }> = ({ value, delay = 0, isVisible }) => {
   const [displayValue, setDisplayValue] = useState('0');
+  const hasAnimated = useRef(false);
 
   useEffect(() => {
+    if (!isVisible || hasAnimated.current) return;
+
     const numericMatch = value.match(/^(\d+)/);
     if (!numericMatch) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setDisplayValue(value);
       return;
     }
@@ -80,6 +83,7 @@ const AnimatedNumber: FC<{ value: string; delay?: number }> = ({ value, delay = 
     const suffix = value.replace(/^\d+/, '');
 
     const timeout = setTimeout(() => {
+      hasAnimated.current = true;
       const duration = 1500;
       const startTime = Date.now();
 
@@ -100,9 +104,9 @@ const AnimatedNumber: FC<{ value: string; delay?: number }> = ({ value, delay = 
     }, delay);
 
     return () => clearTimeout(timeout);
-  }, [value, delay]);
+  }, [value, delay, isVisible]);
 
-  return <span ref={ref}>{displayValue}</span>;
+  return <span>{displayValue}</span>;
 };
 
 const MemberCard: FC<{ member: TeamMember; index: number }> = ({ member, index }) => {
@@ -121,9 +125,10 @@ const MemberCard: FC<{ member: TeamMember; index: number }> = ({ member, index }
   }, [index]);
 
   useEffect(() => {
-    if (!avatarRef.current) return;
+    const ringElement = avatarRef.current?.querySelector('[data-avatar-ring]');
+    if (!ringElement) return;
 
-    const pulseAnimation = animate(avatarRef.current.querySelector('[data-avatar-ring]'), {
+    const animation = animate(ringElement, {
       scale: [1, 1.08, 1],
       opacity: [0.4, 0.7, 0.4],
       duration: 3000,
@@ -132,13 +137,26 @@ const MemberCard: FC<{ member: TeamMember; index: number }> = ({ member, index }
       delay: index * 200,
     });
 
-    return () => pulseAnimation.pause();
+    return () => {
+      animation.pause();
+    };
   }, [index]);
+
+  const handleMouseEnter = useCallback(() => {
+    setIsHovered(true);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    setIsHovered(false);
+  }, []);
 
   useEffect(() => {
     if (!cardRef.current || !isHovered) return;
 
-    animate(cardRef.current.querySelectorAll('[data-tag]'), {
+    const tags = cardRef.current.querySelectorAll('[data-tag]');
+    if (tags.length === 0) return;
+
+    animate(tags, {
       translateY: [5, 0],
       opacity: [0.7, 1],
       duration: 300,
@@ -148,84 +166,88 @@ const MemberCard: FC<{ member: TeamMember; index: number }> = ({ member, index }
   }, [isHovered]);
 
   return (
-    <div ref={cardRef} data-team="card" className="group relative opacity-0" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
-      <div className="absolute inset-0 rounded-3xl bg-linear-to-br from-primary/20 via-transparent to-secondary/20 opacity-0 blur-xl transition-opacity duration-700 group-hover:opacity-100" />
+    <div ref={cardRef} data-team="card" className="group relative opacity-0" onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+      <div className="absolute inset-0 rounded-2xl bg-linear-to-br from-primary/20 via-transparent to-secondary/20 opacity-0 blur-xl transition-opacity duration-700 group-hover:opacity-100" />
 
-      <div className="relative overflow-hidden rounded-3xl border border-border/50 bg-background/80 backdrop-blur-xl transition-all duration-500 hover:border-primary/30">
+      <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-background/80 backdrop-blur-xl transition-all duration-500 hover:border-primary/30">
         <div className="absolute inset-0 bg-linear-to-b from-transparent via-transparent to-muted/30" />
 
-        <div className="absolute -right-20 -top-20 h-40 w-40 rounded-full bg-linear-to-br from-primary/10 to-transparent blur-2xl transition-transform duration-700 group-hover:scale-150" />
-        <div className="absolute -left-20 -bottom-20 h-40 w-40 rounded-full bg-linear-to-tr from-secondary/10 to-transparent blur-2xl transition-transform duration-700 group-hover:scale-150" />
+        <div className="absolute -right-16 -top-16 h-32 w-32 rounded-full bg-linear-to-br from-primary/10 to-transparent blur-2xl transition-transform duration-700 group-hover:scale-150" />
+        <div className="absolute -left-16 -bottom-16 h-32 w-32 rounded-full bg-linear-to-tr from-secondary/10 to-transparent blur-2xl transition-transform duration-700 group-hover:scale-150" />
 
-        <div className="relative px-5 py-6 md:px-6 md:py-8">
+        <div className="relative px-4 py-5 md:px-5 md:py-6">
           <div className="flex flex-col items-center text-center">
-            <div ref={avatarRef} className="relative mb-4">
+            <div ref={avatarRef} className="relative mb-3">
               <div data-avatar-ring className={`absolute inset-0 -m-2 rounded-full bg-linear-to-r ${config.gradient} opacity-40 blur-md`} />
 
-              <div className="relative h-24 w-24 overflow-hidden rounded-full border-4 border-background transition-transform duration-500 group-hover:scale-110 md:h-28 md:w-28">
+              <div className="relative h-20 w-20 overflow-hidden rounded-full border-4 border-background transition-transform duration-500 group-hover:scale-110 md:h-24 md:w-24">
                 {member.image ? (
-                  <Image src={member.image} alt={member.name} fill className="object-cover" sizes="112px" />
+                  <Image src={member.image} alt={member.name} fill className="object-cover" sizes="96px" />
                 ) : (
                   <div className={`flex h-full w-full items-center justify-center bg-linear-to-br ${config.gradient}`}>
-                    <span className="font-heading text-2xl font-black text-white md:text-3xl">{initials}</span>
+                    <span className="font-heading text-xl font-black text-white md:text-2xl">{initials}</span>
                   </div>
                 )}
               </div>
 
-              <div className={`absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full border-2 border-background bg-linear-to-br ${config.gradient}`}>
-                <DepartmentIcon className="h-4 w-4 text-white" />
+              <div className={`absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border-2 border-background bg-linear-to-br ${config.gradient}`}>
+                <DepartmentIcon className="h-3.5 w-3.5 text-white" />
               </div>
             </div>
 
-            <Badge variant="outline" className={`mb-2 text-xs ${config.badge}`}>
-              <Star className="mr-1 h-3 w-3" />
+            <Badge variant="outline" className={`mb-2 text-[10px] ${config.badge}`}>
+              <Star className="mr-1 h-2.5 w-2.5" />
               {member.department}
             </Badge>
 
-            <h2 className="mb-1 font-heading text-lg font-black md:text-xl">{member.name}</h2>
+            <h2 className="mb-0.5 font-heading text-sm font-black md:text-base">{member.name}</h2>
 
-            <p className="mb-3 text-xs font-semibold text-primary">{member.role}</p>
+            <p className="mb-2 text-[10px] font-semibold text-primary md:text-xs">{member.role}</p>
 
-            <p className="mb-4 line-clamp-3 text-xs leading-relaxed text-muted-foreground">{member.bio}</p>
+            <p className="mb-3 line-clamp-2 text-[10px] leading-relaxed text-muted-foreground md:text-xs">{member.bio}</p>
 
-            <div className="mb-4 flex flex-wrap justify-center gap-1">
-              {member.tags.slice(0, 4).map((tag) => (
+            <div className="mb-3 flex flex-wrap justify-center gap-1">
+              {member.tags.slice(0, 3).map((tag) => (
                 <span
                   key={tag}
                   data-tag
-                  className="rounded-full border border-border/50 bg-muted/50 px-2 py-0.5 text-[10px] font-medium text-muted-foreground backdrop-blur-sm transition-all hover:border-primary/30 hover:bg-primary/5 hover:text-foreground"
+                  className="rounded-full border border-border/50 bg-muted/50 px-2 py-0.5 text-[9px] font-medium text-muted-foreground backdrop-blur-sm transition-all hover:border-primary/30 hover:bg-primary/5 hover:text-foreground"
                 >
                   {tag}
                 </span>
               ))}
-              {member.tags.length > 4 && (
-                <span data-tag className="rounded-full border border-border/50 bg-muted/30 px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-                  +{member.tags.length - 4}
+              {member.tags.length > 3 && (
+                <span data-tag className="rounded-full border border-border/50 bg-muted/30 px-2 py-0.5 text-[9px] font-medium text-muted-foreground">
+                  +{member.tags.length - 3}
                 </span>
               )}
             </div>
 
-            <div className="mb-5 flex items-center justify-center gap-5">
+            <div className="mb-4 flex items-center justify-center gap-4">
               <div className="text-center">
                 <div className="flex items-center justify-center gap-1">
-                  <Zap className="h-3.5 w-3.5 text-primary" />
-                  <span className="font-heading text-lg font-black text-foreground">{isVisible ? <AnimatedNumber value={member.stats.projects} delay={index * 100} /> : '0'}</span>
+                  <Zap className="h-3 w-3 text-primary" />
+                  <span className="font-heading text-base font-black text-foreground">
+                    <AnimatedNumber value={member.stats.projects} delay={index * 100} isVisible={isVisible} />
+                  </span>
                 </div>
-                <p className="text-[10px] text-muted-foreground">Proyectos</p>
+                <p className="text-[9px] text-muted-foreground">Proyectos</p>
               </div>
 
-              <div className="h-6 w-px bg-border" />
+              <div className="h-5 w-px bg-border" />
 
               <div className="text-center">
                 <div className="flex items-center justify-center gap-1">
-                  <Clock className="h-3.5 w-3.5 text-secondary" />
-                  <span className="font-heading text-lg font-black text-foreground">{isVisible ? <AnimatedNumber value={member.stats.experience} delay={index * 100 + 200} /> : '0'}</span>
+                  <Clock className="h-3 w-3 text-secondary" />
+                  <span className="font-heading text-base font-black text-foreground">
+                    <AnimatedNumber value={member.stats.experience} delay={index * 100 + 200} isVisible={isVisible} />
+                  </span>
                 </div>
-                <p className="text-[10px] text-muted-foreground">Experiencia</p>
+                <p className="text-[9px] text-muted-foreground">Experiencia</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               {member.socials.map((social) => {
                 const SocialIcon = socialIcons[social.platform];
                 return (
@@ -234,20 +256,20 @@ const MemberCard: FC<{ member: TeamMember; index: number }> = ({ member, index }
                     href={social.url}
                     target="_blank"
                     rel="noreferrer"
-                    className="flex h-9 w-9 items-center justify-center rounded-full border border-border/50 bg-background/50 text-muted-foreground backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:border-primary/50 hover:bg-primary hover:text-white"
+                    className="flex h-8 w-8 items-center justify-center rounded-full border border-border/50 bg-background/50 text-muted-foreground backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:border-primary/50 hover:bg-primary hover:text-white"
                     aria-label={social.platform}
                   >
-                    <SocialIcon className="h-4 w-4" />
+                    <SocialIcon className="h-3.5 w-3.5" />
                   </a>
                 );
               })}
 
               <a
-                href={`mailto:contacto@redorange.net.pe`}
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-border/50 bg-background/50 text-muted-foreground backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:border-primary/50 hover:bg-primary hover:text-white"
+                href="mailto:contacto@redorange.net.pe"
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-border/50 bg-background/50 text-muted-foreground backdrop-blur-sm transition-all duration-300 hover:scale-110 hover:border-primary/50 hover:bg-primary hover:text-white"
                 aria-label="Email"
               >
-                <Mail className="h-4 w-4" />
+                <Mail className="h-3.5 w-3.5" />
               </a>
             </div>
           </div>
@@ -266,44 +288,54 @@ export const TeamGrid: FC<TeamGridProps> = ({ members }) => {
     const container = containerRef.current;
     if (!container) return;
 
-    animate(container.querySelectorAll('[data-team="glow"]'), {
-      translateY: [0, 20, 0],
-      translateX: [0, 10, 0],
-      scale: [1, 1.1, 1],
-      direction: 'alternate',
-      loop: true,
-      easing: 'easeInOutSine',
-      duration: 6000,
-      delay: stagger(1000),
-    });
+    const glowEls = container.querySelectorAll('[data-team="glow"]');
+    if (glowEls.length > 0) {
+      animate(glowEls, {
+        translateY: [0, 20, 0],
+        translateX: [0, 10, 0],
+        scale: [1, 1.1, 1],
+        direction: 'alternate',
+        loop: true,
+        easing: 'easeInOutSine',
+        duration: 6000,
+        delay: stagger(1000),
+      });
+    }
 
-    const headerEls = headerRef.current?.querySelectorAll('[data-team="header"]') ?? [];
-    animate(headerEls, {
-      opacity: [0, 1],
-      translateY: [30, 0],
-      duration: 1000,
-      easing: 'easeOutExpo',
-      delay: stagger(100),
-    });
+    const headerEls = headerRef.current?.querySelectorAll('[data-team="header"]');
+    if (headerEls && headerEls.length > 0) {
+      animate(headerEls, {
+        opacity: [0, 1],
+        translateY: [30, 0],
+        duration: 1000,
+        easing: 'easeOutExpo',
+        delay: stagger(100),
+      });
+    }
 
-    const cardEls = gridRef.current?.querySelectorAll('[data-team="card"]') ?? [];
-    animate(cardEls, {
-      opacity: [0, 1],
-      translateY: [50, 0],
-      rotateX: [10, 0],
-      duration: 1200,
-      easing: 'easeOutExpo',
-      delay: stagger(150, { start: 400 }),
-    });
+    const cardEls = gridRef.current?.querySelectorAll('[data-team="card"]');
+    if (cardEls && cardEls.length > 0) {
+      animate(cardEls, {
+        opacity: [0, 1],
+        translateY: [50, 0],
+        rotateX: [10, 0],
+        duration: 1200,
+        easing: 'easeOutExpo',
+        delay: stagger(150, { start: 400 }),
+      });
+    }
 
-    animate(container.querySelectorAll('[data-team="cta"]'), {
-      opacity: [0, 1],
-      translateY: [30, 0],
-      scale: [0.9, 1],
-      duration: 1000,
-      easing: 'easeOutExpo',
-      delay: 1200,
-    });
+    const ctaEls = container.querySelectorAll('[data-team="cta"]');
+    if (ctaEls.length > 0) {
+      animate(ctaEls, {
+        opacity: [0, 1],
+        translateY: [30, 0],
+        scale: [0.9, 1],
+        duration: 1000,
+        easing: 'easeOutExpo',
+        delay: 1200,
+      });
+    }
   }, []);
 
   return (
@@ -314,54 +346,54 @@ export const TeamGrid: FC<TeamGridProps> = ({ members }) => {
         <div data-team="glow" className="absolute bottom-0 left-1/3 h-[400px] w-[400px] rounded-full bg-linear-to-t from-primary/15 to-transparent blur-3xl" />
       </div>
 
-      <div className="relative mx-auto max-w-7xl px-6 md:px-10">
-        <div ref={headerRef} className="mb-12 text-center md:mb-16">
-          <div data-team="header" className="mb-5 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 opacity-0">
+      <div className="relative mx-auto max-w-6xl px-6 md:px-10">
+        <div ref={headerRef} className="mb-10 text-center md:mb-14">
+          <div data-team="header" className="mb-4 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 opacity-0">
             <Users className="h-4 w-4 text-primary-foreground" />
             <span className="text-sm font-medium text-primary-foreground">Conoce a nuestro equipo</span>
           </div>
 
-          <h1 data-team="header" className="mb-4 text-3xl font-black tracking-tight md:text-4xl lg:text-5xl opacity-0">
+          <h1 data-team="header" className="mb-3 text-2xl font-black tracking-tight md:text-3xl lg:text-4xl opacity-0">
             El talento detrás de <span className="bg-linear-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">REDORANGE</span>
           </h1>
 
-          <p data-team="header" className="mx-auto max-w-2xl text-sm text-muted-foreground md:text-base opacity-0">
+          <p data-team="header" className="mx-auto max-w-xl text-xs text-muted-foreground md:text-sm opacity-0">
             Profesionales apasionados por la tecnología, comprometidos con la excelencia y dedicados a transformar organizaciones a través de soluciones innovadoras.
           </p>
         </div>
 
-        <div ref={gridRef} className="grid gap-6 sm:grid-cols-2 lg:grid-cols-2 xl:gap-8">
+        <div ref={gridRef} className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 xl:gap-6">
           {members.map((member, index) => (
             <MemberCard key={member.id} member={member} index={index} />
           ))}
         </div>
 
-        <div data-team="cta" className="mt-16 text-center opacity-0">
+        <div data-team="cta" className="mt-14 text-center opacity-0">
           <div className="relative inline-block">
-            <div className="absolute inset-0 -m-4 rounded-3xl bg-linear-to-r from-primary/20 via-secondary/20 to-accent/20 blur-2xl" />
+            <div className="absolute inset-0 -m-4 rounded-2xl bg-linear-to-r from-primary/20 via-secondary/20 to-accent/20 blur-2xl" />
 
-            <div className="relative overflow-hidden rounded-3xl border border-border/50 bg-background/80 p-6 backdrop-blur-xl md:p-10">
-              <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-linear-to-br from-primary/20 to-transparent blur-2xl" />
-              <div className="absolute -bottom-10 -left-10 h-32 w-32 rounded-full bg-linear-to-tr from-secondary/20 to-transparent blur-2xl" />
+            <div className="relative overflow-hidden rounded-2xl border border-border/50 bg-background/80 p-5 backdrop-blur-xl md:p-8">
+              <div className="absolute -right-10 -top-10 h-24 w-24 rounded-full bg-linear-to-br from-primary/20 to-transparent blur-2xl" />
+              <div className="absolute -bottom-10 -left-10 h-24 w-24 rounded-full bg-linear-to-tr from-secondary/20 to-transparent blur-2xl" />
 
               <div className="relative">
-                <div className="mb-5 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-linear-to-br from-primary to-secondary">
-                  <Sparkles className="h-7 w-7 text-white" />
+                <div className="mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br from-primary to-secondary">
+                  <Sparkles className="h-6 w-6 text-white" />
                 </div>
 
-                <h3 className="mb-2 font-heading text-xl font-black md:text-2xl">¿Quieres ser parte del equipo?</h3>
+                <h3 className="mb-2 font-heading text-lg font-black md:text-xl">¿Quieres ser parte del equipo?</h3>
 
-                <p className="mb-5 text-sm text-muted-foreground">Estamos siempre buscando talento apasionado por la tecnología y la innovación.</p>
+                <p className="mb-4 text-xs text-muted-foreground">Estamos siempre buscando talento apasionado por la tecnología y la innovación.</p>
 
-                <div className="flex flex-col items-center justify-center gap-3 sm:flex-row">
-                  <Button asChild size="default" className="font-heading group">
+                <div className="flex flex-col items-center justify-center gap-2 sm:flex-row">
+                  <Button asChild size="sm" className="font-heading group">
                     <Link href="/#contact">
                       Contáctanos
                       <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </Link>
                   </Button>
 
-                  <Button asChild size="default" variant="outline" className="font-heading">
+                  <Button asChild size="sm" variant="outline" className="font-heading">
                     <Link href="/#services">Ver servicios</Link>
                   </Button>
                 </div>
