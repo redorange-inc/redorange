@@ -32,8 +32,7 @@ export const ServicesScroller: FC = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
   const isAnimatingRef = useRef(false);
-  const hasEnteredRef = useRef(false);
-  const exitingRef = useRef<'up' | 'down' | null>(null);
+  const lockTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const slides = useMemo<ServiceSlide[]>(
     () => [
@@ -110,45 +109,32 @@ export const ServicesScroller: FC = () => {
   const slideCount = slides.length;
 
   const animateToSlide = useCallback(
-    (targetSlide: number, onComplete?: () => void) => {
+    (targetSlide: number) => {
       if (isAnimatingRef.current) return;
 
       const next = clamp(targetSlide, 0, slideCount - 1);
-      if (next === currentSlide) {
-        onComplete?.();
-        return;
-      }
+      if (next === currentSlide) return;
 
       isAnimatingRef.current = true;
       setCurrentSlide(next);
 
-      const duration = prefersReducedMotion() ? 0 : 500;
+      const duration = prefersReducedMotion() ? 0 : 700;
       setTimeout(() => {
         isAnimatingRef.current = false;
-        onComplete?.();
       }, duration);
     },
     [slideCount, currentSlide],
   );
 
-  const scrollToAbout = useCallback(() => {
-    const aboutSection = document.getElementById('about');
-    if (aboutSection) {
-      exitingRef.current = 'down';
+  const scrollToSection = useCallback((sectionId: string) => {
+    const section = document.getElementById(sectionId);
+    if (section) {
       setIsLocked(false);
-      aboutSection.scrollIntoView({ behavior: 'smooth' });
+      section.scrollIntoView({ behavior: 'smooth' });
     }
   }, []);
 
-  const scrollToHero = useCallback(() => {
-    const heroSection = document.getElementById('home');
-    if (heroSection) {
-      exitingRef.current = 'up';
-      setIsLocked(false);
-      heroSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, []);
-
+  // Detectar cuando la sección está completamente visible
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
@@ -157,69 +143,80 @@ export const ServicesScroller: FC = () => {
       (entries) => {
         const entry = entries[0];
 
-        if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
-          if (!hasEnteredRef.current || exitingRef.current) {
-            hasEnteredRef.current = true;
-            exitingRef.current = null;
+        // Solo activar cuando la sección está casi completamente visible (95%+)
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.95) {
+          // Pequeño delay para evitar activación accidental
+          if (lockTimeoutRef.current) clearTimeout(lockTimeoutRef.current);
+          lockTimeoutRef.current = setTimeout(() => {
             setIsLocked(true);
-            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }
-        } else if (!entry.isIntersecting) {
+          }, 100);
+        } else if (entry.intersectionRatio < 0.5) {
+          // Desactivar cuando menos del 50% es visible
+          if (lockTimeoutRef.current) clearTimeout(lockTimeoutRef.current);
           setIsLocked(false);
-          if (entry.boundingClientRect.top > 0) {
-            hasEnteredRef.current = false;
-          }
         }
       },
-      { threshold: [0, 0.5, 1] },
+      {
+        threshold: [0, 0.5, 0.95, 1],
+        rootMargin: '0px',
+      },
     );
 
     observer.observe(section);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      if (lockTimeoutRef.current) clearTimeout(lockTimeoutRef.current);
+    };
   }, []);
 
+  // Manejar wheel - solo cuando está bloqueado
   useEffect(() => {
     if (!isLocked) return;
 
-    const THRESHOLD = 80;
+    const THRESHOLD = 100;
     let accumulatedDelta = 0;
     let resetTimeout: ReturnType<typeof setTimeout> | null = null;
 
     const handleWheel = (e: WheelEvent) => {
-      if (!isLocked || isAnimatingRef.current) return;
+      // Verificar que estamos realmente en la sección
+      const section = sectionRef.current;
+      if (!section) return;
 
-      const delta = Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+      const rect = section.getBoundingClientRect();
+      const isFullyVisible = rect.top >= -10 && rect.top <= 10;
 
-      if (currentSlide === 0 && delta < 0) {
-        accumulatedDelta += delta;
-        if (Math.abs(accumulatedDelta) >= THRESHOLD) {
-          accumulatedDelta = 0;
-          scrollToHero();
-          return;
-        }
-        e.preventDefault();
-        return;
-      }
-
-      if (currentSlide === slideCount - 1 && delta > 0) {
-        accumulatedDelta += delta;
-        if (accumulatedDelta >= THRESHOLD) {
-          accumulatedDelta = 0;
-          scrollToAbout();
-          return;
-        }
-        e.preventDefault();
+      if (!isFullyVisible) {
+        setIsLocked(false);
         return;
       }
 
       e.preventDefault();
-      accumulatedDelta += delta;
+
+      if (isAnimatingRef.current) return;
+
+      const delta = e.deltaY;
+      accumulatedDelta += delta * 0.6; // Factor de reducción para scroll más suave
 
       if (resetTimeout) clearTimeout(resetTimeout);
       resetTimeout = setTimeout(() => {
         accumulatedDelta = 0;
       }, 150);
 
+      // Salir hacia arriba desde primer slide
+      if (currentSlide === 0 && accumulatedDelta < -THRESHOLD) {
+        accumulatedDelta = 0;
+        scrollToSection('home');
+        return;
+      }
+
+      // Salir hacia abajo desde último slide
+      if (currentSlide === slideCount - 1 && accumulatedDelta > THRESHOLD) {
+        accumulatedDelta = 0;
+        scrollToSection('about');
+        return;
+      }
+
+      // Cambiar slide
       if (Math.abs(accumulatedDelta) >= THRESHOLD) {
         const direction = accumulatedDelta > 0 ? 1 : -1;
         accumulatedDelta = 0;
@@ -228,27 +225,29 @@ export const ServicesScroller: FC = () => {
     };
 
     window.addEventListener('wheel', handleWheel, { passive: false });
+
     return () => {
       window.removeEventListener('wheel', handleWheel);
       if (resetTimeout) clearTimeout(resetTimeout);
     };
-  }, [isLocked, currentSlide, slideCount, animateToSlide, scrollToHero, scrollToAbout]);
+  }, [isLocked, currentSlide, slideCount, animateToSlide, scrollToSection]);
 
+  // Manejar teclas
   useEffect(() => {
     if (!isLocked) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (isAnimatingRef.current) return;
 
-      const nextKeys = ['ArrowRight', 'ArrowDown', 'PageDown'];
-      const prevKeys = ['ArrowLeft', 'ArrowUp', 'PageUp'];
+      const nextKeys = ['ArrowRight', 'ArrowDown'];
+      const prevKeys = ['ArrowLeft', 'ArrowUp'];
 
       if (nextKeys.includes(e.key)) {
         e.preventDefault();
         if (currentSlide < slideCount - 1) {
           animateToSlide(currentSlide + 1);
         } else {
-          scrollToAbout();
+          scrollToSection('about');
         }
       }
 
@@ -257,35 +256,30 @@ export const ServicesScroller: FC = () => {
         if (currentSlide > 0) {
           animateToSlide(currentSlide - 1);
         } else {
-          scrollToHero();
+          scrollToSection('home');
         }
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isLocked, currentSlide, slideCount, animateToSlide, scrollToHero, scrollToAbout]);
+  }, [isLocked, currentSlide, slideCount, animateToSlide, scrollToSection]);
 
+  // Touch support
   useEffect(() => {
     if (!isLocked) return;
 
     let touchStartY = 0;
-    let touchStartX = 0;
 
     const handleTouchStart = (e: TouchEvent) => {
       touchStartY = e.touches[0].clientY;
-      touchStartX = e.touches[0].clientX;
     };
 
     const handleTouchEnd = (e: TouchEvent) => {
       if (isAnimatingRef.current) return;
 
       const touchEndY = e.changedTouches[0].clientY;
-      const touchEndX = e.changedTouches[0].clientX;
-      const deltaY = touchStartY - touchEndY;
-      const deltaX = touchStartX - touchEndX;
-
-      const delta = Math.abs(deltaY) > Math.abs(deltaX) ? deltaY : deltaX;
+      const delta = touchStartY - touchEndY;
       const threshold = 50;
 
       if (Math.abs(delta) < threshold) return;
@@ -294,13 +288,13 @@ export const ServicesScroller: FC = () => {
         if (currentSlide < slideCount - 1) {
           animateToSlide(currentSlide + 1);
         } else {
-          scrollToAbout();
+          scrollToSection('about');
         }
       } else {
         if (currentSlide > 0) {
           animateToSlide(currentSlide - 1);
         } else {
-          scrollToHero();
+          scrollToSection('home');
         }
       }
     };
@@ -312,28 +306,24 @@ export const ServicesScroller: FC = () => {
       window.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchend', handleTouchEnd);
     };
-  }, [isLocked, currentSlide, slideCount, animateToSlide, scrollToHero, scrollToAbout]);
+  }, [isLocked, currentSlide, slideCount, animateToSlide, scrollToSection]);
 
   return (
-    <section id="services" ref={sectionRef} className="relative h-screen w-full overflow-hidden">
-      {/* Background gradient */}
-      <div className={`absolute inset-0 bg-linear-to-br transition-all duration-700 ${slides[currentSlide].gradient}`} />
+    <section id="services" ref={sectionRef} className="relative h-screen w-full overflow-hidden" style={{ scrollSnapAlign: 'start' }}>
+      <div className={`absolute inset-0 bg-linear-to-br transition-all duration-1000 ${slides[currentSlide].gradient}`} />
 
-      {/* Track de slides - contenido centrado */}
-      <div ref={containerRef} className="flex h-full transition-transform duration-500 ease-out will-change-transform" style={{ transform: `translateX(-${currentSlide * 100}vw)` }}>
+      <div ref={containerRef} className="flex h-full transition-transform duration-700 ease-out will-change-transform" style={{ transform: `translateX(-${currentSlide * 100}vw)` }}>
         {slides.map((slide, idx) => {
           const isActive = currentSlide === idx;
           const Icon = slide.icon;
 
           return (
             <div key={slide.id} id={slide.id} className="relative h-screen w-screen shrink-0">
-              {/* Contenedor centrado vertical y horizontalmente */}
               <div className="flex h-full w-full items-center justify-center px-6 md:px-10">
                 <div className="mx-auto w-full max-w-7xl">
                   <div
                     className={`grid w-full items-center gap-6 md:grid-cols-2 md:gap-10 lg:gap-14 transition-all duration-500 ${isActive ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}
                   >
-                    {/* Columna izquierda - Información */}
                     <div className="space-y-4">
                       <Badge variant="secondary" className="w-fit font-heading">
                         {slide.badge}
@@ -373,7 +363,6 @@ export const ServicesScroller: FC = () => {
                       </p>
                     </div>
 
-                    {/* Columna derecha - Panel de entregables */}
                     <div className="rounded-2xl border border-border/60 bg-background/70 p-4 shadow-sm backdrop-blur-md md:p-5">
                       <div className="mb-4 flex items-center gap-3">
                         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 md:h-12 md:w-12">
@@ -423,10 +412,8 @@ export const ServicesScroller: FC = () => {
         })}
       </div>
 
-      {/* Indicadores de navegación - posición fija en la parte inferior */}
       <div className="absolute bottom-0 left-0 right-0 z-20 pb-5 md:pb-6">
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-3 px-6">
-          {/* Dots */}
           <div className="flex items-center gap-2">
             {slides.map((s, idx) => (
               <button
@@ -439,16 +426,13 @@ export const ServicesScroller: FC = () => {
             ))}
           </div>
 
-          {/* Controles */}
           <div className="flex items-center gap-3">
             <button
               type="button"
               onClick={() => {
-                if (currentSlide > 0) {
-                  animateToSlide(currentSlide - 1);
-                } else {
-                  scrollToHero();
-                }
+                if (isAnimatingRef.current) return;
+                if (currentSlide > 0) animateToSlide(currentSlide - 1);
+                else scrollToSection('home');
               }}
               className="flex h-8 w-8 items-center justify-center rounded-full border border-border/60 bg-background/60 text-muted-foreground backdrop-blur transition-all hover:bg-background hover:text-foreground"
               aria-label="Anterior"
@@ -463,10 +447,11 @@ export const ServicesScroller: FC = () => {
             <button
               type="button"
               onClick={() => {
+                if (isAnimatingRef.current) return;
                 if (currentSlide < slideCount - 1) {
                   animateToSlide(currentSlide + 1);
                 } else {
-                  scrollToAbout();
+                  scrollToSection('about');
                 }
               }}
               className="flex h-8 w-8 items-center justify-center rounded-full border border-border/60 bg-background/60 text-muted-foreground backdrop-blur transition-all hover:bg-background hover:text-foreground"
