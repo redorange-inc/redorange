@@ -10,6 +10,7 @@ const navItems = [
   { href: '/#home', label: 'Inicio' },
   { href: '/#services', label: 'Líneas' },
   { href: '/#about', label: 'Sobre Nosotros' },
+  { href: '/team', label: 'Nuestro Equipo' },
   { href: '/#contact', label: 'Contactarnos' },
 ] as const;
 
@@ -25,9 +26,9 @@ export const Navbar: FC = () => {
           </div>
         </Link>
 
-        <nav className="hidden items-center gap-1 md:flex">
+        <nav className="hidden items-center gap-1 lg:flex">
           {navItems.map((item) => (
-            <Button key={item.href} asChild variant="ghost" className="px-3 font-heading">
+            <Button key={item.href} asChild variant="ghost" className="px-3 font-heading text-sm">
               <Link href={item.href}>{item.label}</Link>
             </Button>
           ))}
@@ -43,10 +44,10 @@ export const Navbar: FC = () => {
         </div>
       </div>
 
-      <div className="mx-auto w-full max-w-6xl px-4 pb-3 md:hidden">
+      <div className="mx-auto w-full max-w-6xl px-4 pb-3 lg:hidden">
         <div className="flex flex-wrap gap-2">
           {navItems.map((item) => (
-            <Button key={item.href} asChild size="sm" variant="secondary" className="font-heading">
+            <Button key={item.href} asChild size="sm" variant="secondary" className="font-heading text-xs">
               <Link href={item.href}>{item.label}</Link>
             </Button>
           ))}
