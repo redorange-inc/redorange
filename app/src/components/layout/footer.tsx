@@ -101,14 +101,7 @@ export const Footer: FC = () => {
                 <Phone className="h-4 w-4 text-foreground/70" />
                 {whatsappNumber}
               </div>
-
-              <div className="flex items-center gap-2">
-                <Clock className="h-4 w-4 text-foreground/70" />
-                Lun - Sab
-              </div>
             </div>
-
-            <p className="text-xs text-muted-foreground">Si necesitas, conectamos formularios a correo, CRM o WhatsApp Business.</p>
           </div>
         </div>
 
