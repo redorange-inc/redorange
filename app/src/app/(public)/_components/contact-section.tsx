@@ -9,10 +9,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowRight, Sparkles, MapPin, Clock, Mail, Phone, Cpu, Boxes, Globe, CheckCircle2, Hash, MessageCircle } from 'lucide-react';
 
+import { fn_get_contact, type ContactContent, type ContactLine as ContactLineDTO } from '@/actions/fn-services';
+
 const prefersReducedMotion = (): boolean => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 
-type ContactLine = {
-  key: 'ti' | 'equipos' | 'telecom';
+type ContactLineUI = {
+  key: ContactLineDTO['key'];
   number: string;
   tabLabel: string;
   title: string;
@@ -29,6 +31,16 @@ type ContactLine = {
   };
   bullets: Array<{ icon: FC<{ className?: string }>; text: string }>;
   subjectPlaceholder: string;
+};
+
+const ICONS: Record<ContactLineDTO['accent']['iconKey'], FC<{ className?: string }>> = {
+  cpu: Cpu,
+  boxes: Boxes,
+  globe: Globe,
+};
+
+const BULLET_ICONS: Record<'checkCircle2', FC<{ className?: string }>> = {
+  checkCircle2: CheckCircle2,
 };
 
 const EllipsisMarquee: FC<{
@@ -102,7 +114,6 @@ const AnimatedTextSlider: FC<{
     if (prefersReducedMotion() || !textContainerRef.current) return;
 
     const textEl = textContainerRef.current;
-
     textEl.textContent = '';
 
     const letters = currentBullet.text.split('').map((char) => {
@@ -118,7 +129,6 @@ const AnimatedTextSlider: FC<{
 
     animate(letters, { opacity: [0, 1], translateY: [10, 0], duration: 600, delay: (_, i) => 100 + i * 25, easing: 'easeOutCubic' });
 
-    // Cursor parpadeante al final -- remove
     const cursor = document.createElement('span');
     cursor.className = 'inline-block w-0.5 h-4 bg-current ml-1 align-middle';
     cursor.style.opacity = '0';
@@ -139,15 +149,11 @@ const AnimatedTextSlider: FC<{
 
   useEffect(() => {
     if (prefersReducedMotion() || !cardRef.current) return;
-
     animate(cardRef.current, { scale: [0.98, 1], opacity: [0.8, 1], duration: 500, easing: 'easeOutCubic' });
   }, [currentIndex]);
 
   useEffect(() => {
-    const slideInterval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % bullets.length);
-    }, 4500);
-
+    const slideInterval = setInterval(() => setCurrentIndex((prev) => (prev + 1) % bullets.length), 4500);
     return () => clearInterval(slideInterval);
   }, [bullets.length]);
 
@@ -177,98 +183,81 @@ export const ContactSection: FC = () => {
   const headerRef = useRef<HTMLDivElement | null>(null);
   const formRef = useRef<HTMLDivElement | null>(null);
 
-  const whatsappNumber = '+51999999999';
+  const [data, setData] = useState<ContactContent | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+
+    fn_get_contact()
+      .then((res) => {
+        if (!mounted) return;
+        setData(res);
+      })
+      .catch(() => {
+        if (!mounted) return;
+        setData(null);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const whatsappNumber = data?.meta.whatsappNumber ?? '+51999999999';
   const waDigits = whatsappNumber.replace(/[^\d]/g, '');
   const whatsappHref = `https://wa.me/${waDigits}`;
 
-  const lines = useMemo<ContactLine[]>(
-    () => [
-      {
-        key: 'ti',
-        number: '01',
-        tabLabel: 'TI',
-        title: 'Tecnología y Soluciones Informáticas (TI)',
-        subtitle: 'Consultoría, desarrollo de software y sistemas, soporte y continuidad operativa.',
-        emailBodyLine: 'Línea: Tecnología y Soluciones Informáticas (TI)',
-        accent: {
-          ring: 'ring-cyan-500/25',
-          text: 'text-cyan-700 dark:text-cyan-300',
-          chipBg: 'bg-cyan-500/10',
-          chipText: 'text-cyan-800 dark:text-cyan-200',
-          badgeBg: 'bg-cyan-500/12',
-          badgeText: 'text-cyan-800 dark:text-cyan-200',
-          icon: Cpu,
-        },
-        bullets: [
-          { icon: CheckCircle2, text: 'Consultoría y asesoría en informática y cómputo' },
-          { icon: CheckCircle2, text: 'Desarrollo de software, sistemas y aplicaciones' },
-          { icon: CheckCircle2, text: 'Programación y construcción de sistemas informáticos' },
-          { icon: CheckCircle2, text: 'Operación: servidores, sistemas, redes y bases de datos' },
-        ],
-        subjectPlaceholder: 'Ej. sistema a medida / soporte TI / servidores',
-      },
-      {
-        key: 'equipos',
-        number: '02',
-        tabLabel: 'Equipos',
-        title: 'Comercialización, Importación y Servicios Técnicos de Equipos',
-        subtitle: 'Provisión, cotización, instalación, mantenimiento y postventa de equipos y redes.',
-        emailBodyLine: 'Línea: Comercialización, Importación y Servicios Técnicos de Equipos',
-        accent: {
-          ring: 'ring-rose-500/25',
-          text: 'text-rose-700 dark:text-rose-300',
-          chipBg: 'bg-rose-500/10',
-          chipText: 'text-rose-800 dark:text-rose-200',
-          badgeBg: 'bg-rose-500/12',
-          badgeText: 'text-rose-800 dark:text-rose-200',
-          icon: Boxes,
-        },
-        bullets: [
-          { icon: CheckCircle2, text: 'Importación y exportación de equipos tecnológicos' },
-          { icon: CheckCircle2, text: 'Distribución y comercialización de equipos y suministros' },
-          { icon: CheckCircle2, text: 'Cotización y venta de equipos tecnológicos' },
-          { icon: CheckCircle2, text: 'Instalación, mantenimiento y redes integrales' },
-        ],
-        subjectPlaceholder: 'Ej. cotización de equipos / instalación / mantenimiento',
-      },
-      {
-        key: 'telecom',
-        number: '03',
-        tabLabel: 'Telecom, Digital y Energía',
-        title: 'Telecomunicaciones, Servicios Digitales y Energía Tecnológica',
-        subtitle: 'Conectividad, cloud/hosting, servicios digitales y soluciones energéticas.',
-        emailBodyLine: 'Línea: Telecomunicaciones, Servicios Digitales y Energía Tecnológica',
-        accent: {
-          ring: 'ring-orange-500/25',
-          text: 'text-orange-700 dark:text-orange-300',
-          chipBg: 'bg-orange-500/10',
-          chipText: 'text-orange-800 dark:text-orange-200',
-          badgeBg: 'bg-orange-500/12',
-          badgeText: 'text-orange-800 dark:text-orange-200',
-          icon: Globe,
-        },
-        bullets: [
-          { icon: CheckCircle2, text: 'Telecomunicaciones e internet (incluye línea dedicada)' },
-          { icon: CheckCircle2, text: 'Hosting, cloud, storage y servidores de seguridad' },
-          { icon: CheckCircle2, text: 'Dominios, hosting web, correo corporativo, intranet y extranet' },
-          { icon: CheckCircle2, text: 'Paneles solares, medición y servicios eléctricos asociados' },
-        ],
-        subjectPlaceholder: 'Ej. internet dedicado / hosting / paneles solares',
-      },
-    ],
-    [],
-  );
+  const salesEmail = data?.meta.salesEmail ?? 'ventas@redorange.net.pe';
 
-  const mailtoHrefFor = (line: ContactLine) => {
+  const lines = useMemo<ContactLineUI[]>(() => {
+    const raw = data?.lines ?? [];
+
+    return raw.map((line) => {
+      const LineIcon = ICONS[line.accent.iconKey];
+
+      return {
+        key: line.key,
+        number: line.number,
+        tabLabel: line.tabLabel,
+        title: line.title,
+        subtitle: line.subtitle,
+        emailBodyLine: line.emailBodyLine,
+        accent: {
+          ring: line.accent.ring,
+          text: line.accent.text,
+          chipBg: line.accent.chipBg,
+          chipText: line.accent.chipText,
+          badgeBg: line.accent.badgeBg,
+          badgeText: line.accent.badgeText,
+          icon: LineIcon,
+        },
+        bullets: line.bullets.map((b) => {
+          const BulletIcon = BULLET_ICONS[b.iconKey];
+          return { icon: BulletIcon, text: b.text };
+        }),
+        subjectPlaceholder: line.subjectPlaceholder,
+      };
+    });
+  }, [data]);
+
+  const mailtoHrefFor = (line: ContactLineUI) => {
     const subject = encodeURIComponent(`Cotización / Solicitud de información - ${line.title}`);
     const body = encodeURIComponent(`Hola Red Orange,\n\nMe gustaría solicitar una cotización sobre:\n\n- ${line.emailBodyLine}\n- Empresa/Entidad:\n- Plazo estimado:\n- Detalles:\n\nGracias.`);
-    return `mailto:ventas@redorange.net.pe?subject=${subject}&body=${body}`;
+    return `mailto:${salesEmail}?subject=${subject}&body=${body}`;
   };
 
   useEffect(() => {
     const root = sectionRef.current;
     if (!root) return;
-    if (prefersReducedMotion()) return;
+
+    if (!data || lines.length === 0) return;
+
+    if (prefersReducedMotion()) {
+      const hidden = root.querySelectorAll<HTMLElement>('[data-contact="header"],[data-contact="badge"],[data-contact="chip"]');
+      hidden.forEach((el) => (el.style.opacity = '1'));
+      if (formRef.current) formRef.current.style.opacity = '1';
+      return;
+    }
 
     const headerEls = headerRef.current?.querySelectorAll('[data-contact="header"]') ?? [];
     const badgeEls = root.querySelectorAll('[data-contact="badge"]');
@@ -279,6 +268,7 @@ export const ContactSection: FC = () => {
       (entries) => {
         for (const entry of entries) {
           if (!entry.isIntersecting) continue;
+
           animate(headerEls, { opacity: [0, 1], translateY: [14, 0], duration: 800, easing: 'easeOutExpo', delay: (_, i) => i * 90 });
           animate(badgeEls, { opacity: [0, 1], scale: [0.96, 1], duration: 700, easing: 'easeOutExpo', delay: 120 });
           animate(panelEl, { opacity: [0, 1], translateY: [18, 0], scale: [0.985, 1], duration: 900, easing: 'easeOutExpo', delay: 260 });
@@ -291,9 +281,21 @@ export const ContactSection: FC = () => {
     );
 
     io.observe(root);
-
     return () => io.disconnect();
-  }, []);
+  }, [data, lines.length]);
+
+  if (!data || lines.length === 0) {
+    return (
+      <section id="contact" ref={sectionRef} className="relative mx-auto max-w-7xl px-4 sm:px-5 md:px-6 pb-16 sm:pb-20 pt-12 sm:pt-16 md:pb-28 md:pt-24 scroll-mt-28">
+        <div className="relative z-10 mx-auto flex max-w-xl items-center justify-center">
+          <div className="w-full rounded-2xl border border-border/60 bg-background/60 p-6 text-center backdrop-blur">
+            <p className="font-heading text-base font-extrabold">Cargando contacto...</p>
+            <p className="mt-1 text-sm text-muted-foreground">Preparando la información de contacto y líneas.</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   const defaultLine = lines[0];
 
@@ -305,38 +307,37 @@ export const ContactSection: FC = () => {
       <div ref={headerRef} className="mb-8 sm:mb-10 flex flex-col gap-3">
         <div data-contact="badge" className="inline-flex w-fit items-center gap-2 rounded-full border border-border/60 bg-background/60 px-3 py-1.5 backdrop-blur opacity-0">
           <Sparkles className="h-4 w-4 text-primary" />
-          <span className="text-xs font-semibold text-foreground">Contacto</span>
+          <span className="text-xs font-semibold text-foreground">{data.header.badgeText}</span>
         </div>
 
         <h2 className="text-xl sm:text-2xl font-extrabold md:text-3xl opacity-0" data-contact="header">
-          Contacto y cotizaciones
+          {data.header.title}
         </h2>
 
         <p className="max-w-3xl text-muted-foreground opacity-0 text-sm" data-contact="header">
-          Elige una línea y envíanos tu requerimiento. Te responderemos con una propuesta de alcance y opciones de servicio.
+          {data.header.subtitle}
         </p>
 
         <div className="flex flex-wrap gap-2 pt-2">
-          {[
-            { icon: Clock, text: 'Respuesta rápida' },
-            { icon: MapPin, text: 'Cobertura por proyecto' },
-            { icon: Mail, text: 'Correo corporativo' },
-          ].map(({ icon: Icon, text }) => (
-            <span key={text} data-contact="chip" className="opacity-0 inline-flex items-center gap-2 rounded-full bg-muted/60 px-2.5 sm:px-3 py-1.5 text-xs text-muted-foreground border border-border/50">
-              <Icon className="h-3.5 w-3.5 text-foreground/70" />
-              <span className="hidden sm:inline">{text}</span>
-            </span>
-          ))}
+          {data.meta.chips.map(({ iconKey, text }) => {
+            const Icon = iconKey === 'clock' ? Clock : iconKey === 'mapPin' ? MapPin : Mail;
+            return (
+              <span key={text} data-contact="chip" className="opacity-0 inline-flex items-center gap-2 rounded-full bg-muted/60 px-2.5 sm:px-3 py-1.5 text-xs text-muted-foreground border border-border/50">
+                <Icon className="h-3.5 w-3.5 text-foreground/70" />
+                <span className="hidden sm:inline">{text}</span>
+              </span>
+            );
+          })}
         </div>
 
         <div className="flex flex-col sm:flex-row flex-wrap gap-2 pt-2">
           <a
-            href="mailto:ventas@redorange.net.pe"
+            href={`mailto:${salesEmail}`}
             className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/60 px-3 py-1.5 text-xs text-muted-foreground backdrop-blur transition-colors hover:text-foreground"
             data-contact="chip"
           >
             <Mail className="h-3.5 w-3.5 text-foreground/70" />
-            <span className="truncate">ventas@redorange.net.pe</span>
+            <span className="truncate">{salesEmail}</span>
           </a>
 
           <a
@@ -366,7 +367,7 @@ export const ContactSection: FC = () => {
                 <TabsTrigger
                   key={line.key}
                   value={line.key}
-                  className={`rounded-xl data-[state=active]:bg-background  data-[state=active]:shadow-sm  px-2 sm:px-2.5 py-2.5 sm:py-3.5 transition-all duration-200 hover:bg-muted/60 overflow-hidden`}
+                  className="rounded-xl data-[state=active]:bg-background data-[state=active]:shadow-sm px-2 sm:px-2.5 py-2.5 sm:py-3.5 transition-all duration-200 hover:bg-muted/60 overflow-hidden"
                 >
                   <div className="flex items-center gap-2 sm:gap-2.5 w-full min-w-0 justify-start">
                     <span className="inline-flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-xl bg-background/60 border border-border/60 shrink-0">
@@ -393,6 +394,7 @@ export const ContactSection: FC = () => {
                         <Hash className="h-3.5 w-3.5" />
                         {line.number}
                       </span>
+
                       <span className={`inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[11px] font-semibold border border-border/60 ${line.accent.chipBg} ${line.accent.chipText}`}>
                         <LineIcon className="h-3.5 w-3.5" />
                         {line.tabLabel}
