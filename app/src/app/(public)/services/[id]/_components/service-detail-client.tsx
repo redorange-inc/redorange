@@ -10,9 +10,9 @@ import { ArrowRight, Cpu, Globe, Network, CheckCircle2, ChevronLeft } from 'luci
 import type { ServiceSlide } from '@/actions/fn-services';
 
 const ICONS: Record<ServiceSlide['id'], FC<{ className?: string }>> = {
-  'ti-soluciones': Cpu,
-  'equipos-comercializacion': Network,
-  'telecom-servicios-energia': Globe,
+  'ti-solutions': Cpu,
+  'equipment-marketing': Network,
+  'telecom-services': Globe,
 };
 
 const NavPill: FC<{ href: string; active?: boolean; children: React.ReactNode }> = ({ href, active, children }) => {
@@ -139,7 +139,7 @@ export const ServiceDetailClient: FC<{ service: ServiceSlide }> = ({ service }) 
               <div className="relative mt-4 flex justify-center">
                 <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/70 px-3 py-1.5 text-xs font-semibold backdrop-blur">
                   <Icon className={`h-4 w-4 ${service.accentColor}`} />
-                  {service.id === 'ti-soluciones' ? 'TI' : service.id === 'equipos-comercializacion' ? 'Equipos' : 'Telecom'}
+                  {service.id === 'ti-solutions' ? 'TI' : service.id === 'equipment-marketing' ? 'Equipos' : 'Telecom'}
                 </span>
               </div>
             </div>
@@ -147,13 +147,13 @@ export const ServiceDetailClient: FC<{ service: ServiceSlide }> = ({ service }) 
         </div>
 
         <div className="mt-10 flex flex-wrap justify-center gap-2">
-          <NavPill href="/services/ti-soluciones" active={service.id === 'ti-soluciones'}>
+          <NavPill href="/services/ti-solutions" active={service.id === 'ti-solutions'}>
             TI
           </NavPill>
-          <NavPill href="/services/equipos-comercializacion" active={service.id === 'equipos-comercializacion'}>
+          <NavPill href="/services/equipment-marketing" active={service.id === 'equipment-marketing'}>
             Equipos
           </NavPill>
-          <NavPill href="/services/telecom-servicios-energia" active={service.id === 'telecom-servicios-energia'}>
+          <NavPill href="/services/telecom-services" active={service.id === 'telecom-services'}>
             Telecom
           </NavPill>
         </div>

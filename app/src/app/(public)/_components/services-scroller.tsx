@@ -14,9 +14,9 @@ const clamp = (n: number, min: number, max: number): number => Math.min(max, Mat
 const prefersReducedMotion = (): boolean => typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const ICONS: Record<ServiceSlide['id'], FC<{ className?: string }>> = {
-  'ti-soluciones': Cpu,
-  'equipos-comercializacion': Network,
-  'telecom-servicios-energia': Globe,
+  'ti-solutions': Cpu,
+  'equipment-marketing': Network,
+  'telecom-services': Globe,
 };
 
 export const ServicesScroller: FC = () => {

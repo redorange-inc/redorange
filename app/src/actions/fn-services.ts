@@ -1,6 +1,6 @@
 'use server';
 
-export type ServiceId = 'ti-soluciones' | 'equipos-comercializacion' | 'telecom-servicios-energia';
+export type ServiceId = 'ti-solutions' | 'equipment-marketing' | 'telecom-services';
 
 export type ServiceDeliverable = {
   title: string;
@@ -24,7 +24,7 @@ export type ServiceSlide = {
 
 const services: ServiceSlide[] = [
   {
-    id: 'ti-soluciones',
+    id: 'ti-solutions',
     title: 'Tecnología y Soluciones Informáticas (TI)',
     subtitle: 'Consultoría, desarrollo, soporte y continuidad operativa',
     badge: 'Para procesos y operación crítica',
@@ -48,7 +48,7 @@ const services: ServiceSlide[] = [
     url: '/services/ti-solutions',
   },
   {
-    id: 'equipos-comercializacion',
+    id: 'equipment-marketing',
     title: 'Comercialización, Importación y Servicios Técnicos de Equipos',
     subtitle: 'Equipos, periféricos, provisión, instalación, mantenimiento y postventa',
     badge: 'Para equipamiento y provisión',
@@ -72,7 +72,7 @@ const services: ServiceSlide[] = [
     url: '/services/equipment-marketing',
   },
   {
-    id: 'telecom-servicios-energia',
+    id: 'telecom-services',
     title: 'Telecomunicaciones, Servicios Digitales y Energía Tecnológica',
     subtitle: 'Internet, cloud, hosting, seguridad, canales digitales y energía',
     badge: 'Para conectividad y presencia digital',
