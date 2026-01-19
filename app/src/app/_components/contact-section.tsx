@@ -1,29 +1,269 @@
 'use client';
 
 import type { FC } from 'react';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { animate } from 'animejs';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Mail, Phone, ArrowRight, Sparkles, MapPin, Clock } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ArrowRight, Sparkles, MapPin, Clock, Mail, Phone, Cpu, Boxes, Globe, CheckCircle2, Hash, MessageCircle } from 'lucide-react';
 
-const prefersReducedMotion = (): boolean => typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const prefersReducedMotion = (): boolean => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+type ContactLine = {
+  key: 'ti' | 'equipos' | 'telecom';
+  number: string;
+  tabLabel: string;
+  title: string;
+  subtitle: string;
+  emailBodyLine: string;
+  accent: {
+    ring: string;
+    text: string;
+    chipBg: string;
+    chipText: string;
+    badgeBg: string;
+    badgeText: string;
+    icon: FC<{ className?: string }>;
+  };
+  bullets: Array<{ icon: FC<{ className?: string }>; text: string }>;
+  subjectPlaceholder: string;
+};
+
+const EllipsisMarquee: FC<{
+  text: string;
+  className?: string;
+  speed?: number;
+}> = ({ text, className = '', speed = 20 }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const textRef = useRef<HTMLSpanElement>(null);
+  const [shouldAnimate, setShouldAnimate] = useState(false);
+
+  useEffect(() => {
+    if (!containerRef.current || !textRef.current || prefersReducedMotion()) return;
+
+    const container = containerRef.current;
+    const textEl = textRef.current;
+
+    const containerWidth = container.offsetWidth * 0.8;
+    const textWidth = textEl.scrollWidth;
+
+    setShouldAnimate(textWidth > containerWidth);
+  }, [text]);
+
+  if (!shouldAnimate) {
+    return (
+      <div ref={containerRef} className="w-[80%]">
+        <span ref={textRef} className={`block truncate ${className}`}>
+          {text}
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <div ref={containerRef} className="w-[80%] overflow-hidden">
+      <div className="inline-flex whitespace-nowrap will-change-transform">
+        <span ref={textRef} className={`inline-block pr-8 ${className}`} style={{ animation: `marquee ${speed}s linear infinite` }}>
+          {text}
+        </span>
+        <span className={`inline-block pr-8 ${className}`} style={{ animation: `marquee ${speed}s linear infinite` }}>
+          {text}
+        </span>
+      </div>
+
+      <style jsx global>{`
+        @keyframes marquee {
+          from {
+            transform: translateX(0);
+          }
+          to {
+            transform: translateX(-50%);
+          }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+const AnimatedTextSlider: FC<{
+  bullets: Array<{ icon: FC<{ className?: string }>; text: string }>;
+  accentText: string;
+}> = ({ bullets, accentText }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const textContainerRef = useRef<HTMLParagraphElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  const currentBullet = bullets[currentIndex];
+  const Icon = currentBullet.icon;
+
+  useEffect(() => {
+    if (prefersReducedMotion() || !textContainerRef.current) return;
+
+    const textEl = textContainerRef.current;
+
+    textEl.textContent = '';
+
+    const letters = currentBullet.text.split('').map((char) => {
+      const span = document.createElement('span');
+      span.textContent = char;
+      span.style.opacity = '0';
+      span.style.display = 'inline-block';
+      span.style.transform = 'translateY(10px)';
+      return span;
+    });
+
+    letters.forEach((letter) => textEl.appendChild(letter));
+
+    animate(letters, { opacity: [0, 1], translateY: [10, 0], duration: 600, delay: (_, i) => 100 + i * 25, easing: 'easeOutCubic' });
+
+    // Cursor parpadeante al final -- remove
+    const cursor = document.createElement('span');
+    cursor.className = 'inline-block w-0.5 h-4 bg-current ml-1 align-middle';
+    cursor.style.opacity = '0';
+    textEl.appendChild(cursor);
+
+    const totalDelay = letters.length * 25 + 100;
+
+    animate(cursor, {
+      opacity: [0, 1],
+      duration: 400,
+      delay: totalDelay,
+      easing: 'easeInOutQuad',
+      complete: () => {
+        animate(cursor, { opacity: [1, 0, 1], duration: 530, loop: 3, easing: 'easeInOutQuad' });
+      },
+    });
+  }, [currentBullet.text]);
+
+  useEffect(() => {
+    if (prefersReducedMotion() || !cardRef.current) return;
+
+    animate(cardRef.current, { scale: [0.98, 1], opacity: [0.8, 1], duration: 500, easing: 'easeOutCubic' });
+  }, [currentIndex]);
+
+  useEffect(() => {
+    const slideInterval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % bullets.length);
+    }, 4500);
+
+    return () => clearInterval(slideInterval);
+  }, [bullets.length]);
+
+  return (
+    <div className="relative min-h-[88px] w-full">
+      <div ref={cardRef} key={currentIndex} className="flex items-start gap-3 sm:gap-3.5 rounded-2xl bg-muted/50 p-3 sm:p-4 border border-border/40 transition-all duration-500 ease-out">
+        <Icon className={`mt-0.5 sm:mt-1 h-4 w-4 sm:h-5 sm:w-5 shrink-0 ${accentText}`} />
+        <p ref={textContainerRef} className={`text-xs sm:text-sm text-muted-foreground leading-relaxed flex-1 ${accentText}`} />
+      </div>
+
+      <div className="flex justify-center gap-2 sm:gap-2.5 mt-3 sm:mt-4">
+        {bullets.map((_, idx) => (
+          <button
+            key={idx}
+            onClick={() => setCurrentIndex(idx)}
+            className={`h-1.5 rounded-full transition-all duration-300 ${idx === currentIndex ? 'w-8 sm:w-10 bg-foreground/90' : 'w-1.5 bg-foreground/30 hover:bg-foreground/50'}`}
+            aria-label={`Ir al punto ${idx + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
 
 export const ContactSection: FC = () => {
   const sectionRef = useRef<HTMLElement | null>(null);
   const headerRef = useRef<HTMLDivElement | null>(null);
-  const cardsRef = useRef<HTMLDivElement | null>(null);
+  const formRef = useRef<HTMLDivElement | null>(null);
 
-  //  mailto built on client
-  const mailtoHref = useMemo(() => {
-    const subject = encodeURIComponent('Cotización / Solicitud de información - Red Orange');
-    const body = encodeURIComponent(
-      'Hola Red Orange,\n\nMe gustaría solicitar una cotización sobre:\n\n- Línea de servicio: (IT / Digital / Infra)\n- Empresa/Entidad:\n- Plazo estimado:\n- Detalles:\n\nGracias.',
-    );
+  const whatsappNumber = '+51999999999';
+  const waDigits = whatsappNumber.replace(/[^\d]/g, '');
+  const whatsappHref = `https://wa.me/${waDigits}`;
+
+  const lines = useMemo<ContactLine[]>(
+    () => [
+      {
+        key: 'ti',
+        number: '01',
+        tabLabel: 'TI',
+        title: 'Tecnología y Soluciones Informáticas (TI)',
+        subtitle: 'Consultoría, desarrollo de software y sistemas, soporte y continuidad operativa.',
+        emailBodyLine: 'Línea: Tecnología y Soluciones Informáticas (TI)',
+        accent: {
+          ring: 'ring-cyan-500/25',
+          text: 'text-cyan-700 dark:text-cyan-300',
+          chipBg: 'bg-cyan-500/10',
+          chipText: 'text-cyan-800 dark:text-cyan-200',
+          badgeBg: 'bg-cyan-500/12',
+          badgeText: 'text-cyan-800 dark:text-cyan-200',
+          icon: Cpu,
+        },
+        bullets: [
+          { icon: CheckCircle2, text: 'Consultoría y asesoría en informática y cómputo' },
+          { icon: CheckCircle2, text: 'Desarrollo de software, sistemas y aplicaciones' },
+          { icon: CheckCircle2, text: 'Programación y construcción de sistemas informáticos' },
+          { icon: CheckCircle2, text: 'Operación: servidores, sistemas, redes y bases de datos' },
+        ],
+        subjectPlaceholder: 'Ej. sistema a medida / soporte TI / servidores',
+      },
+      {
+        key: 'equipos',
+        number: '02',
+        tabLabel: 'Equipos',
+        title: 'Comercialización, Importación y Servicios Técnicos de Equipos',
+        subtitle: 'Provisión, cotización, instalación, mantenimiento y postventa de equipos y redes.',
+        emailBodyLine: 'Línea: Comercialización, Importación y Servicios Técnicos de Equipos',
+        accent: {
+          ring: 'ring-rose-500/25',
+          text: 'text-rose-700 dark:text-rose-300',
+          chipBg: 'bg-rose-500/10',
+          chipText: 'text-rose-800 dark:text-rose-200',
+          badgeBg: 'bg-rose-500/12',
+          badgeText: 'text-rose-800 dark:text-rose-200',
+          icon: Boxes,
+        },
+        bullets: [
+          { icon: CheckCircle2, text: 'Importación y exportación de equipos tecnológicos' },
+          { icon: CheckCircle2, text: 'Distribución y comercialización de equipos y suministros' },
+          { icon: CheckCircle2, text: 'Cotización y venta de equipos tecnológicos' },
+          { icon: CheckCircle2, text: 'Instalación, mantenimiento y redes integrales' },
+        ],
+        subjectPlaceholder: 'Ej. cotización de equipos / instalación / mantenimiento',
+      },
+      {
+        key: 'telecom',
+        number: '03',
+        tabLabel: 'Telecom, Digital y Energía',
+        title: 'Telecomunicaciones, Servicios Digitales y Energía Tecnológica',
+        subtitle: 'Conectividad, cloud/hosting, servicios digitales y soluciones energéticas.',
+        emailBodyLine: 'Línea: Telecomunicaciones, Servicios Digitales y Energía Tecnológica',
+        accent: {
+          ring: 'ring-orange-500/25',
+          text: 'text-orange-700 dark:text-orange-300',
+          chipBg: 'bg-orange-500/10',
+          chipText: 'text-orange-800 dark:text-orange-200',
+          badgeBg: 'bg-orange-500/12',
+          badgeText: 'text-orange-800 dark:text-orange-200',
+          icon: Globe,
+        },
+        bullets: [
+          { icon: CheckCircle2, text: 'Telecomunicaciones e internet (incluye línea dedicada)' },
+          { icon: CheckCircle2, text: 'Hosting, cloud, storage y servidores de seguridad' },
+          { icon: CheckCircle2, text: 'Dominios, hosting web, correo corporativo, intranet y extranet' },
+          { icon: CheckCircle2, text: 'Paneles solares, medición y servicios eléctricos asociados' },
+        ],
+        subjectPlaceholder: 'Ej. internet dedicado / hosting / paneles solares',
+      },
+    ],
+    [],
+  );
+
+  const mailtoHrefFor = (line: ContactLine) => {
+    const subject = encodeURIComponent(`Cotización / Solicitud de información - ${line.title}`);
+    const body = encodeURIComponent(`Hola Red Orange,\n\nMe gustaría solicitar una cotización sobre:\n\n- ${line.emailBodyLine}\n- Empresa/Entidad:\n- Plazo estimado:\n- Detalles:\n\nGracias.`);
     return `mailto:ventas@redorange.net.pe?subject=${subject}&body=${body}`;
-  }, []);
+  };
 
   useEffect(() => {
     const root = sectionRef.current;
@@ -31,90 +271,49 @@ export const ContactSection: FC = () => {
     if (prefersReducedMotion()) return;
 
     const headerEls = headerRef.current?.querySelectorAll('[data-contact="header"]') ?? [];
-    const cardEls = cardsRef.current?.querySelectorAll('[data-contact="card"]') ?? [];
     const badgeEls = root.querySelectorAll('[data-contact="badge"]');
     const chipsEls = root.querySelectorAll('[data-contact="chip"]');
+    const panelEl = formRef.current ? [formRef.current] : [];
 
     const io = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (!entry.isIntersecting) continue;
-
-          //  header reveal
-          animate(headerEls, {
-            opacity: [0, 1],
-            translateY: [14, 0],
-            duration: 800,
-            easing: 'easeOutExpo',
-            delay: (el, i) => i * 90,
-          });
-
-          //  badge pop
-          animate(badgeEls, {
-            opacity: [0, 1],
-            scale: [0.96, 1],
-            duration: 700,
-            easing: 'easeOutExpo',
-            delay: 120,
-          });
-
-          //  cards stagger
-          animate(cardEls, {
-            opacity: [0, 1],
-            translateY: [18, 0],
-            scale: [0.985, 1],
-            duration: 900,
-            easing: 'easeOutExpo',
-            delay: (el, i) => 260 + i * 140,
-          });
-
-          //  chips subtle
-          animate(chipsEls, {
-            opacity: [0, 1],
-            translateY: [10, 0],
-            duration: 700,
-            easing: 'easeOutExpo',
-            delay: (el, i) => 520 + i * 90,
-          });
+          animate(headerEls, { opacity: [0, 1], translateY: [14, 0], duration: 800, easing: 'easeOutExpo', delay: (_, i) => i * 90 });
+          animate(badgeEls, { opacity: [0, 1], scale: [0.96, 1], duration: 700, easing: 'easeOutExpo', delay: 120 });
+          animate(panelEl, { opacity: [0, 1], translateY: [18, 0], scale: [0.985, 1], duration: 900, easing: 'easeOutExpo', delay: 260 });
+          animate(chipsEls, { opacity: [0, 1], translateY: [10, 0], duration: 700, easing: 'easeOutExpo', delay: (_, i) => 520 + i * 90 });
 
           io.disconnect();
         }
       },
-      { threshold: 0.2 },
+      { threshold: 0.15 },
     );
 
     io.observe(root);
 
-    //  ambient glow drift
-    const glows = root.querySelectorAll('[data-contact="glow"]');
-    animate(glows, {
-      translateY: [0, 10],
-      direction: 'alternate',
-      loop: true,
-      easing: 'easeInOutSine',
-      duration: 4200,
-      delay: (el, i) => i * 300,
-    });
-
     return () => io.disconnect();
   }, []);
 
-  return (
-    <section id="contact" ref={sectionRef} className="relative mx-auto max-w-7xl px-6 pb-24 pt-20 md:px-10 md:pb-28 md:pt-24 min-h-screen scroll-mt-28">
-      <div data-contact="glow" className="pointer-events-none absolute -right-20 top-16 h-96 w-96 rounded-full bg-primary/5 blur-3xl" />
-      <div data-contact="glow" className="pointer-events-none absolute -left-20 bottom-16 h-96 w-96 rounded-full bg-accent/5 blur-3xl" />
+  const defaultLine = lines[0];
 
-      <div ref={headerRef} className="mb-10 flex flex-col gap-3">
-        <div data-contact="badge" className="inline-flex w-fit items-center gap-2 rounded-full border border-border/60 bg-background/60 px-3 py-1.5 backdrop-blur opacity-0 animate-in fade-in duration-700">
+  return (
+    <section id="contact" ref={sectionRef} className="relative mx-auto max-w-7xl px-4 sm:px-5 md:px-6 pb-16 sm:pb-20 pt-12 sm:pt-16 md:pb-28 md:pt-24 scroll-mt-28">
+      <div data-contact="glow" className="pointer-events-none absolute -right-20 top-12 h-[380px] w-[380px] rounded-full bg-primary/5 blur-3xl" />
+      <div data-contact="glow" className="pointer-events-none absolute -left-20 bottom-12 h-[380px] w-[380px] rounded-full bg-accent/5 blur-3xl" />
+
+      <div ref={headerRef} className="mb-8 sm:mb-10 flex flex-col gap-3">
+        <div data-contact="badge" className="inline-flex w-fit items-center gap-2 rounded-full border border-border/60 bg-background/60 px-3 py-1.5 backdrop-blur opacity-0">
           <Sparkles className="h-4 w-4 text-primary" />
           <span className="text-xs font-semibold text-foreground">Contacto</span>
         </div>
 
-        <h2 className="text-2xl font-extrabold md:text-3xl opacity-0" data-contact="header">
+        <h2 className="text-xl sm:text-2xl font-extrabold md:text-3xl opacity-0" data-contact="header">
           Contacto y cotizaciones
         </h2>
-        <p className="max-w-3xl text-muted-foreground opacity-0" data-contact="header">
-          Compártenos tu requerimiento y te enviamos una propuesta con alcance y opciones de servicio.
+
+        <p className="max-w-3xl text-muted-foreground opacity-0 text-sm" data-contact="header">
+          Elige una línea y envíanos tu requerimiento. Te responderemos con una propuesta de alcance y opciones de servicio.
         </p>
 
         <div className="flex flex-wrap gap-2 pt-2">
@@ -123,101 +322,144 @@ export const ContactSection: FC = () => {
             { icon: MapPin, text: 'Cobertura por proyecto' },
             { icon: Mail, text: 'Correo corporativo' },
           ].map(({ icon: Icon, text }) => (
-            <span key={text} data-contact="chip" className="opacity-0 inline-flex items-center gap-2 rounded-full bg-muted/60 px-3 py-1.5 text-xs text-muted-foreground border border-border/50">
+            <span key={text} data-contact="chip" className="opacity-0 inline-flex items-center gap-2 rounded-full bg-muted/60 px-2.5 sm:px-3 py-1.5 text-xs text-muted-foreground border border-border/50">
               <Icon className="h-3.5 w-3.5 text-foreground/70" />
-              {text}
+              <span className="hidden sm:inline">{text}</span>
             </span>
           ))}
         </div>
+
+        <div className="flex flex-col sm:flex-row flex-wrap gap-2 pt-2">
+          <a
+            href="mailto:ventas@redorange.net.pe"
+            className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/60 px-3 py-1.5 text-xs text-muted-foreground backdrop-blur transition-colors hover:text-foreground"
+            data-contact="chip"
+          >
+            <Mail className="h-3.5 w-3.5 text-foreground/70" />
+            <span className="truncate">ventas@redorange.net.pe</span>
+          </a>
+
+          <a
+            href={whatsappHref}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/60 px-3 py-1.5 text-xs text-muted-foreground backdrop-blur transition-colors hover:text-foreground"
+            data-contact="chip"
+          >
+            <MessageCircle className="h-3.5 w-3.5 text-foreground/70" />
+            <span className="truncate">WhatsApp {whatsappNumber}</span>
+          </a>
+
+          <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/60 px-3 py-1.5 text-xs text-muted-foreground backdrop-blur" data-contact="chip">
+            <Phone className="h-3.5 w-3.5 text-foreground/70" />
+            <span className="truncate">{whatsappNumber}</span>
+          </span>
+        </div>
       </div>
 
-      <div ref={cardsRef} className="grid gap-6 md:grid-cols-2">
-        <Card data-contact="card" className="border-border/70 bg-background/60 backdrop-blur opacity-0 animate-in fade-in duration-700">
-          <CardHeader>
-            <CardTitle className="text-lg font-extrabold">Formulario</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="space-y-2">
-                <label className="text-sm text-muted-foreground">Nombre</label>
-                <Input placeholder="Tu nombre" />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm text-muted-foreground">Correo</label>
-                <Input type="email" placeholder="tu-correo@dominio.com" />
-              </div>
-            </div>
+      <div ref={formRef} className="opacity-0">
+        <Tabs defaultValue={defaultLine.key} className="w-full">
+          <TabsList className="grid w-full grid-cols-3 rounded-2xl bg-muted/40 p-1 sm:p-1.5 border border-border/60 gap-0.5 sm:gap-1">
+            {lines.map((line) => {
+              const LineIcon = line.accent.icon;
+              return (
+                <TabsTrigger
+                  key={line.key}
+                  value={line.key}
+                  className={`rounded-xl data-[state=active]:bg-background  data-[state=active]:shadow-sm  px-2 sm:px-2.5 py-2.5 sm:py-3.5 transition-all duration-200 hover:bg-muted/60 overflow-hidden`}
+                >
+                  <div className="flex items-center gap-2 sm:gap-2.5 w-full min-w-0 justify-start">
+                    <span className="inline-flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-xl bg-background/60 border border-border/60 shrink-0">
+                      <LineIcon className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${line.accent.text}`} />
+                    </span>
 
-            <div className="space-y-2">
-              <label className="text-sm text-muted-foreground">Asunto</label>
-              <Input placeholder="Ej. sistema a medida / web institucional / cableado / internet" />
-            </div>
+                    <EllipsisMarquee text={line.title} className="text-[10px] sm:text-xs font-semibold text-left leading-tight" speed={22} />
+                  </div>
+                </TabsTrigger>
+              );
+            })}
+          </TabsList>
 
-            <div className="space-y-2">
-              <label className="text-sm text-muted-foreground">Detalle</label>
-              <Textarea placeholder="Describe el alcance, plazos y cualquier información relevante." rows={6} />
-            </div>
+          {lines.map((line) => {
+            const LineIcon = line.accent.icon;
+            const mailtoHref = mailtoHrefFor(line);
 
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <Button type="button" className="font-heading group animate-in fade-in slide-in-from-bottom-1 duration-700" asChild>
-                <a href={mailtoHref}>
-                  Enviar por correo
-                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                </a>
-              </Button>
+            return (
+              <TabsContent key={line.key} value={line.key} className="mt-4 sm:mt-6">
+                <div className={`rounded-2xl sm:rounded-3xl border border-border/70 bg-background/60 p-4 sm:p-5 md:p-7 ring-1 ${line.accent.ring}`}>
+                  <div className="space-y-2 sm:space-y-2.5">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold border border-border/60 ${line.accent.badgeBg} ${line.accent.badgeText}`}>
+                        <Hash className="h-3.5 w-3.5" />
+                        {line.number}
+                      </span>
+                      <span className={`inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[11px] font-semibold border border-border/60 ${line.accent.chipBg} ${line.accent.chipText}`}>
+                        <LineIcon className="h-3.5 w-3.5" />
+                        {line.tabLabel}
+                      </span>
+                    </div>
 
-              <Button type="button" variant="secondary" className="font-heading group animate-in fade-in slide-in-from-bottom-1 duration-700 delay-150" asChild>
-                {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-                <a href="/#services">
-                  Ver servicios
-                  <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                </a>
-              </Button>
-            </div>
+                    <h3 className="font-heading text-base sm:text-lg font-extrabold md:text-xl">{line.title}</h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">{line.subtitle}</p>
+                  </div>
 
-            <p className="text-xs text-muted-foreground">Nota: este formulario es una maqueta visual. Si deseas, lo conectamos a correo, backend o CRM.</p>
-          </CardContent>
-        </Card>
+                  <div className="mt-4 sm:mt-5">
+                    <AnimatedTextSlider bullets={line.bullets} accentText={line.accent.text} />
+                  </div>
 
-        <Card data-contact="card" className="border-border/70 bg-background/60 backdrop-blur opacity-0 animate-in fade-in duration-700">
-          <CardHeader>
-            <CardTitle className="text-lg font-extrabold">Información</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4 text-sm text-muted-foreground">
-            <div className="rounded-xl bg-muted/60 p-4 border border-border/50">
-              <p className="font-heading text-sm font-bold text-foreground">Razón social</p>
-              <p className="mt-1">Red Orange E.I.R.L.</p>
-            </div>
+                  <div className="mt-5 sm:mt-6 grid gap-3 sm:gap-4 sm:grid-cols-2">
+                    <div className="space-y-2">
+                      <label className="text-xs sm:text-sm text-muted-foreground">Nombre</label>
+                      <Input placeholder="Tu nombre" className="text-sm" />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs sm:text-sm text-muted-foreground">Correo</label>
+                      <Input type="email" placeholder="tu-correo@dominio.com" className="text-sm" />
+                    </div>
+                  </div>
 
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="rounded-xl bg-muted/60 p-4 border border-border/50">
-                <div className="flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-foreground" />
-                  <p className="font-heading text-sm font-bold text-foreground">Correo</p>
+                  <div className="mt-3 sm:mt-4 space-y-2">
+                    <label className="text-xs sm:text-sm text-muted-foreground">Asunto</label>
+                    <Input placeholder={line.subjectPlaceholder} className="text-sm" />
+                  </div>
+
+                  <div className="mt-3 sm:mt-4 space-y-2">
+                    <label className="text-xs sm:text-sm text-muted-foreground">Detalle</label>
+                    <Textarea placeholder="Describe el alcance, plazos y cualquier información relevante." rows={5} className="text-sm resize-none" />
+                  </div>
+
+                  <div className="mt-5 sm:mt-6 flex flex-col gap-2 sm:gap-3 sm:flex-row sm:flex-wrap">
+                    <Button type="button" className="font-heading group flex-1 sm:flex-none text-sm" asChild>
+                      <a href={mailtoHref}>
+                        Enviar por correo
+                        <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover:translate-x-1" />
+                      </a>
+                    </Button>
+
+                    <Button type="button" variant="secondary" className="font-heading group flex-1 sm:flex-none text-sm" asChild>
+                      <a href={whatsappHref} target="_blank" rel="noreferrer">
+                        WhatsApp
+                        <MessageCircle className="ml-2 h-4 w-4 sm:h-5 sm:w-5" />
+                      </a>
+                    </Button>
+
+                    <Button type="button" variant="outline" className="font-heading group flex-1 sm:flex-none text-sm" asChild>
+                      {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+                      <a href="/#services">
+                        Ver servicios
+                        <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover:translate-x-1" />
+                      </a>
+                    </Button>
+                  </div>
+
+                  <p className="mt-3 sm:mt-4 text-[11px] sm:text-xs text-muted-foreground text-center sm:text-left">
+                    Nota: este formulario es una maqueta visual. Si deseas, lo conectamos a correo, backend o CRM.
+                  </p>
                 </div>
-                <p className="mt-1">ventas@redorange.net.pe</p>
-              </div>
-
-              <div className="rounded-xl bg-muted/60 p-4 border border-border/50">
-                <div className="flex items-center gap-2">
-                  <Phone className="h-4 w-4 text-foreground" />
-                  <p className="font-heading text-sm font-bold text-foreground">Teléfono</p>
-                </div>
-                <p className="mt-1">Agregar número</p>
-              </div>
-            </div>
-
-            <div className="rounded-xl bg-muted/60 p-4 border border-border/50">
-              <p className="font-heading text-sm font-bold text-foreground">Cobertura</p>
-              <p className="mt-1">Implementación y soporte por proyecto, mensual o por demanda.</p>
-            </div>
-
-            <div className="rounded-xl border border-border/60 bg-background/40 p-4">
-              <p className="font-heading text-sm font-bold text-foreground">Atención</p>
-              <p className="mt-1">Cotizaciones, coordinación técnica y programación de visitas según necesidad.</p>
-            </div>
-          </CardContent>
-        </Card>
+              </TabsContent>
+            );
+          })}
+        </Tabs>
       </div>
     </section>
   );

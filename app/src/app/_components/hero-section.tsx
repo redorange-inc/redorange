@@ -23,7 +23,6 @@ export const HeroSection: FC = () => {
     if (!hero) return;
     if (prefersReducedMotion()) return;
 
-    //  intro sequence
     const badgeNode = hero.querySelectorAll('[data-hero="badge"]');
     const titleNodes = hero.querySelectorAll('[data-hero="title"]');
     const subtitleNodes = hero.querySelectorAll('[data-hero="subtitle"]');
@@ -43,7 +42,6 @@ export const HeroSection: FC = () => {
 
     if (statNodes.length) animate(statNodes, { translateY: [10, 0], opacity: [0, 1], duration: 650, easing: 'easeOutExpo', delay: (el, i) => 720 + i * 120 });
 
-    //  subtle ambient motion
     const float = (el: HTMLDivElement | null, dx: number, dy: number, duration: number) => {
       if (!el) return;
       animate(el, { translateX: [0, dx], translateY: [0, dy], direction: 'alternate', easing: 'easeInOutSine', duration, loop: true });
@@ -88,14 +86,14 @@ export const HeroSection: FC = () => {
 
             <div className="space-y-3">
               <h1 className={['text-4xl font-extrabold tracking-tight md:text-5xl lg:text-6xl', 'opacity-0 animate-in fade-in slide-in-from-bottom-3 duration-700'].join(' ')} data-hero="title">
-                Soluciones integrales para <span className="text-gradient">IT, digital</span> e <span className="text-gradient">infraestructura</span>
+                Soluciones integrales en <span className="text-gradient">TI</span>, <span className="text-gradient">equipamiento</span> y <span className="text-gradient">conectividad</span>
               </h1>
 
               <p
                 className={['mx-auto max-w-2xl text-base text-muted-foreground md:text-lg lg:mx-0', 'opacity-0 animate-in fade-in slide-in-from-bottom-2 duration-700 delay-150'].join(' ')}
                 data-hero="subtitle"
               >
-                Diseñamos, implementamos y mantenemos soluciones tecnológicas que mejoran procesos y aseguran disponibilidad: software y cloud, web y hosting, hardware y conectividad.
+                Integramos consultoría, desarrollo, soporte, comercialización de equipos y servicios digitales para impulsar tus procesos con disponibilidad, seguridad y escalabilidad.
               </p>
             </div>
 
@@ -158,9 +156,27 @@ export const HeroSection: FC = () => {
 
               <div className="mt-5 grid gap-2.5">
                 {[
-                  { title: 'IT & Technology', desc: 'Software, cloud, soporte y continuidad.', icon: Cpu, tone: 'bg-primary/10 text-primary', ring: 'hover:border-primary/30' },
-                  { title: 'Digital & Web', desc: 'Web, hosting, dominios y correo.', icon: Globe, tone: 'bg-secondary/10 text-secondary', ring: 'hover:border-secondary/30' },
-                  { title: 'Infra & Telecom', desc: 'Equipos, conectividad e instalación.', icon: Network, tone: 'bg-accent/10 text-accent', ring: 'hover:border-accent/30' },
+                  {
+                    title: 'Tecnología y Soluciones Informáticas (TI)',
+                    desc: 'Consultoría, desarrollo, soporte, redes y bases de datos.',
+                    icon: Cpu,
+                    tone: 'bg-primary/10 text-primary',
+                    ring: 'hover:border-primary/30',
+                  },
+                  {
+                    title: 'Comercialización e Importación de Equipos',
+                    desc: 'Equipos, periféricos, cotizaciones, instalación y mantenimiento.',
+                    icon: Network,
+                    tone: 'bg-secondary/10 text-secondary',
+                    ring: 'hover:border-secondary/30',
+                  },
+                  {
+                    title: 'Telecomunicaciones y Servicios Digitales',
+                    desc: 'Internet, hosting, cloud, dominios, web y soluciones energéticas.',
+                    icon: Globe,
+                    tone: 'bg-accent/10 text-accent',
+                    ring: 'hover:border-accent/30',
+                  },
                 ].map(({ title, desc, icon: Icon, tone, ring }) => (
                   <div
                     key={title}
@@ -219,7 +235,7 @@ export const HeroSection: FC = () => {
             <div className="pointer-events-none absolute -right-6 -top-6 hidden rounded-2xl border border-border/60 bg-background/70 p-4 shadow-sm backdrop-blur xl:block animate-in fade-in zoom-in-95 duration-700 delay-500">
               <p className="text-[10px] font-bold text-muted-foreground tracking-wide">RED ORANGE</p>
               <p className="mt-1 text-sm font-extrabold">Soluciones</p>
-              <p className="text-xs text-muted-foreground">IT · Digital · Infra</p>
+              <p className="text-xs text-muted-foreground">TI · Equipos · Telecom</p>
             </div>
           </div>
         </div>

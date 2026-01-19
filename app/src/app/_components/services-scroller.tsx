@@ -7,10 +7,10 @@ import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { ArrowRight, Laptop, Globe, Network, PhoneCall, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, Cpu, Globe, Network, PhoneCall, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
 
 type ServiceSlide = {
-  id: 'it-technology' | 'digital-web' | 'infra-telecom';
+  id: 'ti-soluciones' | 'equipos-comercializacion' | 'telecom-servicios-energia';
   title: string;
   subtitle: string;
   badge: string;
@@ -39,76 +39,76 @@ export const ServicesScroller: FC = () => {
   const slides = useMemo<ServiceSlide[]>(
     () => [
       {
-        id: 'it-technology',
-        title: 'IT & Technology Solutions',
-        subtitle: 'Software, cloud, soporte y continuidad',
-        badge: 'Para operaciones críticas',
+        id: 'ti-soluciones',
+        title: 'Tecnología y Soluciones Informáticas (TI)',
+        subtitle: 'Consultoría, desarrollo, soporte y continuidad operativa',
+        badge: 'Para procesos y operación crítica',
         bullets: [
-          'Desarrollo de software y sistemas a medida',
-          'Consultoría TI y automatización de procesos',
-          'Administración de servidores y bases de datos',
-          'Cloud, backups, monitoreo y seguridad',
-          'Mesa de ayuda, soporte y mantenimiento',
+          'Consultoría y asesoría en informática y cómputo',
+          'Desarrollo de software, sistemas y aplicaciones',
+          'Programación y construcción de sistemas informáticos',
+          'Administración y mantenimiento de sistemas, servidores y aplicaciones',
+          'Gestión de redes, bases de datos, mejora de procesos y capacitación',
         ],
         href: 'https://tech.redorange.net.pe',
         cta: 'Ir al servicio',
-        icon: Laptop,
+        icon: Cpu,
         image: '/img/tech.png',
         deliverables: [
-          { title: 'Levantamiento y diagnóstico', content: 'Requerimientos, alcance, riesgos y plan de trabajo con entregables.' },
-          { title: 'Implementación y configuración', content: 'Despliegue, parametrización, hardening, backups y monitoreo.' },
-          { title: 'Soporte y mantenimiento', content: 'Mesa de ayuda, correctivos, preventivos y mejora continua según SLA.' },
+          { title: 'Diagnóstico y levantamiento', content: 'Requerimientos, alcance, arquitectura, riesgos y plan de trabajo con entregables.' },
+          { title: 'Desarrollo e implementación', content: 'Construcción, despliegue, pruebas, hardening, backups y monitoreo base.' },
+          { title: 'Soporte y mejora continua', content: 'Mesa de ayuda, correctivos, preventivos, documentación y capacitación según SLA.' },
         ],
         gradient: 'from-cyan-500/15 via-blue-500/10 to-transparent',
         accentColor: 'text-cyan-600 dark:text-cyan-400',
       },
       {
-        id: 'digital-web',
-        title: 'Digital & Web Services',
-        subtitle: 'Web, hosting, correo y soluciones para ventas',
-        badge: 'Para presencia y crecimiento',
+        id: 'equipos-comercializacion',
+        title: 'Comercialización, Importación y Servicios Técnicos de Equipos',
+        subtitle: 'Equipos, periféricos, provisión, instalación, mantenimiento y postventa',
+        badge: 'Para equipamiento y provisión',
         bullets: [
-          'Web institucional moderna y administrable',
-          'Landing pages y campañas de conversión',
-          'E-commerce y catálogos digitales',
-          'Hosting, dominios, certificados y correos',
-          'Seguridad web y soporte continuo',
-        ],
-        href: 'https://digital.redorange.net.pe',
-        cta: 'Conocer más',
-        icon: Globe,
-        image: '/img/digital.png',
-        deliverables: [
-          { title: 'Diseño y contenido', content: 'Arquitectura de información, UI, copy base y estructura por objetivos.' },
-          { title: 'Desarrollo y publicación', content: 'Implementación, optimización, SEO base, deployment y analítica.' },
-          { title: 'Operación y soporte', content: 'Mantenimiento, seguridad, backups y mejoras por iteraciones.' },
-        ],
-        gradient: 'from-orange-500/15 via-amber-500/10 to-transparent',
-        accentColor: 'text-orange-600 dark:text-orange-400',
-      },
-      {
-        id: 'infra-telecom',
-        title: 'Hardware, Telecom & Infrastructure',
-        subtitle: 'Equipos, conectividad e instalación',
-        badge: 'Para infraestructura estable',
-        bullets: [
-          'Venta y distribución de equipos y periféricos',
-          'Conectividad, enlaces y soluciones de telecom',
-          'Instalación de redes y cableado estructurado',
-          'Mantenimiento, soporte y postventa',
-          'Infraestructura preparada para escalar',
+          'Importación y exportación de equipos tecnológicos',
+          'Representación, distribución y comercialización de equipos, periféricos y suministros',
+          'Comercialización de equipos de telecomunicaciones y robótica',
+          'Cotización y venta de equipos tecnológicos',
+          'Reparación, mantenimiento, instalación de equipos e instalación de redes integrales',
         ],
         href: 'https://infra.redorange.net.pe',
         cta: 'Ver soluciones',
         icon: Network,
         image: '/img/infra.png',
         deliverables: [
-          { title: 'Suministro y provisión', content: 'Equipamiento, accesorios, periféricos y componentes según requerimiento.' },
-          { title: 'Instalación y puesta en marcha', content: 'Redes, cableado, pruebas, etiquetado y documentación técnica.' },
-          { title: 'Soporte y postventa', content: 'Mantenimiento, diagnósticos, reposiciones y continuidad del servicio.' },
+          { title: 'Selección y cotización', content: 'Propuesta técnica, compatibilidad, alternativas y cotización según requerimiento y presupuesto.' },
+          { title: 'Provisión e instalación', content: 'Suministro, instalación, configuración, pruebas, etiquetado y documentación técnica.' },
+          { title: 'Postventa y mantenimiento', content: 'Garantías, mantenimiento preventivo/correctivo, reposiciones y soporte postventa.' },
         ],
         gradient: 'from-rose-500/15 via-orange-500/10 to-transparent',
         accentColor: 'text-rose-600 dark:text-rose-400',
+      },
+      {
+        id: 'telecom-servicios-energia',
+        title: 'Telecomunicaciones, Servicios Digitales y Energía Tecnológica',
+        subtitle: 'Internet, cloud, hosting, seguridad, canales digitales y energía',
+        badge: 'Para conectividad y presencia digital',
+        bullets: [
+          'Servicios de telecomunicaciones e internet (incluye línea dedicada)',
+          'Hosting, cloud, storage y servidores de seguridad',
+          'Registro de dominios, alojamiento web, correo corporativo, intranet y extranet',
+          'Publicidad en internet, diseño gráfico, animación, edición y producción digital',
+          'Venta e instalación de paneles solares, equipos de medición y servicios eléctricos asociados',
+        ],
+        href: 'https://digital.redorange.net.pe',
+        cta: 'Conocer más',
+        icon: Globe,
+        image: '/img/digital.png',
+        deliverables: [
+          { title: 'Provisión y activación', content: 'Alta del servicio, configuración, seguridad base y validación de funcionamiento.' },
+          { title: 'Canales y plataformas', content: 'Dominios, hosting, correo corporativo, intranet/extranet y presencia digital.' },
+          { title: 'Operación y energía', content: 'Mantenimiento, monitoreo, soporte continuo y soluciones energéticas/medición.' },
+        ],
+        gradient: 'from-orange-500/15 via-amber-500/10 to-transparent',
+        accentColor: 'text-orange-600 dark:text-orange-400',
       },
     ],
     [],
@@ -170,7 +170,6 @@ export const ServicesScroller: FC = () => {
     };
   }, []);
 
-  // Manejar wheel
   useEffect(() => {
     if (!isLocked) return;
 
@@ -229,7 +228,6 @@ export const ServicesScroller: FC = () => {
     };
   }, [isLocked, currentSlide, slideCount, animateToSlide, scrollToSection]);
 
-  // Manejar teclas
   useEffect(() => {
     if (!isLocked) return;
 
@@ -256,7 +254,6 @@ export const ServicesScroller: FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isLocked, currentSlide, slideCount, animateToSlide, scrollToSection]);
 
-  // Touch support
   useEffect(() => {
     if (!isLocked) return;
 
@@ -368,7 +365,7 @@ export const ServicesScroller: FC = () => {
                     <div className="lg:col-span-3">
                       <div className="rounded-2xl border border-border/60 bg-background/80 p-4 shadow-sm backdrop-blur-md">
                         <div className="mb-3 flex items-center gap-2">
-                          <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10`}>
+                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
                             <Icon className="h-4 w-4 text-primary" />
                           </div>
                           <div>
@@ -422,6 +419,7 @@ export const ServicesScroller: FC = () => {
           <div className="flex items-center gap-3">
             {slides.map((s, idx) => {
               const SlideIcon = s.icon;
+              const shortLabel = idx === 0 ? 'TI' : idx === 1 ? 'Equipos' : 'Telecom';
               return (
                 <button
                   key={s.id}
@@ -434,7 +432,7 @@ export const ServicesScroller: FC = () => {
                 >
                   <SlideIcon className="h-3.5 w-3.5" />
                   <span className={`text-xs font-heading transition-all duration-300 ${currentSlide === idx ? 'w-auto opacity-100' : 'w-0 opacity-0 overflow-hidden'}`}>
-                    {currentSlide === idx && (idx === 0 ? 'IT' : idx === 1 ? 'Digital' : 'Infra')}
+                    {currentSlide === idx && shortLabel}
                   </span>
                 </button>
               );
