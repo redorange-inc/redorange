@@ -4,27 +4,8 @@ import type { FC } from 'react';
 import { useEffect, useMemo, useRef } from 'react';
 import { animate } from 'animejs';
 import { Badge } from '@/components/ui/badge';
-import {
-  Target,
-  Shield,
-  Rocket,
-  ClipboardCheck,
-  Calendar,
-  FileText,
-  CheckSquare,
-  HeadphonesIcon,
-  Wrench,
-  Database,
-  TrendingUp,
-  BookOpen,
-  Zap,
-  RefreshCw,
-  Users,
-  Lightbulb,
-  MessageSquareText,
-  BadgeCheck,
-  Timer,
-} from 'lucide-react';
+import { Target, Shield, Rocket, ClipboardCheck, Calendar, FileText, CheckSquare, HeadphonesIcon, Wrench } from 'lucide-react';
+import { Database, TrendingUp, BookOpen, Zap, RefreshCw, Users, Lightbulb, MessageSquareText, BadgeCheck, Timer } from 'lucide-react';
 
 interface FeatureCard {
   icon: FC<{ className?: string }>;
@@ -89,97 +70,55 @@ export const AboutSection: FC = () => {
     if (!root) return;
     if (prefersReducedMotion()) return;
 
-    //  selectors
-    const headerEls = headerRef.current?.querySelectorAll('[data-about="header"]') ?? [];
-    const cardEls = cardsRef.current?.querySelectorAll('[data-about="card"]') ?? [];
-    const footerWrapEls = footerRef.current?.querySelectorAll('[data-about="footer-wrap"]') ?? [];
-    const footerEls = footerRef.current?.querySelectorAll('[data-about="footer"]') ?? [];
+    const headerEls = headerRef.current?.querySelectorAll('[data-about="header"]');
+    const cardEls = cardsRef.current?.querySelectorAll('[data-about="card"]');
+    const footerWrapEls = footerRef.current?.querySelectorAll('[data-about="footer-wrap"]');
+    const footerEls = footerRef.current?.querySelectorAll('[data-about="footer"]');
 
     const io = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (!entry.isIntersecting) continue;
-
-          //  header reveal
-          animate(headerEls, {
-            opacity: [0, 1],
-            translateY: [14, 0],
-            duration: 800,
-            easing: 'easeOutExpo',
-            delay: (el, i) => i * 90,
-          });
-
-          //  cards stagger
-          animate(cardEls, {
-            opacity: [0, 1],
-            translateY: [18, 0],
-            scale: [0.98, 1],
-            duration: 900,
-            easing: 'easeOutExpo',
-            delay: (el, i) => 220 + i * 120,
-          });
-
-          //  footer wrap reveal (container)
-          animate(footerWrapEls, {
-            opacity: [0, 1],
-            translateY: [14, 0],
-            duration: 850,
-            easing: 'easeOutExpo',
-            delay: 520,
-          });
-
-          //  footer children reveal
-          animate(footerEls, {
-            opacity: [0, 1],
-            translateY: [10, 0],
-            duration: 700,
-            easing: 'easeOutExpo',
-            delay: (el, i) => 640 + i * 90,
-          });
+          if (headerEls && headerEls.length > 0) animate(headerEls, { opacity: [0, 1], translateY: [14, 0], duration: 800, easing: 'easeOutExpo', delay: (_, i) => i * 90 });
+          if (cardEls && cardEls.length > 0) animate(cardEls, { opacity: [0, 1], translateY: [18, 0], scale: [0.98, 1], duration: 900, easing: 'easeOutExpo', delay: (_, i) => 220 + i * 120 });
+          if (footerWrapEls && footerWrapEls.length > 0) animate(footerWrapEls, { opacity: [0, 1], translateY: [14, 0], duration: 850, easing: 'easeOutExpo', delay: 520 });
+          if (footerEls && footerEls.length > 0) animate(footerEls, { opacity: [0, 1], translateY: [10, 0], duration: 700, easing: 'easeOutExpo', delay: (_, i) => 640 + i * 90 });
 
           io.disconnect();
         }
       },
-      { threshold: 0.22 },
+      { threshold: 0.15 },
     );
 
     io.observe(root);
 
-    //  ambient glow drift
     const glows = root.querySelectorAll('[data-about="glow"]');
-    animate(glows, {
-      translateY: [0, 10],
-      direction: 'alternate',
-      loop: true,
-      easing: 'easeInOutSine',
-      duration: 4200,
-      delay: (el, i) => i * 300,
-    });
+    if (glows.length > 0) animate(glows, { translateY: [0, 10], direction: 'alternate', loop: true, easing: 'easeInOutSine', duration: 4200, delay: (_, i) => i * 300 });
 
     return () => io.disconnect();
   }, []);
 
   return (
-    <section id="about" ref={sectionRef} className="relative mx-auto max-w-7xl px-6 py-20 md:px-10 md:py-28 min-h-screen scroll-mt-28">
+    <section id="about" ref={sectionRef} className="relative mx-auto max-w-7xl px-6 py-14 md:px-10 md:py-20 min-h-screen scroll-mt-0">
       <div data-about="glow" className="pointer-events-none absolute -right-20 top-20 h-96 w-96 rounded-full bg-blue-500/5 blur-3xl" />
       <div data-about="glow" className="pointer-events-none absolute -left-20 bottom-20 h-96 w-96 rounded-full bg-purple-500/5 blur-3xl" />
 
-      <div ref={headerRef} className="mb-16 text-center">
-        <Badge variant="secondary" className="mb-4 font-heading opacity-0" data-about="header">
+      <div ref={headerRef} className="mb-10 text-center md:mb-12">
+        <Badge variant="secondary" className="mb-3 font-heading opacity-0" data-about="header">
           <Users className="mr-1.5 h-3.5 w-3.5" />
           Nosotros
         </Badge>
 
-        <h2 className="mb-4 text-4xl font-extrabold md:text-5xl opacity-0" data-about="header">
-          REDORANGE E.I.R.L.
+        <h2 className="mb-3 text-2xl font-extrabold md:text-3xl lg:text-4xl opacity-0" data-about="header">
+          <span className="bg-linear-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">REDORANGE</span> E.I.R.L.
         </h2>
 
-        <p className="mx-auto max-w-3xl text-lg text-muted-foreground md:text-xl opacity-0" data-about="header">
+        <p className="mx-auto max-w-3xl text-sm text-muted-foreground md:text-base opacity-0" data-about="header">
           Somos un equipo orientado a resolver necesidades reales con soluciones tecnológicas integrales: desde el diseño y la implementación hasta el soporte y la continuidad.
         </p>
       </div>
 
-      <div ref={cardsRef} className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+      <div ref={cardsRef} className="grid gap-5 md:grid-cols-2 lg:grid-cols-3 md:gap-6">
         {features.map((feature) => {
           const MainIcon = feature.icon;
 
@@ -187,32 +126,32 @@ export const AboutSection: FC = () => {
             <div
               key={feature.title}
               data-about="card"
-              className="group relative overflow-hidden rounded-2xl border border-border/70 bg-background/60 p-6 shadow-sm backdrop-blur transition-all hover:shadow-lg hover:scale-[1.02] opacity-0"
+              className="group relative overflow-hidden rounded-2xl border border-border/70 bg-background/60 p-4 shadow-sm backdrop-blur transition-all hover:shadow-lg hover:scale-[1.02] opacity-0 md:p-5"
             >
               <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                 <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-primary/10 blur-2xl" />
               </div>
 
-              <div className="mb-6 flex items-start gap-4">
-                <div className="flex h-14 w-14 shrink-0 items-center justify-center">
-                  <MainIcon className={`h-9 w-9 ${feature.iconColor}`} />
+              <div className="mb-4 flex items-start gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center md:h-12 md:w-12">
+                  <MainIcon className={`h-7 w-7 md:h-8 md:w-8 ${feature.iconColor}`} />
                 </div>
                 <div className="flex-1">
-                  <h3 className="mb-2 font-heading text-xl font-extrabold">{feature.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
+                  <h3 className="mb-1.5 font-heading text-base font-extrabold md:text-lg">{feature.title}</h3>
+                  <p className="text-xs text-muted-foreground leading-relaxed md:text-xs">{feature.description}</p>
                 </div>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {feature.items.map((item) => {
                   const ItemIcon = item.icon;
 
                   return (
-                    <div key={item.text} className="flex items-start gap-3 rounded-lg bg-muted/50 p-3 transition-all hover:bg-muted hover:-translate-y-px">
-                      <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center">
-                        <ItemIcon className={`h-5 w-5 ${feature.iconColor}`} />
+                    <div key={item.text} className="flex items-start gap-2.5 rounded-lg bg-muted/50 p-2 transition-all hover:bg-muted hover:-translate-y-px md:p-2.5">
+                      <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center md:h-7 md:w-7">
+                        <ItemIcon className={`h-3.5 w-3.5 md:h-4 md:w-4 ${feature.iconColor}`} />
                       </div>
-                      <span className="text-sm leading-relaxed text-foreground">{item.text}</span>
+                      <span className="text-xs leading-relaxed text-foreground md:text-sm">{item.text}</span>
                     </div>
                   );
                 })}
@@ -222,59 +161,59 @@ export const AboutSection: FC = () => {
         })}
       </div>
 
-      <div ref={footerRef} className="mt-16">
+      <div ref={footerRef} className="mt-10 md:mt-14">
         <div
           data-about="footer-wrap"
-          className={['overflow-hidden rounded-2xl border border-border/70', 'bg-linear-to-br from-primary/5 via-background/60 to-accent/5', 'p-8 md:p-10 text-center backdrop-blur', 'opacity-0'].join(' ')}
+          className="overflow-hidden rounded-2xl border border-border/70 bg-linear-to-br from-primary/5 via-background/60 to-accent/5 p-5 text-center backdrop-blur opacity-0 md:p-6 lg:p-8"
         >
-          <div className="mx-auto max-w-3xl space-y-5">
+          <div className="mx-auto max-w-3xl space-y-3 md:space-y-4">
             <div className="flex items-center justify-center gap-2 opacity-0" data-about="footer">
-              <Lightbulb className="h-6 w-6 text-primary" />
-              <h3 className="font-heading text-2xl font-extrabold md:text-3xl">Trabajamos alineados a tus objetivos</h3>
+              <Lightbulb className="h-4 w-4 text-primary md:h-5 md:w-5" />
+              <h3 className="font-heading text-lg font-extrabold md:text-xl lg:text-2xl">Trabajamos alineados a tus objetivos</h3>
             </div>
 
-            <p className="text-muted-foreground md:text-base opacity-0" data-about="footer">
+            <p className="text-xs text-muted-foreground opacity-0 md:text-sm" data-about="footer">
               Cada proyecto se aborda con transparencia, comunicación constante y un enfoque iterativo que garantiza resultados tangibles y continuidad operativa.
             </p>
 
-            <div className="flex flex-wrap items-center justify-center gap-6 pt-2 opacity-0" data-about="footer">
-              <div className="flex items-center gap-2">
-                <Target className="h-7 w-7 text-blue-500" />
-                <span className="text-sm font-semibold">Orientado a resultados</span>
+            <div className="flex flex-wrap items-center justify-center gap-3 pt-1 opacity-0 md:gap-5" data-about="footer">
+              <div className="flex items-center gap-1.5">
+                <Target className="h-5 w-5 text-blue-500 md:h-6 md:w-6" />
+                <span className="text-[10px] font-semibold md:text-xs">Orientado a resultados</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Shield className="h-7 w-7 text-purple-500" />
-                <span className="text-sm font-semibold">Soporte continuo</span>
+              <div className="flex items-center gap-1.5">
+                <Shield className="h-5 w-5 text-purple-500 md:h-6 md:w-6" />
+                <span className="text-[10px] font-semibold md:text-xs">Soporte continuo</span>
               </div>
-              <div className="flex items-center gap-2">
-                <Rocket className="h-7 w-7 text-orange-500" />
-                <span className="text-sm font-semibold">Preparado para escalar</span>
+              <div className="flex items-center gap-1.5">
+                <Rocket className="h-5 w-5 text-orange-500 md:h-6 md:w-6" />
+                <span className="text-[10px] font-semibold md:text-xs">Preparado para escalar</span>
               </div>
             </div>
 
-            <div className="mx-auto mt-6 grid max-w-4xl gap-3 md:grid-cols-3 opacity-0" data-about="footer">
-              <div className="rounded-xl border border-border/70 bg-background/60 p-4 text-left">
-                <div className="flex items-center gap-2">
-                  <MessageSquareText className="h-5 w-5 text-primary" />
-                  <p className="font-heading text-sm font-extrabold">Comunicación clara</p>
+            <div className="mx-auto mt-3 grid max-w-4xl gap-2.5 opacity-0 md:mt-5 md:grid-cols-3" data-about="footer">
+              <div className="rounded-xl border border-border/70 bg-background/60 p-2.5 text-left md:p-3">
+                <div className="flex items-center gap-1.5">
+                  <MessageSquareText className="h-3.5 w-3.5 text-primary md:h-4 md:w-4" />
+                  <p className="font-heading text-[10px] font-extrabold md:text-xs">Comunicación clara</p>
                 </div>
-                <p className="mt-2 text-xs text-muted-foreground">Estado, avances y acuerdos documentados para asegurar trazabilidad y control.</p>
+                <p className="mt-1 text-[10px] text-muted-foreground md:mt-1.5 md:text-xs">Estado, avances y acuerdos documentados para asegurar trazabilidad.</p>
               </div>
 
-              <div className="rounded-xl border border-border/70 bg-background/60 p-4 text-left">
-                <div className="flex items-center gap-2">
-                  <BadgeCheck className="h-5 w-5 text-accent" />
-                  <p className="font-heading text-sm font-extrabold">Calidad en entregables</p>
+              <div className="rounded-xl border border-border/70 bg-background/60 p-2.5 text-left md:p-3">
+                <div className="flex items-center gap-1.5">
+                  <BadgeCheck className="h-3.5 w-3.5 text-accent md:h-4 md:w-4" />
+                  <p className="font-heading text-[10px] font-extrabold md:text-xs">Calidad en entregables</p>
                 </div>
-                <p className="mt-2 text-xs text-muted-foreground">Criterios definidos, revisión y mejora continua en cada iteración.</p>
+                <p className="mt-1 text-[10px] text-muted-foreground md:mt-1.5 md:text-xs">Criterios definidos, revisión y mejora continua en cada iteración.</p>
               </div>
 
-              <div className="rounded-xl border border-border/70 bg-background/60 p-4 text-left">
-                <div className="flex items-center gap-2">
-                  <Timer className="h-5 w-5 text-secondary" />
-                  <p className="font-heading text-sm font-extrabold">Continuidad operativa</p>
+              <div className="rounded-xl border border-border/70 bg-background/60 p-2.5 text-left md:p-3">
+                <div className="flex items-center gap-1.5">
+                  <Timer className="h-3.5 w-3.5 text-secondary md:h-4 md:w-4" />
+                  <p className="font-heading text-[10px] font-extrabold md:text-xs">Continuidad operativa</p>
                 </div>
-                <p className="mt-2 text-xs text-muted-foreground">Soporte, mantenimiento y evolución para sostener la operación en el tiempo.</p>
+                <p className="mt-1 text-[10px] text-muted-foreground md:mt-1.5 md:text-xs">Soporte, mantenimiento y evolución para sostener la operación.</p>
               </div>
             </div>
           </div>
