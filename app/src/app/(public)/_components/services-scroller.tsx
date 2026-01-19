@@ -3,122 +3,56 @@
 import type { FC } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { ArrowRight, Cpu, Globe, Network, PhoneCall, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
-
-type ServiceSlide = {
-  id: 'ti-soluciones' | 'equipos-comercializacion' | 'telecom-servicios-energia';
-  title: string;
-  subtitle: string;
-  badge: string;
-  bullets: string[];
-  href: string;
-  cta: string;
-  icon: FC<{ className?: string }>;
-  image: string;
-  deliverables: { title: string; content: string }[];
-  gradient: string;
-  accentColor: string;
-};
+import { ArrowRight, Cpu, Globe, Network, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { fn_get_services, type ServiceSlide } from '@/actions/fn-services';
 
 const clamp = (n: number, min: number, max: number): number => Math.min(max, Math.max(min, n));
 const prefersReducedMotion = (): boolean => typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const ICONS: Record<ServiceSlide['id'], FC<{ className?: string }>> = {
+  'ti-soluciones': Cpu,
+  'equipos-comercializacion': Network,
+  'telecom-servicios-energia': Globe,
+};
 
 export const ServicesScroller: FC = () => {
   const sectionRef = useRef<HTMLElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
+  const [slides, setSlides] = useState<ServiceSlide[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
   const isAnimatingRef = useRef(false);
   const lockTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const slides = useMemo<ServiceSlide[]>(
-    () => [
-      {
-        id: 'ti-soluciones',
-        title: 'Tecnología y Soluciones Informáticas (TI)',
-        subtitle: 'Consultoría, desarrollo, soporte y continuidad operativa',
-        badge: 'Para procesos y operación crítica',
-        bullets: [
-          'Consultoría y asesoría en informática y cómputo',
-          'Desarrollo de software, sistemas y aplicaciones',
-          'Programación y construcción de sistemas informáticos',
-          'Administración y mantenimiento de sistemas, servidores y aplicaciones',
-          'Gestión de redes, bases de datos, mejora de procesos y capacitación',
-        ],
-        href: 'https://tech.redorange.net.pe',
-        cta: 'Ir al servicio',
-        icon: Cpu,
-        image: '/img/tech.png',
-        deliverables: [
-          { title: 'Diagnóstico y levantamiento', content: 'Requerimientos, alcance, arquitectura, riesgos y plan de trabajo con entregables.' },
-          { title: 'Desarrollo e implementación', content: 'Construcción, despliegue, pruebas, hardening, backups y monitoreo base.' },
-          { title: 'Soporte y mejora continua', content: 'Mesa de ayuda, correctivos, preventivos, documentación y capacitación según SLA.' },
-        ],
-        gradient: 'from-cyan-500/15 via-blue-500/10 to-transparent',
-        accentColor: 'text-cyan-600 dark:text-cyan-400',
-      },
-      {
-        id: 'equipos-comercializacion',
-        title: 'Comercialización, Importación y Servicios Técnicos de Equipos',
-        subtitle: 'Equipos, periféricos, provisión, instalación, mantenimiento y postventa',
-        badge: 'Para equipamiento y provisión',
-        bullets: [
-          'Importación y exportación de equipos tecnológicos',
-          'Representación, distribución y comercialización de equipos, periféricos y suministros',
-          'Comercialización de equipos de telecomunicaciones y robótica',
-          'Cotización y venta de equipos tecnológicos',
-          'Reparación, mantenimiento, instalación de equipos e instalación de redes integrales',
-        ],
-        href: 'https://infra.redorange.net.pe',
-        cta: 'Ver soluciones',
-        icon: Network,
-        image: '/img/infra.png',
-        deliverables: [
-          { title: 'Selección y cotización', content: 'Propuesta técnica, compatibilidad, alternativas y cotización según requerimiento y presupuesto.' },
-          { title: 'Provisión e instalación', content: 'Suministro, instalación, configuración, pruebas, etiquetado y documentación técnica.' },
-          { title: 'Postventa y mantenimiento', content: 'Garantías, mantenimiento preventivo/correctivo, reposiciones y soporte postventa.' },
-        ],
-        gradient: 'from-rose-500/15 via-orange-500/10 to-transparent',
-        accentColor: 'text-rose-600 dark:text-rose-400',
-      },
-      {
-        id: 'telecom-servicios-energia',
-        title: 'Telecomunicaciones, Servicios Digitales y Energía Tecnológica',
-        subtitle: 'Internet, cloud, hosting, seguridad, canales digitales y energía',
-        badge: 'Para conectividad y presencia digital',
-        bullets: [
-          'Servicios de telecomunicaciones e internet (incluye línea dedicada)',
-          'Hosting, cloud, storage y servidores de seguridad',
-          'Registro de dominios, alojamiento web, correo corporativo, intranet y extranet',
-          'Publicidad en internet, diseño gráfico, animación, edición y producción digital',
-          'Venta e instalación de paneles solares, equipos de medición y servicios eléctricos asociados',
-        ],
-        href: 'https://digital.redorange.net.pe',
-        cta: 'Conocer más',
-        icon: Globe,
-        image: '/img/digital.png',
-        deliverables: [
-          { title: 'Provisión y activación', content: 'Alta del servicio, configuración, seguridad base y validación de funcionamiento.' },
-          { title: 'Canales y plataformas', content: 'Dominios, hosting, correo corporativo, intranet/extranet y presencia digital.' },
-          { title: 'Operación y energía', content: 'Mantenimiento, monitoreo, soporte continuo y soluciones energéticas/medición.' },
-        ],
-        gradient: 'from-orange-500/15 via-amber-500/10 to-transparent',
-        accentColor: 'text-orange-600 dark:text-orange-400',
-      },
-    ],
-    [],
-  );
+  useEffect(() => {
+    let mounted = true;
+    fn_get_services()
+      .then((data) => {
+        if (!mounted) return;
+        setSlides(data);
+        setCurrentSlide(0);
+      })
+      .catch(() => {
+        if (!mounted) return;
+        setSlides([]);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const slideCount = slides.length;
 
   const animateToSlide = useCallback(
     (targetSlide: number) => {
       if (isAnimatingRef.current) return;
+      if (slideCount === 0) return;
 
       const next = clamp(targetSlide, 0, slideCount - 1);
       if (next === currentSlide) return;
@@ -145,6 +79,7 @@ export const ServicesScroller: FC = () => {
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
+    if (slideCount === 0) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -152,9 +87,7 @@ export const ServicesScroller: FC = () => {
 
         if (entry.isIntersecting && entry.intersectionRatio >= 0.95) {
           if (lockTimeoutRef.current) clearTimeout(lockTimeoutRef.current);
-          lockTimeoutRef.current = setTimeout(() => {
-            setIsLocked(true);
-          }, 100);
+          lockTimeoutRef.current = setTimeout(() => setIsLocked(true), 100);
         } else if (entry.intersectionRatio < 0.5) {
           if (lockTimeoutRef.current) clearTimeout(lockTimeoutRef.current);
           setIsLocked(false);
@@ -168,10 +101,11 @@ export const ServicesScroller: FC = () => {
       observer.disconnect();
       if (lockTimeoutRef.current) clearTimeout(lockTimeoutRef.current);
     };
-  }, []);
+  }, [slideCount]);
 
   useEffect(() => {
     if (!isLocked) return;
+    if (slideCount === 0) return;
 
     const THRESHOLD = 100;
     let accumulatedDelta = 0;
@@ -230,6 +164,7 @@ export const ServicesScroller: FC = () => {
 
   useEffect(() => {
     if (!isLocked) return;
+    if (slideCount === 0) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (isAnimatingRef.current) return;
@@ -256,6 +191,7 @@ export const ServicesScroller: FC = () => {
 
   useEffect(() => {
     if (!isLocked) return;
+    if (slideCount === 0) return;
 
     let touchStartY = 0;
 
@@ -290,6 +226,20 @@ export const ServicesScroller: FC = () => {
     };
   }, [isLocked, currentSlide, slideCount, animateToSlide, scrollToSection]);
 
+  if (slides.length === 0) {
+    return (
+      <section id="services" ref={sectionRef} className="relative h-screen w-full overflow-hidden" style={{ scrollSnapAlign: 'start' }}>
+        <div className="absolute inset-0 bg-linear-to-br from-muted/40 via-transparent to-transparent" />
+        <div className="relative z-10 flex h-full items-center justify-center px-6">
+          <div className="rounded-2xl border border-border/60 bg-background/60 p-6 text-center backdrop-blur">
+            <p className="font-heading text-base font-extrabold">Cargando líneas...</p>
+            <p className="mt-1 text-sm text-muted-foreground">Preparando la información de servicios.</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="services" ref={sectionRef} className="relative h-screen w-full overflow-hidden" style={{ scrollSnapAlign: 'start' }}>
       <div className={`absolute inset-0 bg-linear-to-br transition-all duration-1000 ${slides[currentSlide].gradient}`} />
@@ -297,7 +247,7 @@ export const ServicesScroller: FC = () => {
       <div ref={containerRef} className="flex h-full transition-transform duration-700 ease-out will-change-transform" style={{ transform: `translateX(-${currentSlide * 100}vw)` }}>
         {slides.map((slide, idx) => {
           const isActive = currentSlide === idx;
-          const Icon = slide.icon;
+          const Icon = ICONS[slide.id];
 
           return (
             <div key={slide.id} id={slide.id} className="relative h-screen w-screen shrink-0">
@@ -332,10 +282,10 @@ export const ServicesScroller: FC = () => {
                           </a>
                         </Button>
 
-                        <Button asChild size="default" variant="outline" className="font-heading">
-                          <Link href="/#contact">
-                            Contactarnos
-                            <PhoneCall className="ml-2 h-4 w-4" />
+                        <Button asChild size="default" variant="secondary" className="font-heading">
+                          <Link href={slide.url}>
+                            Detalle
+                            <ArrowRight className="ml-2 h-4 w-4" />
                           </Link>
                         </Button>
                       </div>
@@ -397,7 +347,7 @@ export const ServicesScroller: FC = () => {
                           </Button>
 
                           <Button asChild variant="ghost" size="sm" className="font-heading text-xs">
-                            <Link href="/#contact">Cotizar</Link>
+                            <Link href={slide.url}>Detalle</Link>
                           </Button>
                         </div>
                       </div>
@@ -418,7 +368,7 @@ export const ServicesScroller: FC = () => {
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-2 px-6">
           <div className="flex items-center gap-3">
             {slides.map((s, idx) => {
-              const SlideIcon = s.icon;
+              const SlideIcon = ICONS[s.id];
               const shortLabel = idx === 0 ? 'TI' : idx === 1 ? 'Equipos' : 'Telecom';
               return (
                 <button
