@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ArrowRight, Cpu, Globe, Network, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
-import { fn_get_services, type ServiceSlide } from '@/actions/fn-services';
+import { fn_get_services, type ServiceSlide, type ServiceId } from '@/actions/fn-services';
 
 const clamp = (n: number, min: number, max: number): number => Math.min(max, Math.max(min, n));
 const prefersReducedMotion = (): boolean => typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -31,6 +31,7 @@ export const ServicesScroller: FC = () => {
 
   useEffect(() => {
     let mounted = true;
+
     fn_get_services()
       .then((data) => {
         if (!mounted) return;
@@ -248,6 +249,7 @@ export const ServicesScroller: FC = () => {
         {slides.map((slide, idx) => {
           const isActive = currentSlide === idx;
           const Icon = ICONS[slide.id];
+          const detailHref = `/services/${slide.id}` satisfies `/services/${ServiceId}`;
 
           return (
             <div key={slide.id} id={slide.id} className="relative h-screen w-screen shrink-0">
@@ -283,7 +285,7 @@ export const ServicesScroller: FC = () => {
                         </Button>
 
                         <Button asChild size="default" variant="secondary" className="font-heading">
-                          <Link href={slide.url}>
+                          <Link href={detailHref}>
                             Detalle
                             <ArrowRight className="ml-2 h-4 w-4" />
                           </Link>
@@ -347,7 +349,7 @@ export const ServicesScroller: FC = () => {
                           </Button>
 
                           <Button asChild variant="ghost" size="sm" className="font-heading text-xs">
-                            <Link href={slide.url}>Detalle</Link>
+                            <Link href={detailHref}>Detalle</Link>
                           </Button>
                         </div>
                       </div>
