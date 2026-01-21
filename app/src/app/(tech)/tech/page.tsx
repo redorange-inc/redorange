@@ -155,14 +155,9 @@ const PieCustomTooltip = ({ active, payload }: PieTooltipProps) => {
   );
 };
 
-/**
- * ✅ FIX #2: Recharts (SVG) a veces NO renderiza bien con `var(--tech)` en `stroke/stopColor`.
- * Usamos colores HEX reales para los charts.
- */
 const TECH = '#06b6d4';
 const TECH_ACCENT = '#0891b2';
 
-// Colores del pie (hex)
 const PIE_COLORS = ['#06b6d4', '#22d3ee', '#67e8f9', '#0891b2', '#0e7490', '#a5f3fc'];
 
 const ui = {
@@ -254,9 +249,9 @@ const Page = () => {
 
   const achievements = useMemo<Achievement[]>(
     () => [
-      { title: 'Respuesta rápida', description: 'Tiempo promedio', metric: '< 15 min', icon: <Clock className="h-4 w-4" /> },
+      { title: 'Respuesta rápida', description: 'Tiempo promedio', metric: '< 45 min', icon: <Clock className="h-4 w-4" /> },
       { title: 'Certificaciones', description: 'Equipo certificado', metric: '28+', icon: <Award className="h-4 w-4" /> },
-      { title: 'Automatización', description: 'Procesos optimizados', metric: '65%', icon: <Zap className="h-4 w-4" /> },
+      { title: 'Automatización', description: 'Procesos optimizados', metric: '75%', icon: <Zap className="h-4 w-4" /> },
     ],
     [],
   );
@@ -430,7 +425,7 @@ const Page = () => {
                 <p className="mt-3 max-w-2xl text-base text-muted-foreground">Consultoría, desarrollo, soporte y continuidad operativa con métricas claras y enfoque en resultados.</p>
 
                 <div className="mt-6 flex flex-wrap gap-3">
-                  <Button className={`bg-tech hover:bg-tech-accent text-white ${ui.hoverLift} group`}>
+                  <Button className={`bg-tech-muted hover:bg-tech-accent text-white ${ui.hoverLift} group`}>
                     Ir al servicio
                     <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Button>
