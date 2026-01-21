@@ -1,5 +1,5 @@
 import type { FC, ReactNode, JSX } from 'react';
-import { Navbar } from '@/components/layout/navbar';
+import { Navbar } from '@/app/(public)/_components/navbar';
 import { Footer } from '@/components/layout/footer';
 
 type Props = { children: ReactNode };

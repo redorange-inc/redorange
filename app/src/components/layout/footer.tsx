@@ -23,8 +23,8 @@ export const Footer: FC = () => {
             </div>
 
             <p className="text-sm text-muted-foreground">
-              Soluciones integrales en <span className="text-foreground/90">TI</span>, <span className="text-foreground/90">equipos</span> y <span className="text-foreground/90">telecom/digital/energía</span>{' '}
-              para empresas e instituciones.
+              Soluciones integrales en <span className="text-tech">TI</span>, <span className="text-infra">equipos</span> y <span className="text-digital">telecom/digital/energía</span> para empresas e
+              instituciones.
             </p>
 
             <div className="flex flex-wrap gap-2">
@@ -64,19 +64,19 @@ export const Footer: FC = () => {
             <div className="flex flex-col gap-2 text-sm">
               <Link className="text-muted-foreground hover:text-foreground" href="/tech">
                 <span className="inline-flex items-center gap-2">
-                  <Cpu className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
+                  <Cpu className="h-4 w-4 text-tech" />
                   Tecnología y Soluciones Informáticas (TI)
                 </span>
               </Link>
               <Link className="text-muted-foreground hover:text-foreground" href="/#services">
                 <span className="inline-flex items-center gap-2">
-                  <Boxes className="h-4 w-4 text-rose-600 dark:text-rose-400" />
+                  <Boxes className="h-4 w-4 text-infra" />
                   Comercialización e Importación de Equipos
                 </span>
               </Link>
               <Link className="text-muted-foreground hover:text-foreground" href="/#services">
                 <span className="inline-flex items-center gap-2">
-                  <Globe className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+                  <Globe className="h-4 w-4 text-digital" />
                   Telecomunicaciones, Servicios Digitales y Energía
                 </span>
               </Link>
