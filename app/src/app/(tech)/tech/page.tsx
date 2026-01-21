@@ -667,10 +667,10 @@ const Page = () => {
           <Card className={`rounded-3xl lg:col-span-6 ${ui.glassCard}`}>
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2 text-xl text-foreground">
-                <Activity className="h-5 w-5 text-[var(--tech-accent)]" />
+                <Activity className="h-5 w-5 text-tech-accent" />
                 Tendencia anual
               </CardTitle>
-              <CardDescription className="text-sm">Evolución de métricas clave 2024</CardDescription>
+              <CardDescription className="text-sm">Evolución de métricas clave 2026</CardDescription>
             </CardHeader>
             <CardContent>
               {isLoading ? (
