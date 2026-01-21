@@ -219,29 +219,20 @@ const Page = () => {
 
   const achievements = useMemo<Achievement[]>(
     () => [
-      {
-        title: 'Respuesta rápida',
-        description: 'Tiempo promedio',
-        metric: '< 15 min',
-        icon: <Clock className="h-4 w-4" />,
-      },
-      {
-        title: 'Certificaciones',
-        description: 'Equipo certificado',
-        metric: '28+',
-        icon: <Award className="h-4 w-4" />,
-      },
-      {
-        title: 'Automatización',
-        description: 'Procesos optimizados',
-        metric: '65%',
-        icon: <Zap className="h-4 w-4" />,
-      },
+      { title: 'Respuesta rápida', description: 'Tiempo promedio', metric: '< 15 min', icon: <Clock className="h-4 w-4" /> },
+      { title: 'Certificaciones', description: 'Equipo certificado', metric: '28+', icon: <Award className="h-4 w-4" /> },
+      { title: 'Automatización', description: 'Procesos optimizados', metric: '65%', icon: <Zap className="h-4 w-4" /> },
     ],
     [],
   );
 
-  const [animatedValues, setAnimatedValues] = useState<AnimatedMap>({ projects: 0, clients: 0, tickets: 0, uptime: 0 });
+  const [animatedValues, setAnimatedValues] = useState<AnimatedMap>({
+    projects: 0,
+    clients: 0,
+    tickets: 0,
+    uptime: 0,
+  });
+
   const [impactData, setImpactData] = useState<ImpactRow[]>(impactDataFinal.map((d) => ({ ...d, value: 0 })));
   const [timeSeriesData, setTimeSeriesData] = useState<TimeSeriesData[]>(timeSeriesDataFinal.map((d) => ({ ...d, rendimiento: 0, satisfaccion: 0 })));
 
@@ -266,6 +257,21 @@ const Page = () => {
   }, [isLoading, totalSlides]);
 
   useEffect(() => {
+    if (isLoading) return;
+
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setAnimatedValues({
+      projects: statsConfig.find((s) => s.key === 'projects')?.value ?? 0,
+      clients: statsConfig.find((s) => s.key === 'clients')?.value ?? 0,
+      tickets: statsConfig.find((s) => s.key === 'tickets')?.value ?? 0,
+      uptime: statsConfig.find((s) => s.key === 'uptime')?.value ?? 0,
+    });
+
+    setImpactData(impactDataFinal);
+    setTimeSeriesData(timeSeriesDataFinal);
+  }, [isLoading, statsConfig, impactDataFinal, timeSeriesDataFinal]);
+
+  useEffect(() => {
     if (isLoading || animationStarted.current) return;
     animationStarted.current = true;
 
@@ -274,14 +280,9 @@ const Page = () => {
       el.style.opacity = '0';
       el.style.transform = 'translateY(24px) scale(0.98)';
     });
+
     elements.forEach((el, idx) => {
-      animate(el, {
-        opacity: [0, 1],
-        transform: ['translateY(24px) scale(0.98)', 'translateY(0px) scale(1)'],
-        duration: 800,
-        easing: 'easeOutExpo',
-        delay: 100 + 80 * idx,
-      });
+      animate(el, { opacity: [0, 1], transform: ['translateY(24px) scale(0.98)', 'translateY(0px) scale(1)'], duration: 800, easing: 'easeOutExpo', delay: 100 + 80 * idx });
     });
 
     statsConfig.forEach((s) => {
@@ -292,10 +293,7 @@ const Page = () => {
         easing: 'easeOutExpo',
         delay: 200,
         update: () => {
-          setAnimatedValues((prev) => ({
-            ...prev,
-            [s.key]: Number.isInteger(s.value) ? Math.round(obj.v) : Number(obj.v.toFixed(1)),
-          }));
+          setAnimatedValues((prev) => ({ ...prev, [s.key]: Number.isInteger(s.value) ? Math.round(obj.v) : Number(obj.v.toFixed(1)) }));
         },
       });
     });
@@ -341,15 +339,7 @@ const Page = () => {
 
     const particles = document.querySelectorAll<HTMLElement>('[data-particle]');
     particles.forEach((particle, idx) => {
-      animate(particle, {
-        translateY: [0, -15, 0],
-        translateX: [0, idx % 2 === 0 ? 8 : -8, 0],
-        opacity: [0.3, 0.6, 0.3],
-        duration: 4000 + idx * 500,
-        easing: 'easeInOutSine',
-        loop: true,
-        delay: idx * 200,
-      });
+      animate(particle, { translateY: [0, -15, 0], translateX: [0, idx % 2 === 0 ? 8 : -8, 0], opacity: [0.3, 0.6, 0.3], duration: 4000 + idx * 500, easing: 'easeInOutSine', loop: true, delay: idx * 200 });
     });
   }, [isLoading, statsConfig, impactDataFinal, timeSeriesDataFinal]);
 
@@ -546,29 +536,8 @@ const Page = () => {
         <Separator className="my-10" />
 
         <section data-anim="fade-up">
-          <Card className={`rounded-3xl ${ui.glassCard}`}>
-            <CardHeader className="pb-3">
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-xl text-slate-900 dark:text-white">Qué incluye</CardTitle>
-                  <CardDescription className="text-sm">Alcance y entregables del servicio</CardDescription>
-                </div>
-                {!isLoading && (
-                  <div className="flex items-center gap-2">
-                    <div className="flex gap-1">
-                      {Array.from({ length: totalSlides }).map((_, idx) => (
-                        <button
-                          key={idx}
-                          onClick={() => setCurrentSlide(idx)}
-                          className={`h-2 rounded-full transition-all duration-300 ${idx === currentSlide ? 'w-6 bg-orange-500' : 'w-2 bg-slate-300 dark:bg-slate-600 hover:bg-slate-400'}`}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent className="pt-0">
+          <div className={`rounded-3xl ${ui.glassCard} relative`}>
+            <div className="pt-0">
               {isLoading ? (
                 <div className="rounded-2xl border border-slate-200/50 dark:border-slate-800/40 bg-white/40 dark:bg-white/5 p-4 backdrop-blur">
                   <div className="flex items-start gap-3">
@@ -589,10 +558,26 @@ const Page = () => {
                       </div>
                     </div>
                   ))}
+
+                  {!isLoading && (
+                    <div className="absolute bottom-3 right-3">
+                      <div className="flex items-center gap-2">
+                        <div className="flex gap-1">
+                          {Array.from({ length: totalSlides }).map((_, idx) => (
+                            <button
+                              key={idx}
+                              onClick={() => setCurrentSlide(idx)}
+                              className={`h-2 rounded-full transition-all duration-300 ${idx === currentSlide ? 'w-6 bg-orange-500' : 'w-2 bg-slate-300 dark:bg-slate-600 hover:bg-slate-400'}`}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </section>
 
         <Separator className="my-10" />
