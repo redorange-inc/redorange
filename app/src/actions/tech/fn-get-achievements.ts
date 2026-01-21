@@ -3,10 +3,8 @@
 import type { ApiResponse, AchievementResponse } from '@/app/(tech)/tech/_components/types';
 
 export const getAchievements = async (): Promise<ApiResponse<AchievementResponse>> => {
-  // Simulación de delay de red
-  await new Promise((resolve) => setTimeout(resolve, 700));
+  await new Promise((resolve) => setTimeout(resolve, 100));
 
-  // Mock data - simula respuesta del backend
   const mockData: AchievementResponse = {
     items: [
       { title: 'Respuesta rápida', description: 'Tiempo promedio', metric: '< 45 min', iconName: 'Clock' },
@@ -17,10 +15,7 @@ export const getAchievements = async (): Promise<ApiResponse<AchievementResponse
 
   return {
     data: mockData,
-    meta: {
-      timestamp: new Date().toISOString(),
-      source: 'mock-database',
-    },
+    meta: { timestamp: new Date().toISOString(), source: 'mock-database' },
     message: 'Achievements retrieved successfully',
   };
 };

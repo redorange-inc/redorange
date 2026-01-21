@@ -18,10 +18,7 @@ export const getServices = async (): Promise<ApiResponse<ServiceItemResponse>> =
 
   return {
     data: mockData,
-    meta: {
-      timestamp: new Date().toISOString(),
-      source: 'mock-database',
-    },
+    meta: { timestamp: new Date().toISOString(), source: 'mock-database' },
     message: 'Services retrieved successfully',
   };
 };

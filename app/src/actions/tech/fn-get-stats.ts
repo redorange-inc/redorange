@@ -3,10 +3,8 @@
 import type { ApiResponse, StatsResponse } from '@/app/(tech)/tech/_components/types';
 
 export const getStats = async (): Promise<ApiResponse<StatsResponse>> => {
-  // Simulación de delay de red
   await new Promise((resolve) => setTimeout(resolve, 100));
 
-  // Mock data - simula respuesta del backend
   const mockData: StatsResponse = {
     projects: 127,
     clients: 58,
@@ -16,10 +14,7 @@ export const getStats = async (): Promise<ApiResponse<StatsResponse>> => {
 
   return {
     data: mockData,
-    meta: {
-      timestamp: new Date().toISOString(),
-      source: 'mock-database',
-    },
+    meta: { timestamp: new Date().toISOString(), source: 'mock-database' },
     message: 'Stats retrieved successfully',
   };
 };

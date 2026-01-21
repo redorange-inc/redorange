@@ -1,8 +1,14 @@
-'use client';
+'use server';
 
-import React, { useEffect, useRef } from 'react';
-import { animate } from 'animejs';
 import { Separator } from '@/components/ui/separator';
+import { getStats } from '@/actions/tech/fn-get-stats';
+import { getImpactData } from '@/actions/tech/fn-get-impact-data';
+import { getTimeSeries } from '@/actions/tech/fn-get-time-series';
+import { getServices } from '@/actions/tech/fn-get-services';
+import { getAchievements } from '@/actions/tech/fn-get-achievements';
+import { getHighlights } from '@/actions/tech/fn-get-highlights';
+
+import { PageAnimations } from './_components/page-animations';
 import { BackgroundEffects } from './_components/background-effects';
 import { HeroSection } from './_components/hero-section';
 import { OverviewCard } from './_components/overview-card';
@@ -12,70 +18,52 @@ import { TrendChart } from './_components/trend-chart';
 import { AchievementsSection } from './_components/achievements-section';
 import { CtaSection } from './_components/cta-section';
 
-const TechPage = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const animationStarted = useRef(false);
-
-  useEffect(() => {
-    if (animationStarted.current) return;
-    animationStarted.current = true;
-
-    const timer = setTimeout(() => {
-      const elements = Array.from(document.querySelectorAll<HTMLElement>('[data-anim="fade-up"]'));
-      elements.forEach((el) => {
-        el.style.opacity = '0';
-        el.style.transform = 'translateY(24px) scale(0.98)';
-      });
-
-      elements.forEach((el, idx) => {
-        animate(el, { opacity: [0, 1], transform: ['translateY(24px) scale(0.98)', 'translateY(0px) scale(1)'], duration: 800, easing: 'easeOutExpo', delay: 100 + 80 * idx });
-      });
-
-      const particles = document.querySelectorAll<HTMLElement>('[data-particle]');
-      particles.forEach((particle, idx) => {
-        animate(particle, { translateY: [0, -15, 0], translateX: [0, idx % 2 === 0 ? 8 : -8, 0], opacity: [0.3, 0.6, 0.3], duration: 4000 + idx * 500, easing: 'easeInOutSine', loop: true, delay: idx * 200 });
-      });
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, []);
+const TechPage = async () => {
+  const [statsResponse, impactResponse, timeSeriesResponse, servicesResponse, achievementsResponse, highlightsResponse] = await Promise.all([
+    getStats(),
+    getImpactData(),
+    getTimeSeries(),
+    getServices(),
+    getAchievements(),
+    getHighlights(),
+  ]);
 
   return (
-    <main ref={containerRef} className="relative min-h-screen overflow-hidden bg-background pt-20">
+    <PageAnimations>
       <BackgroundEffects />
 
       <div className="relative mx-auto w-full max-w-6xl px-4 py-14 lg:px-6">
         <section className="grid gap-8 lg:grid-cols-12" data-anim="fade-up">
           <div className="lg:col-span-7">
-            <HeroSection />
+            <HeroSection highlights={highlightsResponse.data.items} />
           </div>
           <div className="lg:col-span-5">
-            <OverviewCard />
+            <OverviewCard stats={statsResponse.data} />
           </div>
         </section>
 
         <Separator className="my-10" />
 
         <section data-anim="fade-up">
-          <ServicesCarousel />
+          <ServicesCarousel services={servicesResponse.data.items} />
         </section>
 
         <Separator className="my-10" />
 
         <section className="grid gap-6 lg:grid-cols-12" data-anim="fade-up">
-          <ImpactChart />
-          <TrendChart />
+          <ImpactChart impactData={impactResponse.data.items} />
+          <TrendChart timeSeriesData={timeSeriesResponse.data.items} />
         </section>
 
         <Separator className="my-10" />
 
-        <AchievementsSection />
+        <AchievementsSection achievements={achievementsResponse.data.items} />
 
         <Separator className="my-10" />
 
         <CtaSection />
       </div>
-    </main>
+    </PageAnimations>
   );
 };
 

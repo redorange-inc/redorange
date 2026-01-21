@@ -3,10 +3,8 @@
 import type { ApiResponse, TimeSeriesResponse } from '@/app/(tech)/tech/_components/types';
 
 export const getTimeSeries = async (): Promise<ApiResponse<TimeSeriesResponse>> => {
-  // Simulación de delay de red
-  await new Promise((resolve) => setTimeout(resolve, 1200));
+  await new Promise((resolve) => setTimeout(resolve, 100));
 
-  // Mock data - simula respuesta del backend
   const mockData: TimeSeriesResponse = {
     items: [
       { month: 'Ene', rendimiento: 78, satisfaccion: 85 },
@@ -26,10 +24,7 @@ export const getTimeSeries = async (): Promise<ApiResponse<TimeSeriesResponse>> 
 
   return {
     data: mockData,
-    meta: {
-      timestamp: new Date().toISOString(),
-      source: 'mock-database',
-    },
+    meta: { timestamp: new Date().toISOString(), source: 'mock-database' },
     message: 'Time series data retrieved successfully',
   };
 };

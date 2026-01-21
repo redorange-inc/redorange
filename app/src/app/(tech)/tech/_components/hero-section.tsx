@@ -1,43 +1,16 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Sparkles, ArrowRight } from 'lucide-react';
-import { SkeletonHeroSection } from './skeletons';
 import { ui, getIcon } from './constants';
-import { getHighlights } from '@/actions/tech/fn-get-highlights';
+import type { HighlightResponse } from './types';
 
-interface HighlightItem {
-  title: string;
-  desc: string;
-  iconName: string;
+interface HeroSectionProps {
+  highlights: HighlightResponse['items'];
 }
 
-export const HeroSection = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [highlights, setHighlights] = useState<HighlightItem[]>([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await getHighlights();
-        setHighlights(response.data.items);
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('Error fetching highlights:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  if (isLoading) {
-    return <SkeletonHeroSection />;
-  }
-
+export const HeroSection = ({ highlights }: HeroSectionProps) => {
   return (
     <>
       <div className="flex flex-wrap items-center gap-2 font-mono text-xs">
