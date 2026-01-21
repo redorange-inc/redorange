@@ -24,34 +24,66 @@ const statsConfig: StatConfig[] = [
   { key: 'uptime', label: 'Disponibilidad', suffix: '%', icon: <Settings className="h-4 w-4" /> },
 ];
 
+type Status = 'loading' | 'ready' | 'error';
+
 export const OverviewCard = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [animatedValues, setAnimatedValues] = useState<AnimatedMap>({ projects: 0, clients: 0, tickets: 0, uptime: 0 });
+  const [status, setStatus] = useState<Status>('loading');
   const [statsData, setStatsData] = useState<StatsResponse | null>(null);
+
+  const [animatedValues, setAnimatedValues] = useState<AnimatedMap>({
+    projects: 0,
+    clients: 0,
+    tickets: 0,
+    uptime: 0,
+  });
+
   const animationStarted = useRef(false);
 
   useEffect(() => {
+    let alive = true;
+
     const fetchData = async () => {
       try {
+        setStatus('loading');
+
         const response = await getStats();
+
+        // Validación defensiva (para no caer en "0" silencioso)
+        if (!response?.data) {
+          throw new Error('Respuesta inválida: no viene data');
+        }
+
+        if (!alive) return;
+
         setStatsData(response.data);
+        setStatus('ready');
       } catch (error) {
         // eslint-disable-next-line no-console
         console.error('Error fetching stats:', error);
-      } finally {
-        setIsLoading(false);
+        if (!alive) return;
+
+        setStatsData(null);
+        setStatus('error');
       }
     };
 
     fetchData();
+
+    return () => {
+      alive = false;
+    };
   }, []);
 
   useEffect(() => {
-    if (isLoading || !statsData || animationStarted.current) return;
+    if (status !== 'ready' || !statsData || animationStarted.current) return;
     animationStarted.current = true;
 
     statsConfig.forEach((s) => {
       const targetValue = statsData[s.key];
+
+      // Por seguridad (si viniera undefined)
+      if (typeof targetValue !== 'number') return;
+
       const obj = { v: 0 };
       animate(obj, {
         v: targetValue,
@@ -59,16 +91,22 @@ export const OverviewCard = () => {
         easing: 'easeOutExpo',
         delay: 200,
         update: () => {
-          setAnimatedValues((prev) => ({ ...prev, [s.key]: s.key === 'uptime' ? Number(obj.v.toFixed(1)) : Math.round(obj.v) }));
+          setAnimatedValues((prev) => ({
+            ...prev,
+            [s.key]: s.key === 'uptime' ? Number(obj.v.toFixed(1)) : Math.round(obj.v),
+          }));
         },
       });
     });
-  }, [isLoading, statsData]);
+  }, [status, statsData]);
+
+  const isLoading = status === 'loading';
 
   return (
     <Card className={`relative overflow-hidden rounded-3xl ${ui.glassCard}`} data-anim="fade-up">
       <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-(--tech-gradient-from) blur-2xl animate-pulse" />
       <div className="absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-(--tech-accent)/20 blur-2xl animate-pulse" style={{ animationDelay: '1s' }} />
+
       <CardContent className="p-6">
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -86,6 +124,10 @@ export const OverviewCard = () => {
               <SkeletonStatCard />
               <SkeletonStatCard />
             </>
+          ) : status === 'error' ? (
+            <div className="col-span-2 rounded-2xl border border-border/50 bg-background/40 p-4 text-sm text-muted-foreground backdrop-blur">
+              No se pudieron cargar las métricas. Revisa consola/Server Actions o intenta recargar.
+            </div>
           ) : (
             statsConfig.map((s) => (
               <div key={s.key} className={`rounded-2xl ${ui.softBorder} bg-background/40 p-3 backdrop-blur ${ui.hoverLift} group`}>
