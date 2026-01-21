@@ -1,8 +1,9 @@
 'use client';
 
+import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ui, getIcon, categoryColors } from './constants';
+import { ui, categoryColors } from './constants';
 import type { TechStackResponse } from './types';
 
 interface TechStackSectionProps {
@@ -15,6 +16,32 @@ const categoryLabels: Record<string, string> = {
   database: 'Base de Datos',
   devops: 'DevOps',
   tools: 'Herramientas',
+};
+
+const getIconPath = (iconName: string): string => {
+  const availableIcons = [
+    'default',
+    'docker',
+    'github',
+    'go',
+    'golang',
+    'grafana',
+    'java',
+    'js',
+    'keycloak',
+    'kubernetes',
+    'mysql',
+    'nextjs',
+    'postgresql',
+    'prometheus',
+    'react',
+    'rust',
+    'typescript',
+    'webassembly',
+  ];
+
+  const name = availableIcons.includes(iconName) ? iconName : 'default';
+  return `/icons/tech/${name}-icon.svg`;
 };
 
 export const TechStackSection = ({ techStack }: TechStackSectionProps) => {
@@ -50,7 +77,9 @@ export const TechStackSection = ({ techStack }: TechStackSectionProps) => {
                 <Card key={idx} className={`rounded-2xl ${ui.glassCard} ${ui.hoverLift} group`}>
                   <CardContent className="p-4">
                     <div className="flex items-center gap-3">
-                      <div className="rounded-xl bg-tech/20 p-2.5 text-tech group-hover:scale-110 transition-transform">{getIcon(tech.iconName)}</div>
+                      <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-background/80 p-2 group-hover:scale-110 transition-transform">
+                        <Image src={getIconPath(tech.iconName)} alt={tech.name} width={24} height={24} className="object-contain" />
+                      </div>
                       <div>
                         <div className="text-sm font-semibold text-foreground">{tech.name}</div>
                         <p className="text-[10px] text-muted-foreground leading-relaxed">{tech.description}</p>
