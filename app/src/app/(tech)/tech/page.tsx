@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import React, { useEffect, useMemo, useRef, useState, CSSProperties } from 'react';
 import { animate } from 'animejs';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as ReTooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import { PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip as ReTooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -76,6 +76,7 @@ interface Stat {
 interface ImpactRow {
   area: string;
   value: number;
+  [key: string]: string | number;
 }
 
 interface Achievement {
@@ -109,6 +110,18 @@ interface CustomTooltipProps {
   }>;
 }
 
+interface PieTooltipProps {
+  active?: boolean;
+  payload?: Array<{
+    value?: number | string;
+    name?: string;
+    payload?: {
+      area?: string;
+      value?: number;
+    };
+  }>;
+}
+
 const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (!active || !payload?.length) return null;
 
@@ -130,6 +143,25 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   );
 };
 
+const PieCustomTooltip = ({ active, payload }: PieTooltipProps) => {
+  if (!active || !payload?.length) return null;
+
+  const data = payload[0];
+  return (
+    <Card className="border-orange-200/60 bg-white/95 shadow-2xl backdrop-blur-xl dark:border-orange-800/50 dark:bg-slate-950/90">
+      <CardContent className="p-4">
+        <div className="text-sm font-bold text-slate-900 dark:text-white mb-1">{data.payload?.area}</div>
+        <div className="flex items-center gap-2 text-xs">
+          <span className="text-slate-600 dark:text-slate-400">Impacto:</span>
+          <span className="font-bold text-orange-600 dark:text-orange-400">{data.payload?.value}%</span>
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
+
+const PIE_COLORS = ['#f97316', '#fb923c', '#fdba74', '#ea580c', '#c2410c', '#fed7aa'];
+
 const ui = {
   glassCard: 'border-white/40 bg-white/40 shadow-[0_18px_50px_-30px_rgba(2,6,23,0.25)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/30',
   softBorder: 'border border-slate-200/50 dark:border-slate-800/40',
@@ -142,35 +174,10 @@ const Page = () => {
 
   const statsConfig = useMemo<Stat[]>(
     () => [
-      {
-        key: 'projects',
-        label: 'Proyectos ejecutados',
-        value: 127,
-        helper: 'Implementaciones completadas',
-        icon: <Wrench className="h-4 w-4" />,
-      },
-      {
-        key: 'clients',
-        label: 'Clientes atendidos',
-        value: 58,
-        helper: 'Empresas y organizaciones',
-        icon: <ShieldCheck className="h-4 w-4" />,
-      },
-      {
-        key: 'tickets',
-        label: 'Tickets resueltos',
-        value: 4280,
-        helper: 'Mesa de ayuda y soporte',
-        icon: <Headphones className="h-4 w-4" />,
-      },
-      {
-        key: 'uptime',
-        label: 'Disponibilidad',
-        value: 99.8,
-        suffix: '%',
-        helper: 'Servicios críticos',
-        icon: <Settings className="h-4 w-4" />,
-      },
+      { key: 'projects', label: 'Proyectos ejecutados', value: 127, helper: 'Implementaciones completadas', icon: <Wrench className="h-4 w-4" /> },
+      { key: 'clients', label: 'Clientes atendidos', value: 58, helper: 'Empresas y organizaciones', icon: <ShieldCheck className="h-4 w-4" /> },
+      { key: 'tickets', label: 'Tickets resueltos', value: 4280, helper: 'Mesa de ayuda y soporte', icon: <Headphones className="h-4 w-4" /> },
+      { key: 'uptime', label: 'Disponibilidad', value: 99.8, suffix: '%', helper: 'Servicios críticos', icon: <Settings className="h-4 w-4" /> },
     ],
     [],
   );
@@ -226,12 +233,7 @@ const Page = () => {
     [],
   );
 
-  const [animatedValues, setAnimatedValues] = useState<AnimatedMap>({
-    projects: 0,
-    clients: 0,
-    tickets: 0,
-    uptime: 0,
-  });
+  const [animatedValues, setAnimatedValues] = useState<AnimatedMap>({ projects: 0, clients: 0, tickets: 0, uptime: 0 });
 
   const [impactData, setImpactData] = useState<ImpactRow[]>(impactDataFinal.map((d) => ({ ...d, value: 0 })));
   const [timeSeriesData, setTimeSeriesData] = useState<TimeSeriesData[]>(timeSeriesDataFinal.map((d) => ({ ...d, rendimiento: 0, satisfaccion: 0 })));
@@ -326,11 +328,7 @@ const Page = () => {
         update: () => {
           setTimeSeriesData((prev) => {
             const newData = [...prev];
-            newData[idx] = {
-              month: row.month,
-              rendimiento: Math.round(obj.r),
-              satisfaccion: Math.round(obj.s),
-            };
+            newData[idx] = { month: row.month, rendimiento: Math.round(obj.r), satisfaccion: Math.round(obj.s) };
             return newData;
           });
         },
@@ -597,20 +595,69 @@ const Page = () => {
               ) : (
                 <div className="h-[300px] w-full">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={impactData} margin={{ top: 10, right: 12, bottom: 10, left: 0 }}>
+                    <PieChart>
                       <defs>
-                        <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#f97316" stopOpacity={1} />
-                          <stop offset="100%" stopColor="#ea580c" stopOpacity={0.8} />
-                        </linearGradient>
+                        {PIE_COLORS.map((color, index) => (
+                          <linearGradient key={`gradient-${index}`} id={`pieGradient-${index}`} x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor={color} stopOpacity={1} />
+                            <stop offset="100%" stopColor={color} stopOpacity={0.7} />
+                          </linearGradient>
+                        ))}
                       </defs>
-                      <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="stroke-slate-200/80 dark:stroke-slate-700/70" />
-                      <XAxis dataKey="area" tickLine={false} axisLine={false} className="text-xs" tick={{ fill: 'currentColor' }} />
-                      <YAxis tickLine={false} axisLine={false} width={35} className="text-xs" tick={{ fill: 'currentColor' }} domain={[0, 100]} />
-                      <ReTooltip content={(props) => <CustomTooltip {...(props as unknown as CustomTooltipProps)} />} cursor={{ fill: 'rgba(249, 115, 22, 0.08)' }} />
-                      <Bar dataKey="value" name="Impacto" radius={[10, 10, 0, 0]} fill="url(#barGradient)" />
-                    </BarChart>
+                      <Pie
+                        data={impactData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={100}
+                        paddingAngle={3}
+                        dataKey="value"
+                        nameKey="area"
+                        stroke="none"
+                        labelLine={false}
+                        label={(props) => {
+                          const { cx, cy, midAngle, outerRadius, payload } = props as {
+                            cx: number;
+                            cy: number;
+                            midAngle: number;
+                            outerRadius: number;
+                            payload: ImpactRow;
+                          };
+                          const RADIAN = Math.PI / 180;
+                          const radius = (outerRadius ?? 100) + 25;
+                          const angle = midAngle ?? 0;
+                          const x = (cx ?? 0) + radius * Math.cos(-angle * RADIAN);
+                          const y = (cy ?? 0) + radius * Math.sin(-angle * RADIAN);
+                          return (
+                            <text x={x} y={y} fill="currentColor" className="text-[10px] fill-slate-600 dark:fill-slate-400" textAnchor={x > (cx ?? 0) ? 'start' : 'end'} dominantBaseline="central">
+                              {payload.area} ({payload.value}%)
+                            </text>
+                          );
+                        }}
+                      >
+                        {impactData.map((_, index) => (
+                          <Cell
+                            key={`cell-${index}`}
+                            fill={`url(#pieGradient-${index})`}
+                            className="transition-all duration-300 hover:opacity-80"
+                            style={{ filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))' }}
+                          />
+                        ))}
+                      </Pie>
+                      <ReTooltip content={<PieCustomTooltip />} />
+                    </PieChart>
                   </ResponsiveContainer>
+                </div>
+              )}
+
+              {!isLoading && (
+                <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+                  {impactData.map((item, idx) => (
+                    <div key={item.area} className="flex items-center gap-1.5">
+                      <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: PIE_COLORS[idx] }} />
+                      <span className="text-[10px] text-slate-600 dark:text-slate-400">{item.area}</span>
+                    </div>
+                  ))}
                 </div>
               )}
             </CardContent>
