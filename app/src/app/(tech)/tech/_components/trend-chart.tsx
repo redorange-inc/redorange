@@ -1,7 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { animate } from 'animejs';
+import React, { useMemo } from 'react';
 import { XAxis, YAxis, CartesianGrid, Tooltip as ReTooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Activity } from 'lucide-react';
@@ -13,35 +12,19 @@ interface TrendChartProps {
   timeSeriesData: TimeSeriesResponse['items'];
 }
 
-export const TrendChart = ({ timeSeriesData: initialData }: TrendChartProps) => {
-  const [timeSeriesData, setTimeSeriesData] = useState<TimeSeriesData[]>(initialData.map((d) => ({ ...d, rendimiento: 0, satisfaccion: 0 })));
-  const animationStarted = useRef(false);
-
-  useEffect(() => {
-    if (animationStarted.current || initialData.length === 0) return;
-    animationStarted.current = true;
-
-    initialData.forEach((row, idx) => {
-      const obj = { r: 0, s: 0 };
-      animate(obj, {
-        r: row.rendimiento,
-        s: row.satisfaccion,
-        duration: 2500,
-        easing: 'easeOutQuart',
-        delay: 600 + idx * 60,
-        update: () => {
-          setTimeSeriesData((prev) => {
-            const newData = [...prev];
-            newData[idx] = { month: row.month, rendimiento: Math.round(obj.r), satisfaccion: Math.round(obj.s) };
-            return newData;
-          });
-        },
-      });
-    });
-  }, [initialData]);
+export const TrendChart = ({ timeSeriesData }: TrendChartProps) => {
+  const data = useMemo<TimeSeriesData[]>(
+    () =>
+      (timeSeriesData ?? []).map((d) => ({
+        month: d.month,
+        rendimiento: Number(d.rendimiento ?? 0),
+        satisfaccion: Number(d.satisfaccion ?? 0),
+      })),
+    [timeSeriesData],
+  );
 
   return (
-    <Card className={`rounded-3xl lg:col-span-6 ${ui.glassCard}`}>
+    <Card className={`rounded-3xl lg:col-span-6 ${ui.glassCard} min-w-0`}>
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2 text-xl text-foreground">
           <Activity className="h-5 w-5 text-tech-accent" />
@@ -49,15 +32,18 @@ export const TrendChart = ({ timeSeriesData: initialData }: TrendChartProps) => 
         </CardTitle>
         <CardDescription className="text-sm">Evolución de métricas clave 2026</CardDescription>
       </CardHeader>
+
       <CardContent>
-        <div className="h-[300px] min-h-[300px] w-full">
+        {/* min-w-0 + height fija => ResponsiveContainer siempre tiene medidas válidas */}
+        <div className="h-[300px] min-h-[300px] w-full min-w-0">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={timeSeriesData} margin={{ top: 10, right: 12, bottom: 10, left: 0 }}>
+            <AreaChart data={data} margin={{ top: 10, right: 12, bottom: 10, left: 0 }}>
               <defs>
                 <linearGradient id="rendimientoGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor={TECH} stopOpacity={0.4} />
                   <stop offset="100%" stopColor={TECH} stopOpacity={0} />
                 </linearGradient>
+
                 <linearGradient id="satisfaccionGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="0%" stopColor={TECH_ACCENT} stopOpacity={0.4} />
                   <stop offset="100%" stopColor={TECH_ACCENT} stopOpacity={0} />
@@ -67,6 +53,7 @@ export const TrendChart = ({ timeSeriesData: initialData }: TrendChartProps) => 
               <CartesianGrid strokeDasharray="3 3" stroke="currentColor" className="stroke-border" />
               <XAxis dataKey="month" tickLine={false} axisLine={false} className="text-xs" tick={{ fill: 'currentColor' }} />
               <YAxis tickLine={false} axisLine={false} width={35} className="text-xs" tick={{ fill: 'currentColor' }} domain={[0, 100]} />
+
               <ReTooltip content={(props) => <CustomTooltip {...(props as unknown as CustomTooltipProps)} />} />
 
               <Area type="monotone" dataKey="rendimiento" name="Rendimiento" stroke={TECH} strokeWidth={2} fill="url(#rendimientoGrad)" />
