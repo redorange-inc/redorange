@@ -101,11 +101,14 @@
   --color-primary: var(--primary);
   --color-secondary: var(--secondary);
 
+  /* -- service theme colors - light mode */
+
   /* Tech (ti-solutions) - Cyan/Blue theme */
   --tech: #0891b2; /* cyan-600 */
   --tech-accent: #0891b2; /* cyan-600 */
   --tech-muted: #06b6d4; /* cyan-500 */
   --tech-light: #22d3ee; /* cyan-400 */
+  --tech-foreground: #ffffff; /* white text on tech bg */
   --tech-gradient-from: rgba(6, 182, 212, 0.15); /* cyan-500/15 */
   --tech-gradient-via: rgba(59, 130, 246, 0.1); /* blue-500/10 */
   --tech-bg: rgba(6, 182, 212, 0.08); /* cyan-500/8 */
@@ -117,6 +120,7 @@
   --infra-accent: #e11d48; /* rose-600 */
   --infra-muted: #f43f5e; /* rose-500 */
   --infra-light: #fb7185; /* rose-400 */
+  --infra-foreground: #ffffff; /* white text on infra bg */
   --infra-gradient-from: rgba(244, 63, 94, 0.15); /* rose-500/15 */
   --infra-gradient-via: rgba(249, 115, 22, 0.1); /* orange-500/10 */
   --infra-bg: rgba(244, 63, 94, 0.08); /* rose-500/8 */
@@ -128,6 +132,7 @@
   --digital-accent: #ea580c; /* orange-600 */
   --digital-muted: #f97316; /* orange-500 */
   --digital-light: #fb923c; /* orange-400 */
+  --digital-foreground: #ffffff; /* white text on digital bg */
   --digital-gradient-from: rgba(249, 115, 22, 0.15); /* orange-500/15 */
   --digital-gradient-via: rgba(245, 158, 11, 0.1); /* amber-500/10 */
   --digital-bg: rgba(249, 115, 22, 0.08); /* orange-500/8 */
@@ -176,11 +181,14 @@
   --color-primary: var(--primary);
   --color-secondary: var(--secondary);
 
+  /* -- service theme colors - dark mode */
+
   /* Tech (ti-solutions) - Cyan/Blue theme */
   --tech: #22d3ee; /* cyan-400 */
   --tech-accent: #22d3ee; /* cyan-400 */
   --tech-muted: #06b6d4; /* cyan-500 */
   --tech-light: #67e8f9; /* cyan-300 */
+  --tech-foreground: #0a0605; /* dark text on tech bg in dark mode */
   --tech-gradient-from: rgba(6, 182, 212, 0.15); /* cyan-500/15 */
   --tech-gradient-via: rgba(59, 130, 246, 0.1); /* blue-500/10 */
   --tech-bg: rgba(6, 182, 212, 0.1); /* cyan-500/10 */
@@ -192,6 +200,7 @@
   --infra-accent: #fb7185; /* rose-400 */
   --infra-muted: #f43f5e; /* rose-500 */
   --infra-light: #fda4af; /* rose-300 */
+  --infra-foreground: #0a0605; /* dark text on infra bg in dark mode */
   --infra-gradient-from: rgba(244, 63, 94, 0.15); /* rose-500/15 */
   --infra-gradient-via: rgba(249, 115, 22, 0.1); /* orange-500/10 */
   --infra-bg: rgba(244, 63, 94, 0.1); /* rose-500/10 */
@@ -203,6 +212,7 @@
   --digital-accent: #fb923c; /* orange-400 */
   --digital-muted: #f97316; /* orange-500 */
   --digital-light: #fdba74; /* orange-300 */
+  --digital-foreground: #0a0605; /* dark text on digital bg in dark mode */
   --digital-gradient-from: rgba(249, 115, 22, 0.15); /* orange-500/15 */
   --digital-gradient-via: rgba(245, 158, 11, 0.1); /* amber-500/10 */
   --digital-bg: rgba(249, 115, 22, 0.1); /* orange-500/10 */
@@ -213,6 +223,7 @@
 html {
   font-size: var(--font-size);
   scroll-behavior: smooth;
+  /* Scroll snap para secciones principales */
   scroll-snap-type: y mandatory;
 }
 
@@ -298,8 +309,16 @@ samp {
   color: var(--tech-accent);
 }
 
+.text-tech-foreground {
+  color: var(--tech-foreground);
+}
+
 .bg-tech {
   background-color: var(--tech-bg);
+}
+
+.bg-tech-solid {
+  background-color: var(--tech);
 }
 
 .bg-tech-hover:hover {
@@ -323,8 +342,16 @@ samp {
   color: var(--infra-accent);
 }
 
+.text-infra-foreground {
+  color: var(--infra-foreground);
+}
+
 .bg-infra {
   background-color: var(--infra-bg);
+}
+
+.bg-infra-solid {
+  background-color: var(--infra);
 }
 
 .bg-infra-hover:hover {
@@ -348,8 +375,16 @@ samp {
   color: var(--digital-accent);
 }
 
+.text-digital-foreground {
+  color: var(--digital-foreground);
+}
+
 .bg-digital {
   background-color: var(--digital-bg);
+}
+
+.bg-digital-solid {
+  background-color: var(--digital);
 }
 
 .bg-digital-hover:hover {

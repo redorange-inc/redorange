@@ -64,32 +64,21 @@ export const Navbar: FC = () => {
             const active = isActive(item.sectionId);
 
             return (
-              <Button
+              <Link
                 key={item.href}
-                asChild
-                variant="ghost"
-                className={cn('relative px-3 font-heading text-sm transition-colors', 'hover:text-cyan-600 dark:hover:text-cyan-400', active && 'text-cyan-600 dark:text-cyan-400')}
+                href={item.href}
+                className={cn('relative px-3 py-2 font-heading text-sm transition-all duration-200', 'hover:text-tech hover:font-bold', active ? 'text-tech font-bold' : 'text-foreground/80')}
               >
-                <Link href={item.href}>
-                  {item.label}
-                  {active && <span className="absolute bottom-0 left-1/2 h-0.5 w-3/4 -translate-x-1/2 rounded-full bg-cyan-600 dark:bg-cyan-400" />}
-                </Link>
-              </Button>
+                {item.label}
+                {active && <span className="absolute bottom-0 left-1/2 h-0.5 w-3/4 -translate-x-1/2 rounded-full bg-tech" />}
+              </Link>
             );
           })}
         </nav>
 
         <div className="flex items-center gap-2">
-          <div className="hidden md:block ">
-            <Button
-              asChild
-              className={cn(
-                'font-heading',
-                'bg-cyan-600 text-white dark:bg-cyan-400 dark:text-slate-950',
-                'hover:bg-cyan-700 hover:text-white dark:hover:bg-cyan-300 dark:hover:text-slate-950',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-500 focus-visible:ring-offset-2',
-              )}
-            >
+          <div className="hidden md:block">
+            <Button asChild className="font-heading bg-tech-muted text-white hover:bg-tech-accent">
               <Link href="/auth/sign-in">Iniciar Sesión</Link>
             </Button>
           </div>
@@ -103,13 +92,7 @@ export const Navbar: FC = () => {
             const active = isActive(item.sectionId);
 
             return (
-              <Button
-                key={item.href}
-                asChild
-                size="sm"
-                variant={active ? 'default' : 'secondary'}
-                className={cn('font-heading text-xs', 'hover:text-cyan-600 dark:hover:text-cyan-400', active && 'text-cyan-600 dark:text-cyan-400')}
-              >
+              <Button key={item.href} asChild size="sm" variant={active ? 'default' : 'secondary'} className={cn('font-heading text-xs', active && 'bg-tech text-white hover:bg-tech-accent')}>
                 <Link href={item.href}>{item.label}</Link>
               </Button>
             );
