@@ -11,9 +11,9 @@ import { cn } from '@/lib/utils';
 
 const navItems = [
   { href: '/tech/#inicio', label: 'Inicio', sectionId: 'inicio' },
-  { href: '/tech/#servicios', label: 'Servicios', sectionId: 'servicios' },
-  { href: '/tech/#proyectos', label: 'Proyectos', sectionId: 'proyectos' },
-  { href: '/tech/#metodologia', label: 'Metodología', sectionId: 'metodologia' },
+  { href: '/tech/services', label: 'Servicios', sectionId: 'servicios' },
+  { href: '/tech/projects', label: 'Proyectos', sectionId: 'proyectos' },
+  { href: '/tech/method', label: 'Metodología', sectionId: 'metodologia' },
   { href: '/tech/#contacto', label: 'Contacto', sectionId: 'contacto' },
 ] as const;
 
