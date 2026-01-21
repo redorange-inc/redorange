@@ -10,29 +10,28 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 const navItems = [
-  { href: '/tech/#inicio', label: 'Inicio', sectionId: 'inicio' },
-  { href: '/tech/services', label: 'Servicios', sectionId: 'servicios' },
-  { href: '/tech/projects', label: 'Proyectos', sectionId: 'proyectos' },
-  { href: '/tech/method', label: 'Metodología', sectionId: 'metodologia' },
-  { href: '/tech/#contacto', label: 'Contacto', sectionId: 'contacto' },
+  { href: '/tech', label: 'Inicio', exact: true },
+  { href: '/tech/services', label: 'Servicios', exact: false },
+  { href: '/tech/projects', label: 'Proyectos', exact: false },
+  { href: '/tech/method', label: 'Metodología', exact: false },
+  { href: '/tech#contact', label: 'Contacto', exact: true },
 ] as const;
 
 export const Navbar: FC = () => {
   const pathname = usePathname();
-  const [activeSection, setActiveSection] = useState<string>('inicio');
+  const [scrolledToContact, setScrolledToContact] = useState(false);
 
   const handleScroll = useCallback(() => {
-    if (pathname !== '/tech') return;
+    if (pathname !== '/tech') {
+      setScrolledToContact(false);
+      return;
+    }
 
-    const sections = ['inicio', 'servicios', 'proyectos', 'metodologia', 'contacto'];
-    const scrollPosition = window.scrollY + 100;
-
-    for (let i = sections.length - 1; i >= 0; i--) {
-      const section = document.getElementById(sections[i]);
-      if (section && section.offsetTop <= scrollPosition) {
-        setActiveSection(sections[i]);
-        break;
-      }
+    const contactSection = document.getElementById('contact');
+    if (contactSection) {
+      const scrollPosition = window.scrollY + window.innerHeight;
+      const contactTop = contactSection.offsetTop;
+      setScrolledToContact(scrollPosition >= contactTop + 100);
     }
   }, [pathname]);
 
@@ -42,15 +41,22 @@ export const Navbar: FC = () => {
       handleScroll();
       window.addEventListener('scroll', handleScroll, { passive: true });
       return () => window.removeEventListener('scroll', handleScroll);
+    } else {
+      setScrolledToContact(false);
     }
   }, [pathname, handleScroll]);
 
-  const isActive = (sectionId: string) => pathname === '/tech' && activeSection === sectionId;
+  const isActive = (item: (typeof navItems)[number]) => {
+    if (item.href === '/tech#contact') return pathname === '/tech' && scrolledToContact;
+
+    if (item.exact) return pathname === item.href;
+
+    return pathname === item.href || pathname.startsWith(`${item.href}/`);
+  };
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 w-full border-b border-border/70 bg-background/80 backdrop-blur supports-backdrop-filter:bg-background/60">
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-3">
-        {/* Logo -> Home */}
         <Link href="/" className="flex items-center gap-2">
           <Image src="/img/logo.webp" alt="REDORANGE" width={36} height={36} className="rounded-md" priority />
           <div className="flex flex-col leading-none">
@@ -61,7 +67,7 @@ export const Navbar: FC = () => {
 
         <nav className="hidden items-center gap-1 lg:flex">
           {navItems.map((item) => {
-            const active = isActive(item.sectionId);
+            const active = isActive(item);
 
             return (
               <Link
@@ -70,7 +76,7 @@ export const Navbar: FC = () => {
                 className={cn('relative px-3 py-2 font-heading text-sm transition-all duration-200', 'hover:text-tech hover:font-bold', active ? 'text-tech font-bold' : 'text-foreground/80')}
               >
                 {item.label}
-                {active && <span className="absolute bottom-0 left-1/2 h-0.5 w-3/4 -translate-x-1/2 rounded-full bg-tech" />}
+                {active && <span className="absolute bottom-0 left-1/2 h-0.5 w-3/4 -translate-x-1/2 rounded-full bg-tech-accent" />}
               </Link>
             );
           })}
@@ -89,7 +95,7 @@ export const Navbar: FC = () => {
       <div className="mx-auto w-full max-w-6xl px-4 pb-3 lg:hidden">
         <div className="flex flex-wrap gap-2">
           {navItems.map((item) => {
-            const active = isActive(item.sectionId);
+            const active = isActive(item);
 
             return (
               <Button key={item.href} asChild size="sm" variant={active ? 'default' : 'secondary'} className={cn('font-heading text-xs', active && 'bg-tech text-white hover:bg-tech-accent')}>
