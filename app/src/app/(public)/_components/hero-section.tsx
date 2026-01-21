@@ -8,6 +8,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, ChevronDown, ShieldCheck, Layers, Cpu, Globe, Network, Sparkles } from 'lucide-react';
 
+import { getThemeClasses, type ColorTheme } from '@/helpers/theme-helpers';
+
 const prefersReducedMotion = (): boolean => typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 export const HeroSection: FC = () => {
@@ -23,7 +25,6 @@ export const HeroSection: FC = () => {
     if (!hero) return;
     if (prefersReducedMotion()) return;
 
-    //  intro sequence
     const badgeNode = hero.querySelectorAll('[data-hero="badge"]');
     const titleNodes = hero.querySelectorAll('[data-hero="title"]');
     const subtitleNodes = hero.querySelectorAll('[data-hero="subtitle"]');
@@ -43,7 +44,6 @@ export const HeroSection: FC = () => {
 
     if (statNodes.length) animate(statNodes, { translateY: [10, 0], opacity: [0, 1], duration: 650, easing: 'easeOutExpo', delay: (el, i) => 720 + i * 120 });
 
-    //  subtle ambient motion
     const float = (el: HTMLDivElement | null, dx: number, dy: number, duration: number) => {
       if (!el) return;
       animate(el, { translateX: [0, dx], translateY: [0, dy], direction: 'alternate', easing: 'easeInOutSine', duration, loop: true });
@@ -56,14 +56,43 @@ export const HeroSection: FC = () => {
     if (chipRowRef.current) animate(chipRowRef.current, { opacity: [0, 1], duration: 850, easing: 'easeOutQuad', delay: 280 });
   }, []);
 
+  const serviceLines: Array<{
+    title: string;
+    desc: string;
+    icon: typeof Cpu;
+    colorTheme: ColorTheme;
+  }> = [
+    {
+      title: 'Tecnología y Soluciones Informáticas (TI)',
+      desc: 'Consultoría, desarrollo, soporte, redes y bases de datos.',
+      icon: Cpu,
+      colorTheme: 'tech',
+    },
+    {
+      title: 'Comercialización e Importación de Equipos',
+      desc: 'Equipos, periféricos, cotizaciones, instalación y mantenimiento.',
+      icon: Network,
+      colorTheme: 'infra',
+    },
+    {
+      title: 'Telecomunicaciones y Servicios Digitales',
+      desc: 'Internet, hosting, cloud, dominios, web y soluciones energéticas.',
+      icon: Globe,
+      colorTheme: 'digital',
+    },
+  ];
+
   return (
     <section id="home" ref={heroRef} className="relative flex h-screen min-h-[700px] items-center overflow-hidden scroll-mt-0">
       <div className="pointer-events-none absolute inset-0">
         <div className="absolute inset-0 bg-pattern" />
 
-        <div ref={glowLeftRef} className="absolute -left-44 top-[-120px] h-[520px] w-[520px] rounded-full bg-primary/12 blur-3xl animate-in fade-in duration-700" />
-        <div ref={glowRightRef} className="absolute -right-44 top-[-40px] h-[560px] w-[560px] rounded-full bg-secondary/10 blur-3xl animate-in fade-in duration-700 delay-150" />
-        <div ref={glowBottomRef} className="absolute bottom-[-220px] left-1/2 h-[560px] w-[560px] -translate-x-1/2 rounded-full bg-accent/10 blur-3xl animate-in fade-in duration-700 delay-300" />
+        <div ref={glowLeftRef} className="absolute -left-44 top-[-120px] h-[520px] w-[520px] rounded-full bg-(--tech-gradient-from) blur-3xl animate-in fade-in duration-700" />
+        <div ref={glowRightRef} className="absolute -right-44 top-[-40px] h-[560px] w-[560px] rounded-full bg-(--infra-gradient-from) blur-3xl animate-in fade-in duration-700 delay-150" />
+        <div
+          ref={glowBottomRef}
+          className="absolute bottom-[-220px] left-1/2 h-[560px] w-[560px] -translate-x-1/2 rounded-full bg-(--digital-gradient-from) blur-3xl animate-in fade-in duration-700 delay-300"
+        />
 
         <div className="absolute inset-0 bg-linear-to-b from-background/35 via-transparent to-background" />
       </div>
@@ -88,14 +117,14 @@ export const HeroSection: FC = () => {
 
             <div className="space-y-3">
               <h1 className={['text-4xl font-extrabold tracking-tight md:text-5xl lg:text-6xl', 'opacity-0 animate-in fade-in slide-in-from-bottom-3 duration-700'].join(' ')} data-hero="title">
-                Soluciones integrales para <span className="text-gradient">IT, digital</span> e <span className="text-gradient">infraestructura</span>
+                Soluciones integrales en <span className="text-tech">TI</span>, <span className="text-infra">equipamiento</span> y <span className="text-digital">conectividad</span>
               </h1>
 
               <p
                 className={['mx-auto max-w-2xl text-base text-muted-foreground md:text-lg lg:mx-0', 'opacity-0 animate-in fade-in slide-in-from-bottom-2 duration-700 delay-150'].join(' ')}
                 data-hero="subtitle"
               >
-                Diseñamos, implementamos y mantenemos soluciones tecnológicas que mejoran procesos y aseguran disponibilidad: software y cloud, web y hosting, hardware y conectividad.
+                Integramos consultoría, desarrollo, soporte, comercialización de equipos y servicios digitales para impulsar tus procesos con disponibilidad, seguridad y escalabilidad.
               </p>
             </div>
 
@@ -157,37 +186,37 @@ export const HeroSection: FC = () => {
               </div>
 
               <div className="mt-5 grid gap-2.5">
-                {[
-                  { title: 'IT & Technology', desc: 'Software, cloud, soporte y continuidad.', icon: Cpu, tone: 'bg-primary/10 text-primary', ring: 'hover:border-primary/30' },
-                  { title: 'Digital & Web', desc: 'Web, hosting, dominios y correo.', icon: Globe, tone: 'bg-secondary/10 text-secondary', ring: 'hover:border-secondary/30' },
-                  { title: 'Infra & Telecom', desc: 'Equipos, conectividad e instalación.', icon: Network, tone: 'bg-accent/10 text-accent', ring: 'hover:border-accent/30' },
-                ].map(({ title, desc, icon: Icon, tone, ring }) => (
-                  <div
-                    key={title}
-                    data-hero="line"
-                    className={['group rounded-2xl border border-border/70 bg-background/60 p-3.5', 'transition-all hover:-translate-y-0.5 hover:shadow-sm', ring, 'opacity-0'].join(' ')}
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <div>
-                        <p className="font-heading text-sm font-bold">{title}</p>
-                        <p className="mt-0.5 text-xs text-muted-foreground">{desc}</p>
-                      </div>
-                      <div className={['flex h-9 w-9 shrink-0 items-center justify-center rounded-xl', tone].join(' ')}>
-                        <Icon className="h-4 w-4" />
-                      </div>
-                    </div>
+                {serviceLines.map(({ title, desc, icon: Icon, colorTheme }) => {
+                  const theme = getThemeClasses(colorTheme);
 
-                    <div className="mt-2.5 flex items-center justify-between gap-3 text-xs text-muted-foreground">
-                      <span className="inline-flex items-center gap-2">
-                        <Sparkles className="h-3.5 w-3.5" />
-                        Entregables y soporte incluidos
-                      </span>
-                      <span className="opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                        <ArrowRight className="h-4 w-4" />
-                      </span>
+                  return (
+                    <div
+                      key={title}
+                      data-hero="line"
+                      className={['group rounded-2xl border border-border/70 bg-background/60 p-3.5', 'transition-all hover:-translate-y-0.5 hover:shadow-sm', `hover:${theme.border}`, 'opacity-0'].join(' ')}
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <div>
+                          <p className="font-heading text-sm font-bold">{title}</p>
+                          <p className="mt-0.5 text-xs text-muted-foreground">{desc}</p>
+                        </div>
+                        <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${theme.bg} ${theme.text}`}>
+                          <Icon className="h-4 w-4" />
+                        </div>
+                      </div>
+
+                      <div className="mt-2.5 flex items-center justify-between gap-3 text-xs text-muted-foreground">
+                        <span className="inline-flex items-center gap-2">
+                          <Sparkles className="h-3.5 w-3.5" />
+                          Entregables y soporte incluidos
+                        </span>
+                        <span className="opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                          <ArrowRight className="h-4 w-4" />
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               <div ref={statsRef} className="mt-5 grid grid-cols-3 gap-2.5">
@@ -219,7 +248,7 @@ export const HeroSection: FC = () => {
             <div className="pointer-events-none absolute -right-6 -top-6 hidden rounded-2xl border border-border/60 bg-background/70 p-4 shadow-sm backdrop-blur xl:block animate-in fade-in zoom-in-95 duration-700 delay-500">
               <p className="text-[10px] font-bold text-muted-foreground tracking-wide">RED ORANGE</p>
               <p className="mt-1 text-sm font-extrabold">Soluciones</p>
-              <p className="text-xs text-muted-foreground">IT · Digital · Infra</p>
+              <p className="text-xs text-muted-foreground">TI · Equipos · Telecom</p>
             </div>
           </div>
         </div>

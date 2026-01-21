@@ -3,122 +3,58 @@
 import type { FC } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { ArrowRight, Laptop, Globe, Network, PhoneCall, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
-
-type ServiceSlide = {
-  id: 'it-technology' | 'digital-web' | 'infra-telecom';
-  title: string;
-  subtitle: string;
-  badge: string;
-  bullets: string[];
-  href: string;
-  cta: string;
-  icon: FC<{ className?: string }>;
-  image: string;
-  deliverables: { title: string; content: string }[];
-  gradient: string;
-  accentColor: string;
-};
+import { ArrowRight, Cpu, Globe, Network, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { fn_get_services, type ServiceSlide, type ServiceId } from '@/actions/fn-services';
+import { getThemeClasses } from '@/helpers/theme-helpers';
 
 const clamp = (n: number, min: number, max: number): number => Math.min(max, Math.max(min, n));
 const prefersReducedMotion = (): boolean => typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const ICONS: Record<ServiceSlide['id'], FC<{ className?: string }>> = {
+  'ti-solutions': Cpu,
+  'equipment-marketing': Network,
+  'telecom-services': Globe,
+};
 
 export const ServicesScroller: FC = () => {
   const sectionRef = useRef<HTMLElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
+  const [slides, setSlides] = useState<ServiceSlide[]>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isLocked, setIsLocked] = useState(false);
   const isAnimatingRef = useRef(false);
   const lockTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const slides = useMemo<ServiceSlide[]>(
-    () => [
-      {
-        id: 'it-technology',
-        title: 'IT & Technology Solutions',
-        subtitle: 'Software, cloud, soporte y continuidad',
-        badge: 'Para operaciones críticas',
-        bullets: [
-          'Desarrollo de software y sistemas a medida',
-          'Consultoría TI y automatización de procesos',
-          'Administración de servidores y bases de datos',
-          'Cloud, backups, monitoreo y seguridad',
-          'Mesa de ayuda, soporte y mantenimiento',
-        ],
-        href: 'https://tech.redorange.net.pe',
-        cta: 'Ir al servicio',
-        icon: Laptop,
-        image: '/img/tech.png',
-        deliverables: [
-          { title: 'Levantamiento y diagnóstico', content: 'Requerimientos, alcance, riesgos y plan de trabajo con entregables.' },
-          { title: 'Implementación y configuración', content: 'Despliegue, parametrización, hardening, backups y monitoreo.' },
-          { title: 'Soporte y mantenimiento', content: 'Mesa de ayuda, correctivos, preventivos y mejora continua según SLA.' },
-        ],
-        gradient: 'from-cyan-500/15 via-blue-500/10 to-transparent',
-        accentColor: 'text-cyan-600 dark:text-cyan-400',
-      },
-      {
-        id: 'digital-web',
-        title: 'Digital & Web Services',
-        subtitle: 'Web, hosting, correo y soluciones para ventas',
-        badge: 'Para presencia y crecimiento',
-        bullets: [
-          'Web institucional moderna y administrable',
-          'Landing pages y campañas de conversión',
-          'E-commerce y catálogos digitales',
-          'Hosting, dominios, certificados y correos',
-          'Seguridad web y soporte continuo',
-        ],
-        href: 'https://digital.redorange.net.pe',
-        cta: 'Conocer más',
-        icon: Globe,
-        image: '/img/digital.png',
-        deliverables: [
-          { title: 'Diseño y contenido', content: 'Arquitectura de información, UI, copy base y estructura por objetivos.' },
-          { title: 'Desarrollo y publicación', content: 'Implementación, optimización, SEO base, deployment y analítica.' },
-          { title: 'Operación y soporte', content: 'Mantenimiento, seguridad, backups y mejoras por iteraciones.' },
-        ],
-        gradient: 'from-orange-500/15 via-amber-500/10 to-transparent',
-        accentColor: 'text-orange-600 dark:text-orange-400',
-      },
-      {
-        id: 'infra-telecom',
-        title: 'Hardware, Telecom & Infrastructure',
-        subtitle: 'Equipos, conectividad e instalación',
-        badge: 'Para infraestructura estable',
-        bullets: [
-          'Venta y distribución de equipos y periféricos',
-          'Conectividad, enlaces y soluciones de telecom',
-          'Instalación de redes y cableado estructurado',
-          'Mantenimiento, soporte y postventa',
-          'Infraestructura preparada para escalar',
-        ],
-        href: 'https://infra.redorange.net.pe',
-        cta: 'Ver soluciones',
-        icon: Network,
-        image: '/img/infra.png',
-        deliverables: [
-          { title: 'Suministro y provisión', content: 'Equipamiento, accesorios, periféricos y componentes según requerimiento.' },
-          { title: 'Instalación y puesta en marcha', content: 'Redes, cableado, pruebas, etiquetado y documentación técnica.' },
-          { title: 'Soporte y postventa', content: 'Mantenimiento, diagnósticos, reposiciones y continuidad del servicio.' },
-        ],
-        gradient: 'from-rose-500/15 via-orange-500/10 to-transparent',
-        accentColor: 'text-rose-600 dark:text-rose-400',
-      },
-    ],
-    [],
-  );
+  useEffect(() => {
+    let mounted = true;
+
+    fn_get_services()
+      .then((data) => {
+        if (!mounted) return;
+        setSlides(data);
+        setCurrentSlide(0);
+      })
+      .catch(() => {
+        if (!mounted) return;
+        setSlides([]);
+      });
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const slideCount = slides.length;
 
   const animateToSlide = useCallback(
     (targetSlide: number) => {
       if (isAnimatingRef.current) return;
+      if (slideCount === 0) return;
 
       const next = clamp(targetSlide, 0, slideCount - 1);
       if (next === currentSlide) return;
@@ -145,6 +81,7 @@ export const ServicesScroller: FC = () => {
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return;
+    if (slideCount === 0) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -152,9 +89,7 @@ export const ServicesScroller: FC = () => {
 
         if (entry.isIntersecting && entry.intersectionRatio >= 0.95) {
           if (lockTimeoutRef.current) clearTimeout(lockTimeoutRef.current);
-          lockTimeoutRef.current = setTimeout(() => {
-            setIsLocked(true);
-          }, 100);
+          lockTimeoutRef.current = setTimeout(() => setIsLocked(true), 100);
         } else if (entry.intersectionRatio < 0.5) {
           if (lockTimeoutRef.current) clearTimeout(lockTimeoutRef.current);
           setIsLocked(false);
@@ -168,11 +103,11 @@ export const ServicesScroller: FC = () => {
       observer.disconnect();
       if (lockTimeoutRef.current) clearTimeout(lockTimeoutRef.current);
     };
-  }, []);
+  }, [slideCount]);
 
-  // Manejar wheel
   useEffect(() => {
     if (!isLocked) return;
+    if (slideCount === 0) return;
 
     const THRESHOLD = 100;
     let accumulatedDelta = 0;
@@ -229,9 +164,9 @@ export const ServicesScroller: FC = () => {
     };
   }, [isLocked, currentSlide, slideCount, animateToSlide, scrollToSection]);
 
-  // Manejar teclas
   useEffect(() => {
     if (!isLocked) return;
+    if (slideCount === 0) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (isAnimatingRef.current) return;
@@ -256,9 +191,9 @@ export const ServicesScroller: FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isLocked, currentSlide, slideCount, animateToSlide, scrollToSection]);
 
-  // Touch support
   useEffect(() => {
     if (!isLocked) return;
+    if (slideCount === 0) return;
 
     let touchStartY = 0;
 
@@ -293,14 +228,32 @@ export const ServicesScroller: FC = () => {
     };
   }, [isLocked, currentSlide, slideCount, animateToSlide, scrollToSection]);
 
+  if (slides.length === 0) {
+    return (
+      <section id="services" ref={sectionRef} className="relative h-screen w-full overflow-hidden" style={{ scrollSnapAlign: 'start' }}>
+        <div className="absolute inset-0 bg-linear-to-br from-muted/40 via-transparent to-transparent" />
+        <div className="relative z-10 flex h-full items-center justify-center px-6">
+          <div className="rounded-2xl border border-border/60 bg-background/60 p-6 text-center backdrop-blur">
+            <p className="font-heading text-base font-extrabold">Cargando líneas...</p>
+            <p className="mt-1 text-sm text-muted-foreground">Preparando la información de servicios.</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  const currentTheme = getThemeClasses(slides[currentSlide].colorTheme);
+
   return (
     <section id="services" ref={sectionRef} className="relative h-screen w-full overflow-hidden" style={{ scrollSnapAlign: 'start' }}>
-      <div className={`absolute inset-0 bg-linear-to-br transition-all duration-1000 ${slides[currentSlide].gradient}`} />
+      <div className={`absolute inset-0 transition-all duration-1000 ${currentTheme.gradient}`} />
 
       <div ref={containerRef} className="flex h-full transition-transform duration-700 ease-out will-change-transform" style={{ transform: `translateX(-${currentSlide * 100}vw)` }}>
         {slides.map((slide, idx) => {
           const isActive = currentSlide === idx;
-          const Icon = slide.icon;
+          const Icon = ICONS[slide.id];
+          const theme = getThemeClasses(slide.colorTheme);
+          const detailHref = `/services/${slide.id}` satisfies `/services/${ServiceId}`;
 
           return (
             <div key={slide.id} id={slide.id} className="relative h-screen w-screen shrink-0">
@@ -309,7 +262,7 @@ export const ServicesScroller: FC = () => {
                   <div className={`grid w-full items-center gap-6 lg:grid-cols-12 lg:gap-8 transition-all duration-500 ${isActive ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
                     <div className="lg:col-span-5 space-y-4">
                       <Badge variant="secondary" className="w-fit font-heading">
-                        <Icon className={`mr-1.5 h-3.5 w-3.5 ${slide.accentColor}`} />
+                        <Icon className={`mr-1.5 h-3.5 w-3.5 ${theme.text}`} />
                         {slide.badge}
                       </Badge>
 
@@ -321,7 +274,7 @@ export const ServicesScroller: FC = () => {
                       <ul className="space-y-1.5">
                         {slide.bullets.map((bullet) => (
                           <li key={bullet} className="flex items-start gap-2 text-xs md:text-sm text-muted-foreground">
-                            <CheckCircle2 className={`h-4 w-4 mt-0.5 shrink-0 ${slide.accentColor}`} />
+                            <CheckCircle2 className={`h-4 w-4 mt-0.5 shrink-0 ${theme.text}`} />
                             <span>{bullet}</span>
                           </li>
                         ))}
@@ -335,10 +288,10 @@ export const ServicesScroller: FC = () => {
                           </a>
                         </Button>
 
-                        <Button asChild size="default" variant="outline" className="font-heading">
-                          <Link href="/#contact">
-                            Contactarnos
-                            <PhoneCall className="ml-2 h-4 w-4" />
+                        <Button asChild size="default" variant="secondary" className="font-heading">
+                          <Link href={detailHref}>
+                            Detalle
+                            <ArrowRight className="ml-2 h-4 w-4" />
                           </Link>
                         </Button>
                       </div>
@@ -346,7 +299,7 @@ export const ServicesScroller: FC = () => {
 
                     <div className="hidden lg:flex lg:col-span-4 items-center justify-center">
                       <div className={`relative transition-all duration-700 ${isActive ? 'scale-100 opacity-100' : 'scale-90 opacity-0'}`}>
-                        <div className={`absolute inset-0 blur-3xl opacity-30 bg-linear-to-br ${slide.gradient}`} />
+                        <div className={`absolute inset-0 blur-3xl opacity-30 ${theme.gradient}`} />
 
                         <div className="relative">
                           <Image
@@ -360,7 +313,7 @@ export const ServicesScroller: FC = () => {
                         </div>
 
                         <div className="absolute -bottom-4 -right-4 h-20 w-20 rounded-2xl border border-border/50 bg-background/50 backdrop-blur-sm flex items-center justify-center">
-                          <Icon className={`h-8 w-8 ${slide.accentColor}`} />
+                          <Icon className={`h-8 w-8 ${theme.text}`} />
                         </div>
                       </div>
                     </div>
@@ -368,8 +321,8 @@ export const ServicesScroller: FC = () => {
                     <div className="lg:col-span-3">
                       <div className="rounded-2xl border border-border/60 bg-background/80 p-4 shadow-sm backdrop-blur-md">
                         <div className="mb-3 flex items-center gap-2">
-                          <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10`}>
-                            <Icon className="h-4 w-4 text-primary" />
+                          <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${theme.bg}`}>
+                            <Icon className={`h-4 w-4 ${theme.text}`} />
                           </div>
                           <div>
                             <p className="font-heading text-xs font-semibold text-muted-foreground">Qué incluye</p>
@@ -400,7 +353,7 @@ export const ServicesScroller: FC = () => {
                           </Button>
 
                           <Button asChild variant="ghost" size="sm" className="font-heading text-xs">
-                            <Link href="/#contact">Cotizar</Link>
+                            <Link href={detailHref}>Detalle</Link>
                           </Button>
                         </div>
                       </div>
@@ -421,7 +374,8 @@ export const ServicesScroller: FC = () => {
         <div className="mx-auto flex max-w-7xl flex-col items-center gap-2 px-6">
           <div className="flex items-center gap-3">
             {slides.map((s, idx) => {
-              const SlideIcon = s.icon;
+              const SlideIcon = ICONS[s.id];
+              const shortLabel = idx === 0 ? 'TI' : idx === 1 ? 'Equipos' : 'Telecom';
               return (
                 <button
                   key={s.id}
@@ -434,7 +388,7 @@ export const ServicesScroller: FC = () => {
                 >
                   <SlideIcon className="h-3.5 w-3.5" />
                   <span className={`text-xs font-heading transition-all duration-300 ${currentSlide === idx ? 'w-auto opacity-100' : 'w-0 opacity-0 overflow-hidden'}`}>
-                    {currentSlide === idx && (idx === 0 ? 'IT' : idx === 1 ? 'Digital' : 'Infra')}
+                    {currentSlide === idx && shortLabel}
                   </span>
                 </button>
               );
