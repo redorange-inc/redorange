@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ArrowRight, Cpu, Globe, Network, ChevronLeft, ChevronRight, CheckCircle2 } from 'lucide-react';
 import { fn_get_services, type ServiceSlide, type ServiceId } from '@/actions/fn-services';
+import { getThemeClasses } from '@/helpers/theme-helpers';
 
 const clamp = (n: number, min: number, max: number): number => Math.min(max, Math.max(min, n));
 const prefersReducedMotion = (): boolean => typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -241,14 +242,18 @@ export const ServicesScroller: FC = () => {
     );
   }
 
+  // Obtener tema del slide actual para el fondo
+  const currentTheme = getThemeClasses(slides[currentSlide].colorTheme);
+
   return (
     <section id="services" ref={sectionRef} className="relative h-screen w-full overflow-hidden" style={{ scrollSnapAlign: 'start' }}>
-      <div className={`absolute inset-0 bg-linear-to-br transition-all duration-1000 ${slides[currentSlide].gradient}`} />
+      <div className={`absolute inset-0 transition-all duration-1000 ${currentTheme.gradient}`} />
 
       <div ref={containerRef} className="flex h-full transition-transform duration-700 ease-out will-change-transform" style={{ transform: `translateX(-${currentSlide * 100}vw)` }}>
         {slides.map((slide, idx) => {
           const isActive = currentSlide === idx;
           const Icon = ICONS[slide.id];
+          const theme = getThemeClasses(slide.colorTheme);
           const detailHref = `/services/${slide.id}` satisfies `/services/${ServiceId}`;
 
           return (
@@ -258,7 +263,7 @@ export const ServicesScroller: FC = () => {
                   <div className={`grid w-full items-center gap-6 lg:grid-cols-12 lg:gap-8 transition-all duration-500 ${isActive ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
                     <div className="lg:col-span-5 space-y-4">
                       <Badge variant="secondary" className="w-fit font-heading">
-                        <Icon className={`mr-1.5 h-3.5 w-3.5 ${slide.accentColor}`} />
+                        <Icon className={`mr-1.5 h-3.5 w-3.5 ${theme.text}`} />
                         {slide.badge}
                       </Badge>
 
@@ -270,7 +275,7 @@ export const ServicesScroller: FC = () => {
                       <ul className="space-y-1.5">
                         {slide.bullets.map((bullet) => (
                           <li key={bullet} className="flex items-start gap-2 text-xs md:text-sm text-muted-foreground">
-                            <CheckCircle2 className={`h-4 w-4 mt-0.5 shrink-0 ${slide.accentColor}`} />
+                            <CheckCircle2 className={`h-4 w-4 mt-0.5 shrink-0 ${theme.text}`} />
                             <span>{bullet}</span>
                           </li>
                         ))}
@@ -295,7 +300,7 @@ export const ServicesScroller: FC = () => {
 
                     <div className="hidden lg:flex lg:col-span-4 items-center justify-center">
                       <div className={`relative transition-all duration-700 ${isActive ? 'scale-100 opacity-100' : 'scale-90 opacity-0'}`}>
-                        <div className={`absolute inset-0 blur-3xl opacity-30 bg-linear-to-br ${slide.gradient}`} />
+                        <div className={`absolute inset-0 blur-3xl opacity-30 ${theme.gradient}`} />
 
                         <div className="relative">
                           <Image
@@ -309,7 +314,7 @@ export const ServicesScroller: FC = () => {
                         </div>
 
                         <div className="absolute -bottom-4 -right-4 h-20 w-20 rounded-2xl border border-border/50 bg-background/50 backdrop-blur-sm flex items-center justify-center">
-                          <Icon className={`h-8 w-8 ${slide.accentColor}`} />
+                          <Icon className={`h-8 w-8 ${theme.text}`} />
                         </div>
                       </div>
                     </div>
@@ -317,8 +322,8 @@ export const ServicesScroller: FC = () => {
                     <div className="lg:col-span-3">
                       <div className="rounded-2xl border border-border/60 bg-background/80 p-4 shadow-sm backdrop-blur-md">
                         <div className="mb-3 flex items-center gap-2">
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                            <Icon className="h-4 w-4 text-primary" />
+                          <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${theme.bg}`}>
+                            <Icon className={`h-4 w-4 ${theme.text}`} />
                           </div>
                           <div>
                             <p className="font-heading text-xs font-semibold text-muted-foreground">Qué incluye</p>
