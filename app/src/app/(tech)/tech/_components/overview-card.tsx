@@ -1,12 +1,11 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
-import { animate } from 'animejs';
+import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { CheckCircle2, Wrench, ShieldCheck, Headphones, Settings } from 'lucide-react';
 import { ui } from './constants';
-import type { StatsResponse, AnimatedMap } from './types';
+import type { StatsResponse } from './types';
 
 interface StatConfig {
   key: keyof StatsResponse;
@@ -27,37 +26,11 @@ interface OverviewCardProps {
 }
 
 export const OverviewCard = ({ stats }: OverviewCardProps) => {
-  const [animatedValues, setAnimatedValues] = useState<AnimatedMap>({
-    projects: 0,
-    clients: 0,
-    tickets: 0,
-    uptime: 0,
-  });
-  const animationStarted = useRef(false);
-
-  useEffect(() => {
-    if (animationStarted.current) return;
-    animationStarted.current = true;
-
-    statsConfig.forEach((s) => {
-      const targetValue = stats[s.key];
-      const obj = { v: 0 };
-      animate(obj, {
-        v: targetValue,
-        duration: 1800,
-        easing: 'easeOutExpo',
-        delay: 200,
-        update: () => {
-          setAnimatedValues((prev) => ({ ...prev, [s.key]: s.key === 'uptime' ? Number(obj.v.toFixed(1)) : Math.round(obj.v) }));
-        },
-      });
-    });
-  }, [stats]);
-
   return (
     <Card className={`relative overflow-hidden rounded-3xl ${ui.glassCard}`} data-anim="fade-up">
       <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-(--tech-gradient-from) blur-2xl animate-pulse" />
       <div className="absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-(--tech-accent)/20 blur-2xl animate-pulse" style={{ animationDelay: '1s' }} />
+
       <CardContent className="p-6">
         <div className="flex items-start justify-between gap-3">
           <div>
@@ -68,20 +41,25 @@ export const OverviewCard = ({ stats }: OverviewCardProps) => {
         </div>
 
         <div className="mt-5 grid grid-cols-2 gap-3">
-          {statsConfig.map((s) => (
-            <div key={s.key} className={`rounded-2xl ${ui.softBorder} bg-background/40 p-3 backdrop-blur ${ui.hoverLift} group`}>
-              <div className="flex items-center justify-between">
-                <div className="rounded-xl bg-tech p-2 text-tech transition-all group-hover:scale-110 group-hover:rotate-3">{s.icon}</div>
-                <div className="text-right">
-                  <div className="text-lg font-bold text-foreground tabular-nums">
-                    {animatedValues[s.key]}
-                    {s.suffix ?? ''}
+          {statsConfig.map((s) => {
+            const value = s.key === 'uptime' ? Number(stats[s.key]).toFixed(1) : Number(stats[s.key]).toLocaleString('es-MX');
+
+            return (
+              <div key={s.key} className={`rounded-2xl ${ui.softBorder} bg-background/40 p-3 backdrop-blur ${ui.hoverLift} group`}>
+                <div className="flex items-center justify-between">
+                  <div className="rounded-xl bg-tech p-2 text-tech transition-all group-hover:scale-110 group-hover:rotate-3">{s.icon}</div>
+
+                  <div className="text-right">
+                    <div className="text-lg font-bold text-foreground tabular-nums">
+                      {value}
+                      {s.suffix ?? ''}
+                    </div>
+                    <div className="text-[11px] text-muted-foreground">{s.label}</div>
                   </div>
-                  <div className="text-[11px] text-muted-foreground">{s.label}</div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="mt-5 overflow-hidden rounded-2xl bg-background/40 p-4 backdrop-blur">
