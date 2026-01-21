@@ -8,24 +8,22 @@ import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ArrowRight, Cpu, Globe, Network, CheckCircle2, ChevronLeft } from 'lucide-react';
 import type { ServiceSlide } from '@/actions/fn-services';
-import { getThemeClasses } from '@/helpers/theme-helpers';
+import { getThemeClasses, type ColorTheme } from '@/helpers/theme-helpers';
 
-const ICONS: Record<ServiceSlide['id'], FC<{ className?: string }>> = {
-  'ti-solutions': Cpu,
-  'equipment-marketing': Network,
-  'telecom-services': Globe,
-};
+const ICONS: Record<ServiceSlide['id'], FC<{ className?: string }>> = { 'ti-solutions': Cpu, 'equipment-marketing': Network, 'telecom-services': Globe };
 
-const NavPill: FC<{ href: string; active?: boolean; children: React.ReactNode }> = ({ href, active, children }) => {
+const NavPill: FC<{ href: string; active?: boolean; icon: FC<{ className?: string }>; colorTheme: ColorTheme; children: React.ReactNode }> = ({ href, active, icon: Icon, colorTheme, children }) => {
   return (
     <Link
       href={href}
       className={[
-        'inline-flex items-center justify-center rounded-full px-3 py-1.5 text-xs font-semibold transition-all',
+        'inline-flex items-center justify-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition-all',
         'border border-border/60 backdrop-blur',
-        active ? 'bg-primary text-primary-foreground shadow-sm' : 'bg-background/60 text-foreground hover:bg-background',
+        active ? 'text-white shadow-sm' : 'bg-background/60 text-foreground hover:bg-background',
       ].join(' ')}
+      style={active ? { backgroundColor: `var(--${colorTheme})` } : undefined}
     >
+      <Icon className="h-3.5 w-3.5" />
       {children}
     </Link>
   );
@@ -76,7 +74,7 @@ export const ServiceDetailClient: FC<{ service: ServiceSlide }> = ({ service }) 
             </div>
 
             <div className="mt-6 flex flex-col gap-2 sm:flex-row">
-              <Button asChild size="default" className="font-heading group rounded-xl bg-tech text-white hover:bg-tech-accent">
+              <Button asChild size="default" className="font-heading group rounded-xl text-white hover:opacity-90" style={{ backgroundColor: `var(--${service.colorTheme})` }}>
                 <a href={service.href} target="_blank" rel="noreferrer">
                   {service.cta}
                   <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -119,7 +117,7 @@ export const ServiceDetailClient: FC<{ service: ServiceSlide }> = ({ service }) 
               </div>
 
               <div className="mt-4 flex gap-2">
-                <Button asChild variant="secondary" size="sm" className="font-heading text-xs flex-1 rounded-xl">
+                <Button asChild size="sm" className="font-heading text-xs flex-1 rounded-xl text-white hover:opacity-90" style={{ backgroundColor: `var(--${service.colorTheme})` }}>
                   <a href={service.href} target="_blank" rel="noreferrer">
                     Ver más
                     <ArrowRight className="ml-1 h-3 w-3" />
@@ -139,7 +137,7 @@ export const ServiceDetailClient: FC<{ service: ServiceSlide }> = ({ service }) 
               </div>
 
               <div className="relative mt-4 flex justify-center">
-                <span className={`inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/70 px-3 py-1.5 text-xs font-semibold backdrop-blur`}>
+                <span className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/70 px-3 py-1.5 text-xs font-semibold backdrop-blur">
                   <Icon className={`h-4 w-4 ${theme.text}`} />
                   {service.id === 'ti-solutions' ? 'TI' : service.id === 'equipment-marketing' ? 'Equipos' : 'Telecom'}
                 </span>
@@ -149,13 +147,13 @@ export const ServiceDetailClient: FC<{ service: ServiceSlide }> = ({ service }) 
         </div>
 
         <div className="mt-10 flex flex-wrap justify-center gap-2">
-          <NavPill href="/services/ti-solutions" active={service.id === 'ti-solutions'}>
+          <NavPill href="/services/ti-solutions" active={service.id === 'ti-solutions'} icon={Cpu} colorTheme="tech">
             TI
           </NavPill>
-          <NavPill href="/services/equipment-marketing" active={service.id === 'equipment-marketing'}>
+          <NavPill href="/services/equipment-marketing" active={service.id === 'equipment-marketing'} icon={Network} colorTheme="infra">
             Equipos
           </NavPill>
-          <NavPill href="/services/telecom-services" active={service.id === 'telecom-services'}>
+          <NavPill href="/services/telecom-services" active={service.id === 'telecom-services'} icon={Globe} colorTheme="digital">
             Telecom
           </NavPill>
         </div>
