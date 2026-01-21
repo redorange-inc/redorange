@@ -242,7 +242,6 @@ export const ServicesScroller: FC = () => {
     );
   }
 
-  // Obtener tema del slide actual para el fondo
   const currentTheme = getThemeClasses(slides[currentSlide].colorTheme);
 
   return (

@@ -45,11 +45,7 @@ const BULLET_ICONS: Record<'checkCircle2', FC<{ className?: string }>> = {
   checkCircle2: CheckCircle2,
 };
 
-const EllipsisMarquee: FC<{
-  text: string;
-  className?: string;
-  speed?: number;
-}> = ({ text, className = '', speed = 20 }) => {
+const EllipsisMarquee: FC<{ text: string; className?: string; speed?: number }> = ({ text, className = '', speed = 20 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
   const [shouldAnimate, setShouldAnimate] = useState(false);
@@ -101,10 +97,7 @@ const EllipsisMarquee: FC<{
   );
 };
 
-const AnimatedTextSlider: FC<{
-  bullets: Array<{ icon: FC<{ className?: string }>; text: string }>;
-  textClass: string;
-}> = ({ bullets, textClass }) => {
+const AnimatedTextSlider: FC<{ bullets: Array<{ icon: FC<{ className?: string }>; text: string }>; textClass: string }> = ({ bullets, textClass }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const textContainerRef = useRef<HTMLParagraphElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -120,33 +113,18 @@ const AnimatedTextSlider: FC<{
 
     const letters = currentBullet.text.split('').map((char) => {
       const span = document.createElement('span');
-      span.textContent = char;
+      span.textContent = char === ' ' ? '\u00A0' : char;
       span.style.opacity = '0';
       span.style.display = 'inline-block';
       span.style.transform = 'translateY(10px)';
+      if (char === ' ') span.style.width = '0.25em';
+
       return span;
     });
 
     letters.forEach((letter) => textEl.appendChild(letter));
 
     animate(letters, { opacity: [0, 1], translateY: [10, 0], duration: 600, delay: (_, i) => 100 + i * 25, easing: 'easeOutCubic' });
-
-    const cursor = document.createElement('span');
-    cursor.className = 'inline-block w-0.5 h-4 bg-current ml-1 align-middle';
-    cursor.style.opacity = '0';
-    textEl.appendChild(cursor);
-
-    const totalDelay = letters.length * 25 + 100;
-
-    animate(cursor, {
-      opacity: [0, 1],
-      duration: 400,
-      delay: totalDelay,
-      easing: 'easeInOutQuad',
-      complete: () => {
-        animate(cursor, { opacity: [1, 0, 1], duration: 530, loop: 3, easing: 'easeInOutQuad' });
-      },
-    });
   }, [currentBullet.text]);
 
   useEffect(() => {

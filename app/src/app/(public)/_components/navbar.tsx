@@ -69,12 +69,18 @@ export const Navbar: FC = () => {
 
         <nav className="hidden items-center gap-1 lg:flex">
           {navItems.map((item) => (
-            <Button key={item.href} asChild variant="ghost" className={cn('relative px-3 font-heading text-sm transition-colors', isActive(item.sectionId) && 'text-primary')}>
-              <Link href={item.href}>
-                {item.label}
-                {isActive(item.sectionId) && <span className="absolute bottom-0 left-1/2 h-0.5 w-3/4 -translate-x-1/2 rounded-full bg-primary" />}
-              </Link>
-            </Button>
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                'relative px-3 py-2 font-heading text-sm transition-all duration-200',
+                'hover:text-primary hover:font-bold',
+                isActive(item.sectionId) ? 'text-primary font-bold' : 'text-foreground/80',
+              )}
+            >
+              {item.label}
+              {isActive(item.sectionId) && <span className="absolute bottom-0 left-1/2 h-0.5 w-3/4 -translate-x-1/2 rounded-full bg-primary" />}
+            </Link>
           ))}
         </nav>
 
