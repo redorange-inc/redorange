@@ -62,7 +62,7 @@ export const Footer: FC = () => {
           <div className="space-y-3">
             <p className="font-heading text-sm font-bold">Líneas</p>
             <div className="flex flex-col gap-2 text-sm">
-              <Link className="text-muted-foreground hover:text-foreground" href="/#services">
+              <Link className="text-muted-foreground hover:text-foreground" href="/tech">
                 <span className="inline-flex items-center gap-2">
                   <Cpu className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
                   Tecnología y Soluciones Informáticas (TI)

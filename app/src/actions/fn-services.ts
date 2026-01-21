@@ -35,7 +35,7 @@ const services: ServiceSlide[] = [
       'Administración y mantenimiento de sistemas, servidores y aplicaciones',
       'Gestión de redes, bases de datos, mejora de procesos y capacitación',
     ],
-    href: 'https://tech.redorange.net.pe',
+    href: '/tech',
     cta: 'Ir al servicio',
     image: '/img/tech.png',
     deliverables: [
@@ -59,7 +59,7 @@ const services: ServiceSlide[] = [
       'Cotización y venta de equipos tecnológicos',
       'Reparación, mantenimiento, instalación de equipos e instalación de redes integrales',
     ],
-    href: 'https://infra.redorange.net.pe',
+    href: '/infra',
     cta: 'Ver soluciones',
     image: '/img/infra.png',
     deliverables: [
@@ -83,7 +83,7 @@ const services: ServiceSlide[] = [
       'Publicidad en internet, diseño gráfico, animación, edición y producción digital',
       'Venta e instalación de paneles solares, equipos de medición y servicios eléctricos asociados',
     ],
-    href: 'https://digital.redorange.net.pe',
+    href: '/digital',
     cta: 'Conocer más',
     image: '/img/digital.png',
     deliverables: [
