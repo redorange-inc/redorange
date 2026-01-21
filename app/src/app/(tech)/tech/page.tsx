@@ -10,7 +10,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Separator } from '@/components/ui/separator';
 import { CheckCircle2, Headphones, Settings, ShieldCheck, Wrench, TrendingUp, Clock, Award, Zap, ArrowRight, Sparkles, Activity, Server, Database, Code2 } from 'lucide-react';
 
-/** ✅ FIX #1: permitir `style` y cualquier prop HTML */
 interface SkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
   className?: string;
 }
@@ -121,7 +120,7 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
   if (!active || !payload?.length) return null;
 
   return (
-    <Card className="border-(--tech-border) bg-background/95 shadow-2xl backdrop-blur-xl">
+    <Card className="border-[var(--tech-border)] bg-background/95 shadow-2xl backdrop-blur-xl">
       <CardContent className="p-4">
         <div className="text-sm font-bold text-foreground mb-2">{String(label ?? '')}</div>
         <div className="space-y-1.5">
@@ -143,7 +142,7 @@ const PieCustomTooltip = ({ active, payload }: PieTooltipProps) => {
 
   const data = payload[0];
   return (
-    <Card className="border-(--tech-border) bg-background/95 shadow-2xl backdrop-blur-xl">
+    <Card className="border-[var(--tech-border)] bg-background/95 shadow-2xl backdrop-blur-xl">
       <CardContent className="p-4">
         <div className="text-sm font-bold text-foreground mb-1">{data.payload?.area}</div>
         <div className="flex items-center gap-2 text-xs">
@@ -240,8 +239,14 @@ const Page = () => {
       { text: 'Consultoría y asesoría en informática y cómputo', icon: <Code2 className="h-5 w-5" /> },
       { text: 'Desarrollo de software, sistemas y aplicaciones', icon: <Database className="h-5 w-5" /> },
       { text: 'Programación y construcción de sistemas informáticos', icon: <Server className="h-5 w-5" /> },
-      { text: 'Administración y mantenimiento de sistemas, servidores y aplicaciones', icon: <Settings className="h-5 w-5" /> },
-      { text: 'Gestión de redes, bases de datos, mejora de procesos y capacitación', icon: <Activity className="h-5 w-5" /> },
+      {
+        text: 'Administración y mantenimiento de sistemas, servidores y aplicaciones',
+        icon: <Settings className="h-5 w-5" />,
+      },
+      {
+        text: 'Gestión de redes, bases de datos, mejora de procesos y capacitación',
+        icon: <Activity className="h-5 w-5" />,
+      },
       { text: 'Monitoreo, disponibilidad y continuidad operativa', icon: <ShieldCheck className="h-5 w-5" /> },
     ],
     [],
@@ -249,9 +254,9 @@ const Page = () => {
 
   const achievements = useMemo<Achievement[]>(
     () => [
-      { title: 'Respuesta rápida', description: 'Tiempo promedio', metric: '< 45 min', icon: <Clock className="h-4 w-4" /> },
+      { title: 'Respuesta rápida', description: 'Tiempo promedio', metric: '< 15 min', icon: <Clock className="h-4 w-4" /> },
       { title: 'Certificaciones', description: 'Equipo certificado', metric: '28+', icon: <Award className="h-4 w-4" /> },
-      { title: 'Automatización', description: 'Procesos optimizados', metric: '75%', icon: <Zap className="h-4 w-4" /> },
+      { title: 'Automatización', description: 'Procesos optimizados', metric: '65%', icon: <Zap className="h-4 w-4" /> },
     ],
     [],
   );
@@ -356,17 +361,25 @@ const Page = () => {
 
     const particles = document.querySelectorAll<HTMLElement>('[data-particle]');
     particles.forEach((particle, idx) => {
-      animate(particle, { translateY: [0, -15, 0], translateX: [0, idx % 2 === 0 ? 8 : -8, 0], opacity: [0.3, 0.6, 0.3], duration: 4000 + idx * 500, easing: 'easeInOutSine', loop: true, delay: idx * 200 });
+      animate(particle, {
+        translateY: [0, -15, 0],
+        translateX: [0, idx % 2 === 0 ? 8 : -8, 0],
+        opacity: [0.3, 0.6, 0.3],
+        duration: 4000 + idx * 500,
+        easing: 'easeInOutSine',
+        loop: true,
+        delay: idx * 200,
+      });
     });
   }, [isLoading, statsConfig, impactDataFinal, timeSeriesDataFinal]);
 
   return (
     <main ref={containerRef} className="relative min-h-screen overflow-hidden bg-background pt-20">
       <div className="pointer-events-none absolute inset-0">
-        <div data-particle className="absolute -top-24 left-1/2 h-[380px] w-[680px] -translate-x-1/2 rounded-full bg-(--tech-gradient-from) blur-3xl" />
-        <div data-particle className="absolute -bottom-24 -left-24 h-[420px] w-[420px] rounded-full bg-(--tech-accent)/20 blur-3xl" />
-        <div data-particle className="absolute right-[-160px] top-[240px] h-[420px] w-[420px] rounded-full bg-(--tech-gradient-via) blur-3xl" />
-        <div data-particle className="absolute left-1/4 top-1/3 h-[200px] w-[200px] rounded-full bg-tech-muted blur-2xl" />
+        <div data-particle className="absolute -top-24 left-1/2 h-[380px] w-[680px] -translate-x-1/2 rounded-full bg-[var(--tech-gradient-from)] blur-3xl" />
+        <div data-particle className="absolute -bottom-24 -left-24 h-[420px] w-[420px] rounded-full bg-[var(--tech-accent)]/20 blur-3xl" />
+        <div data-particle className="absolute right-[-160px] top-[240px] h-[420px] w-[420px] rounded-full bg-[var(--tech-gradient-via)] blur-3xl" />
+        <div data-particle className="absolute left-1/4 top-1/3 h-[200px] w-[200px] rounded-full bg-[var(--tech-muted)] blur-2xl" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(15,23,42,0.04),transparent_55%)] dark:bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.06),transparent_55%)]" />
         <div
           className="absolute inset-0 opacity-[0.015] dark:opacity-[0.03]"
@@ -425,7 +438,7 @@ const Page = () => {
                 <p className="mt-3 max-w-2xl text-base text-muted-foreground">Consultoría, desarrollo, soporte y continuidad operativa con métricas claras y enfoque en resultados.</p>
 
                 <div className="mt-6 flex flex-wrap gap-3">
-                  <Button className={`bg-tech-muted hover:bg-tech-accent text-white ${ui.hoverLift} group`}>
+                  <Button className={`bg-[var(--tech)] hover:bg-[var(--tech-accent)] text-white ${ui.hoverLift} group`}>
                     Ir al servicio
                     <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Button>
@@ -456,8 +469,8 @@ const Page = () => {
 
           <div className="lg:col-span-5">
             <Card className={`relative overflow-hidden rounded-3xl ${ui.glassCard}`} data-anim="fade-up">
-              <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-(--tech-gradient-from) blur-2xl animate-pulse" />
-              <div className="absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-(--tech-accent)/20 blur-2xl animate-pulse" style={{ animationDelay: '1s' }} />
+              <div className="absolute -right-16 -top-16 h-48 w-48 rounded-full bg-[var(--tech-gradient-from)] blur-2xl animate-pulse" />
+              <div className="absolute -bottom-16 -left-16 h-48 w-48 rounded-full bg-[var(--tech-accent)]/20 blur-2xl animate-pulse" style={{ animationDelay: '1s' }} />
               <CardContent className="p-6">
                 <div className="flex items-start justify-between gap-3">
                   <div>
@@ -553,7 +566,7 @@ const Page = () => {
                             <button
                               key={idx}
                               onClick={() => setCurrentSlide(idx)}
-                              className={`h-2 rounded-full transition-all duration-300 ${idx === currentSlide ? 'w-6 bg-tech' : 'w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50'}`}
+                              className={`h-2 rounded-full transition-all duration-300 ${idx === currentSlide ? 'w-6 bg-[var(--tech)]' : 'w-2 bg-muted-foreground/30 hover:bg-muted-foreground/50'}`}
                             />
                           ))}
                         </div>
@@ -654,7 +667,7 @@ const Page = () => {
           <Card className={`rounded-3xl lg:col-span-6 ${ui.glassCard}`}>
             <CardHeader className="pb-4">
               <CardTitle className="flex items-center gap-2 text-xl text-foreground">
-                <Activity className="h-5 w-5 text-tech-accent" />
+                <Activity className="h-5 w-5 text-[var(--tech-accent)]" />
                 Tendencia anual
               </CardTitle>
               <CardDescription className="text-sm">Evolución de métricas clave 2024</CardDescription>
@@ -744,9 +757,9 @@ const Page = () => {
         <Separator className="my-10" />
 
         <section data-anim="fade-up">
-          <Card className="relative overflow-hidden rounded-3xl border-(--tech-border) bg-linear-to-r from-(--tech-bg) via-tech-muted to-background/80 shadow-[0_20px_70px_-45px_rgba(6,182,212,0.6)] backdrop-blur">
-            <div className="absolute -right-10 -top-10 h-44 w-44 rounded-full bg-(--tech-gradient-from) blur-2xl animate-pulse" />
-            <div className="absolute -bottom-16 -left-16 h-60 w-60 rounded-full bg-(--tech-accent)/20 blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+          <Card className="relative overflow-hidden rounded-3xl border-[var(--tech-border)] bg-gradient-to-r from-[var(--tech-bg)] via-[var(--tech-muted)] to-background/80 shadow-[0_20px_70px_-45px_rgba(6,182,212,0.6)] backdrop-blur">
+            <div className="absolute -right-10 -top-10 h-44 w-44 rounded-full bg-[var(--tech-gradient-from)] blur-2xl animate-pulse" />
+            <div className="absolute -bottom-16 -left-16 h-60 w-60 rounded-full bg-[var(--tech-accent)]/20 blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
             <CardContent className="relative p-6">
               {isLoading ? (
                 <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
@@ -779,7 +792,7 @@ const Page = () => {
                   </div>
 
                   <div className="flex flex-wrap gap-3">
-                    <Button size="lg" className={`bg-tech hover:bg-tech-accent text-white ${ui.hoverLift} group`}>
+                    <Button size="lg" className={`bg-[var(--tech)] hover:bg-[var(--tech-accent)] text-white ${ui.hoverLift} group`}>
                       Solicitar cotización
                       <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                     </Button>
