@@ -8,7 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { CheckCircle2, Headphones, Settings, ShieldCheck, Wrench, TrendingUp, Clock, Award, Zap, ArrowRight, Sparkles, Activity, Server, Database, Code2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { CheckCircle2, Headphones, Settings, ShieldCheck, Wrench, TrendingUp, Clock, Award, Zap, ArrowRight, Sparkles, Activity, Server, Database, Code2 } from 'lucide-react';
 
 interface SkeletonProps {
   className?: string;
@@ -23,7 +23,7 @@ const SkeletonPulse = ({ className = '', style }: SkeletonProps) => (
 );
 
 const SkeletonStatCard = () => (
-  <div className="rounded-2xl border border-slate-200/70 dark:border-slate-800/60 bg-white/55 dark:bg-white/5 p-3 backdrop-blur">
+  <div className="rounded-2xl border border-slate-200/70 dark:border-slate-800/60 bg-white/40 dark:bg-white/5 p-3 backdrop-blur">
     <div className="flex items-center justify-between">
       <SkeletonPulse className="h-10 w-10 rounded-xl" />
       <div className="text-right space-y-2">
@@ -35,7 +35,7 @@ const SkeletonStatCard = () => (
 );
 
 const SkeletonAchievementCard = () => (
-  <Card className="rounded-3xl border-white/60 bg-white/55 dark:border-white/10 dark:bg-slate-950/35 backdrop-blur">
+  <Card className="rounded-3xl border-white/40 bg-white/40 dark:border-white/10 dark:bg-slate-950/30 backdrop-blur">
     <CardContent className="p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2">
@@ -76,7 +76,6 @@ interface Stat {
 interface ImpactRow {
   area: string;
   value: number;
-  trend?: number;
 }
 
 interface Achievement {
@@ -132,17 +131,16 @@ const CustomTooltip = ({ active, payload, label }: CustomTooltipProps) => {
 };
 
 const ui = {
-  glassCard: 'border-white/60 bg-white/55 shadow-[0_18px_50px_-30px_rgba(2,6,23,0.35)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/35',
-  softBorder: 'border border-slate-200/70 dark:border-slate-800/60',
+  glassCard: 'border-white/40 bg-white/40 shadow-[0_18px_50px_-30px_rgba(2,6,23,0.25)] backdrop-blur-xl dark:border-white/10 dark:bg-slate-950/30',
+  softBorder: 'border border-slate-200/50 dark:border-slate-800/40',
   hoverLift: 'transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_25px_60px_-20px_rgba(249,115,22,0.4)]',
 };
 
 const Page = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [currentSlide, setCurrentSlide] = useState(0);
-  const [chartReady, setChartReady] = useState(false);
 
-  const stats = useMemo<Stat[]>(
+  const statsConfig = useMemo<Stat[]>(
     () => [
       {
         key: 'projects',
@@ -177,19 +175,19 @@ const Page = () => {
     [],
   );
 
-  const impactDataBase = useMemo<ImpactRow[]>(
+  const impactDataFinal = useMemo<ImpactRow[]>(
     () => [
-      { area: 'Desarrollo', value: 92, trend: 8 },
-      { area: 'Infraestructura', value: 88, trend: 12 },
-      { area: 'Redes', value: 76, trend: -3 },
-      { area: 'Soporte', value: 95, trend: 5 },
-      { area: 'Automatización', value: 84, trend: 15 },
-      { area: 'Capacitación', value: 71, trend: 7 },
+      { area: 'Desarrollo', value: 92 },
+      { area: 'Infraestructura', value: 88 },
+      { area: 'Redes', value: 76 },
+      { area: 'Soporte', value: 95 },
+      { area: 'Automatización', value: 84 },
+      { area: 'Capacitación', value: 71 },
     ],
     [],
   );
 
-  const timeSeriesDataBase = useMemo<TimeSeriesData[]>(
+  const timeSeriesDataFinal = useMemo<TimeSeriesData[]>(
     () => [
       { month: 'Ene', rendimiento: 78, satisfaccion: 85 },
       { month: 'Feb', rendimiento: 82, satisfaccion: 88 },
@@ -243,11 +241,11 @@ const Page = () => {
     [],
   );
 
-  const [animatedValues, setAnimatedValues] = useState<AnimatedMap>(() => Object.fromEntries(stats.map((s) => [s.key, 0])));
-  const [impactData, setImpactData] = useState<ImpactRow[]>(() => impactDataBase.map((d) => ({ ...d, value: 0 })));
-  const [timeSeriesData, setTimeSeriesData] = useState<TimeSeriesData[]>(() => timeSeriesDataBase.map((d) => ({ ...d, rendimiento: 0, satisfaccion: 0 })));
+  const [animatedValues, setAnimatedValues] = useState<AnimatedMap>({ projects: 0, clients: 0, tickets: 0, uptime: 0 });
+  const [impactData, setImpactData] = useState<ImpactRow[]>(impactDataFinal.map((d) => ({ ...d, value: 0 })));
+  const [timeSeriesData, setTimeSeriesData] = useState<TimeSeriesData[]>(timeSeriesDataFinal.map((d) => ({ ...d, rendimiento: 0, satisfaccion: 0 })));
 
-  const didAnimate = useRef(false);
+  const animationStarted = useRef(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const totalSlides = serviceItems.length;
@@ -255,32 +253,27 @@ const Page = () => {
   useEffect(() => {
     const loadTimer = setTimeout(() => {
       setIsLoading(false);
-      setTimeout(() => setChartReady(true), 300);
-    }, 1800);
-
+    }, 1500);
     return () => clearTimeout(loadTimer);
   }, []);
 
   useEffect(() => {
     if (isLoading) return;
-
     const interval = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % totalSlides);
     }, 5000);
-
     return () => clearInterval(interval);
   }, [isLoading, totalSlides]);
 
   useEffect(() => {
-    if (!chartReady || didAnimate.current) return;
-    didAnimate.current = true;
+    if (isLoading || animationStarted.current) return;
+    animationStarted.current = true;
 
     const elements = Array.from(document.querySelectorAll<HTMLElement>('[data-anim="fade-up"]'));
     elements.forEach((el) => {
       el.style.opacity = '0';
       el.style.transform = 'translateY(24px) scale(0.98)';
     });
-
     elements.forEach((el, idx) => {
       animate(el, {
         opacity: [0, 1],
@@ -291,13 +284,13 @@ const Page = () => {
       });
     });
 
-    stats.forEach((s, idx) => {
+    statsConfig.forEach((s) => {
       const obj = { v: 0 };
       animate(obj, {
         v: s.value,
-        duration: 1600,
+        duration: 1800,
         easing: 'easeOutExpo',
-        delay: 300 + idx * 150,
+        delay: 200,
         update: () => {
           setAnimatedValues((prev) => ({
             ...prev,
@@ -307,31 +300,31 @@ const Page = () => {
       });
     });
 
-    impactDataBase.forEach((row, idx) => {
+    impactDataFinal.forEach((row, idx) => {
       const obj = { v: 0 };
       animate(obj, {
         v: row.value,
-        duration: 1800,
-        easing: 'easeOutCubic',
-        delay: 600 + idx * 120,
+        duration: 2000,
+        easing: 'easeOutQuart',
+        delay: 400 + idx * 80,
         update: () => {
           setImpactData((prev) => {
             const newData = [...prev];
-            newData[idx] = { ...newData[idx], value: Math.round(obj.v) };
+            newData[idx] = { area: row.area, value: Math.round(obj.v) };
             return newData;
           });
         },
       });
     });
 
-    timeSeriesDataBase.forEach((row, idx) => {
+    timeSeriesDataFinal.forEach((row, idx) => {
       const obj = { r: 0, s: 0 };
       animate(obj, {
         r: row.rendimiento,
         s: row.satisfaccion,
-        duration: 2200,
+        duration: 2500,
         easing: 'easeOutQuart',
-        delay: 800 + idx * 100,
+        delay: 600 + idx * 60,
         update: () => {
           setTimeSeriesData((prev) => {
             const newData = [...prev];
@@ -358,10 +351,7 @@ const Page = () => {
         delay: idx * 200,
       });
     });
-  }, [chartReady, stats, impactDataBase, timeSeriesDataBase]);
-
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % totalSlides);
-  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + totalSlides) % totalSlides);
+  }, [isLoading, statsConfig, impactDataFinal, timeSeriesDataFinal]);
 
   return (
     <main ref={containerRef} className="relative min-h-screen overflow-hidden bg-slate-50 dark:bg-slate-950 pt-20">
@@ -372,15 +362,6 @@ const Page = () => {
           }
           100% {
             background-position: -200% 0;
-          }
-        }
-        @keyframes float {
-          0%,
-          100% {
-            transform: translateY(0px);
-          }
-          50% {
-            transform: translateY(-10px);
           }
         }
         @keyframes pulse-glow {
@@ -423,7 +404,7 @@ const Page = () => {
           }}
         />
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="relative w-[800px] h-[800px] opacity-[0.08] dark:opacity-[0.06]">
+          <div className="relative w-[900px] h-[900px] opacity-[0.12] dark:opacity-[0.08]">
             <Image src="/img/tech.png" alt="" fill className="object-contain" priority />
           </div>
         </div>
@@ -454,11 +435,11 @@ const Page = () => {
             ) : (
               <>
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge className="rounded-full bg-white/70 text-slate-700 shadow-sm backdrop-blur dark:bg-white/10 dark:text-slate-200 transition-all hover:scale-105">
+                  <Badge className="rounded-full bg-white/60 text-slate-700 shadow-sm backdrop-blur dark:bg-white/10 dark:text-slate-200 transition-all hover:scale-105">
                     <Sparkles className="mr-1 h-3.5 w-3.5 text-orange-500 animate-pulse" />
                     Operación crítica & continuidad
                   </Badge>
-                  <Badge className="rounded-full bg-orange-100 text-orange-800 dark:bg-orange-950/35 dark:text-orange-300">SLA • Soporte • Desarrollo</Badge>
+                  <Badge className="rounded-full bg-orange-100/80 text-orange-800 dark:bg-orange-950/35 dark:text-orange-300">SLA • Soporte • Desarrollo</Badge>
                 </div>
 
                 <h1 className="mt-4 font-heading text-3xl font-bold leading-tight tracking-tight text-slate-900 md:text-4xl lg:text-5xl dark:text-white">
@@ -476,7 +457,7 @@ const Page = () => {
                     Ir al servicio
                     <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                   </Button>
-                  <Button variant="outline" className={`bg-white/60 backdrop-blur hover:bg-white/80 dark:bg-white/5 dark:hover:bg-white/10 ${ui.hoverLift}`}>
+                  <Button variant="outline" className={`bg-white/50 backdrop-blur hover:bg-white/70 dark:bg-white/5 dark:hover:bg-white/10 ${ui.hoverLift}`}>
                     Ver detalle
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -488,9 +469,9 @@ const Page = () => {
                     { title: 'Entrega ágil', desc: 'Ciclos cortos y medibles', icon: <Zap className="h-4 w-4" /> },
                     { title: 'Seguridad', desc: 'Buenas prácticas y hardening', icon: <ShieldCheck className="h-4 w-4" /> },
                   ].map((h) => (
-                    <div key={h.title} className={`rounded-2xl ${ui.softBorder} bg-white/55 p-3 backdrop-blur dark:bg-white/5 ${ui.hoverLift} group cursor-default`}>
+                    <div key={h.title} className={`rounded-2xl ${ui.softBorder} bg-white/40 p-3 backdrop-blur dark:bg-white/5 ${ui.hoverLift} group cursor-default`}>
                       <div className="flex items-center gap-2">
-                        <div className="rounded-lg bg-orange-100 p-1.5 text-orange-600 dark:bg-orange-950/35 dark:text-orange-400 transition-transform group-hover:scale-110">{h.icon}</div>
+                        <div className="rounded-lg bg-orange-100/80 p-1.5 text-orange-600 dark:bg-orange-950/35 dark:text-orange-400 transition-transform group-hover:scale-110">{h.icon}</div>
                         <div className="text-xs font-semibold text-slate-900 dark:text-white">{h.title}</div>
                       </div>
                       <div className="mt-1.5 text-xs text-slate-600 dark:text-slate-300">{h.desc}</div>
@@ -523,10 +504,10 @@ const Page = () => {
                       <SkeletonStatCard />
                     </>
                   ) : (
-                    stats.slice(0, 4).map((s) => (
-                      <div key={s.key} className={`rounded-2xl ${ui.softBorder} bg-white/55 p-3 backdrop-blur dark:bg-white/5 ${ui.hoverLift} group`}>
+                    statsConfig.map((s) => (
+                      <div key={s.key} className={`rounded-2xl ${ui.softBorder} bg-white/40 p-3 backdrop-blur dark:bg-white/5 ${ui.hoverLift} group`}>
                         <div className="flex items-center justify-between">
-                          <div className="rounded-xl bg-orange-100 p-2 text-orange-700 dark:bg-orange-950/35 dark:text-orange-300 transition-all group-hover:scale-110 group-hover:rotate-3">{s.icon}</div>
+                          <div className="rounded-xl bg-orange-100/80 p-2 text-orange-700 dark:bg-orange-950/35 dark:text-orange-300 transition-all group-hover:scale-110 group-hover:rotate-3">{s.icon}</div>
                           <div className="text-right">
                             <div className="text-lg font-bold text-slate-900 dark:text-white tabular-nums">
                               {animatedValues[s.key]}
@@ -540,7 +521,7 @@ const Page = () => {
                   )}
                 </div>
 
-                <div className="mt-5 overflow-hidden rounded-2xl bg-white/50 p-4 backdrop-blur dark:bg-white/5">
+                <div className="mt-5 overflow-hidden rounded-2xl bg-white/40 p-4 backdrop-blur dark:bg-white/5">
                   {isLoading ? (
                     <div className="space-y-2">
                       <SkeletonPulse className="h-4 w-32" />
@@ -564,8 +545,8 @@ const Page = () => {
 
         <Separator className="my-10" />
 
-        <section className="grid gap-6 lg:grid-cols-12" data-anim="fade-up">
-          <Card className={`rounded-3xl lg:col-span-7 ${ui.glassCard}`}>
+        <section data-anim="fade-up">
+          <Card className={`rounded-3xl ${ui.glassCard}`}>
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <div>
@@ -574,9 +555,6 @@ const Page = () => {
                 </div>
                 {!isLoading && (
                   <div className="flex items-center gap-2">
-                    <Button variant="outline" size="icon" className="h-8 w-8 rounded-full" onClick={prevSlide}>
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
                     <div className="flex gap-1">
                       {Array.from({ length: totalSlides }).map((_, idx) => (
                         <button
@@ -586,16 +564,13 @@ const Page = () => {
                         />
                       ))}
                     </div>
-                    <Button variant="outline" size="icon" className="h-8 w-8 rounded-full" onClick={nextSlide}>
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
                   </div>
                 )}
               </div>
             </CardHeader>
             <CardContent className="pt-0">
               {isLoading ? (
-                <div className="rounded-2xl border border-slate-200/70 dark:border-slate-800/60 bg-white/55 dark:bg-white/5 p-4 backdrop-blur">
+                <div className="rounded-2xl border border-slate-200/50 dark:border-slate-800/40 bg-white/40 dark:bg-white/5 p-4 backdrop-blur">
                   <div className="flex items-start gap-3">
                     <SkeletonPulse className="h-10 w-10 rounded-xl" />
                     <div className="flex-1 space-y-2">
@@ -608,40 +583,14 @@ const Page = () => {
                 <div className="relative overflow-hidden min-h-[80px]">
                   {serviceItems.map((item, idx) => (
                     <div key={idx} className={`${idx === currentSlide ? 'block animate-fadeSlideIn' : 'hidden'}`}>
-                      <div className={`group flex items-center gap-4 rounded-2xl ${ui.softBorder} bg-white/55 p-5 backdrop-blur ${ui.hoverLift} dark:bg-white/5`}>
-                        <div className="rounded-xl bg-orange-100 p-3 text-orange-700 dark:bg-orange-950/35 dark:text-orange-300 transition-all group-hover:scale-110">{item.icon}</div>
+                      <div className={`group flex items-center gap-4 rounded-2xl ${ui.softBorder} bg-white/40 p-5 backdrop-blur ${ui.hoverLift} dark:bg-white/5`}>
+                        <div className="rounded-xl bg-orange-100/80 p-3 text-orange-700 dark:bg-orange-950/35 dark:text-orange-300 transition-all group-hover:scale-110">{item.icon}</div>
                         <div className="text-base font-medium text-slate-700 dark:text-slate-200">{item.text}</div>
                       </div>
                     </div>
                   ))}
                 </div>
               )}
-            </CardContent>
-          </Card>
-
-          <Card className={`relative overflow-hidden rounded-3xl lg:col-span-5 ${ui.glassCard}`}>
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(249,115,22,0.18),transparent_55%)] dark:bg-[radial-gradient(circle_at_30%_20%,rgba(249,115,22,0.12),transparent_55%)]" />
-            <CardContent className="relative z-10 p-6 h-full flex flex-col justify-center min-h-[200px]">
-              <div className="grid grid-cols-3 gap-3 text-center">
-                {isLoading ? (
-                  <>
-                    <SkeletonPulse className="h-16 rounded-2xl" />
-                    <SkeletonPulse className="h-16 rounded-2xl" />
-                    <SkeletonPulse className="h-16 rounded-2xl" />
-                  </>
-                ) : (
-                  [
-                    { k: 'SLA', v: '99.8%' },
-                    { k: 'Soporte', v: '24/7' },
-                    { k: 'Entrega', v: 'Ágil' },
-                  ].map((x) => (
-                    <div key={x.k} className={`rounded-2xl ${ui.softBorder} bg-white/80 p-4 backdrop-blur-lg dark:bg-white/15 ${ui.hoverLift}`}>
-                      <div className="text-xs font-semibold text-slate-600 dark:text-slate-300">{x.k}</div>
-                      <div className="text-lg font-bold text-slate-900 dark:text-white mt-1">{x.v}</div>
-                    </div>
-                  ))
-                )}
-              </div>
             </CardContent>
           </Card>
         </section>
@@ -739,7 +688,7 @@ const Page = () => {
         <section data-anim="fade-up">
           <div className="mb-5 flex items-center justify-between">
             <h3 className="text-xl font-bold text-slate-900 dark:text-white">Logros destacados</h3>
-            <Badge className="rounded-full bg-white/70 text-slate-700 backdrop-blur dark:bg-white/10 dark:text-slate-200">KPIs</Badge>
+            <Badge className="rounded-full bg-white/60 text-slate-700 backdrop-blur dark:bg-white/10 dark:text-slate-200">KPIs</Badge>
           </div>
 
           <div className="grid gap-4 md:grid-cols-3">
@@ -755,7 +704,7 @@ const Page = () => {
                   <CardContent className="p-5">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3">
-                        <div className="rounded-2xl bg-orange-100 p-3 text-orange-700 dark:bg-orange-950/35 dark:text-orange-300 transition-all group-hover:scale-110">{achievement.icon}</div>
+                        <div className="rounded-2xl bg-orange-100/80 p-3 text-orange-700 dark:bg-orange-950/35 dark:text-orange-300">{achievement.icon}</div>
                         <div>
                           <div className="text-sm font-semibold text-slate-900 dark:text-white">{achievement.title}</div>
                           <div className="text-xs text-slate-600 dark:text-slate-300">{achievement.description}</div>
@@ -775,7 +724,7 @@ const Page = () => {
         <Separator className="my-10" />
 
         <section data-anim="fade-up">
-          <Card className="relative overflow-hidden rounded-3xl border border-orange-200/60 bg-linear-to-r from-orange-50 via-amber-50 to-white shadow-[0_20px_70px_-45px_rgba(249,115,22,0.6)] dark:border-orange-900/40 dark:from-orange-950/25 dark:via-amber-950/15 dark:to-slate-950">
+          <Card className="relative overflow-hidden rounded-3xl border border-orange-200/40 bg-linear-to-r from-orange-50/80 via-amber-50/80 to-white/80 shadow-[0_20px_70px_-45px_rgba(249,115,22,0.6)] backdrop-blur dark:border-orange-900/40 dark:from-orange-950/25 dark:via-amber-950/15 dark:to-slate-950/80">
             <div className="absolute -right-10 -top-10 h-44 w-44 rounded-full bg-orange-400/25 blur-2xl dark:bg-orange-500/15" style={{ animation: 'pulse-glow 3s ease-in-out infinite' }} />
             <div className="absolute -bottom-16 -left-16 h-60 w-60 rounded-full bg-amber-400/20 blur-3xl dark:bg-amber-500/10" style={{ animation: 'pulse-glow 4s ease-in-out infinite 1s' }} />
             <CardContent className="relative p-6">
@@ -802,7 +751,7 @@ const Page = () => {
                     <p className="mt-1 text-sm text-slate-700 dark:text-slate-300">Hablemos sobre cómo impulsar tu organización con soluciones tecnológicas modernas, seguras y medibles.</p>
                     <div className="mt-3 flex flex-wrap gap-2">
                       {['Evaluación', 'Roadmap', 'Implementación', 'Soporte'].map((t) => (
-                        <Badge key={t} className="rounded-full bg-white/70 text-slate-700 backdrop-blur dark:bg-white/10 dark:text-slate-200 transition-transform hover:scale-105">
+                        <Badge key={t} className="rounded-full bg-white/60 text-slate-700 backdrop-blur dark:bg-white/10 dark:text-slate-200 transition-transform hover:scale-105">
                           {t}
                         </Badge>
                       ))}
@@ -814,7 +763,7 @@ const Page = () => {
                       Solicitar cotización
                       <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                     </Button>
-                    <Button size="lg" variant="outline" className={`bg-white/60 backdrop-blur hover:bg-white/80 dark:bg-white/5 dark:hover:bg-white/10 ${ui.hoverLift}`}>
+                    <Button size="lg" variant="outline" className={`bg-white/50 backdrop-blur hover:bg-white/70 dark:bg-white/5 dark:hover:bg-white/10 ${ui.hoverLift}`}>
                       Agendar llamada
                       <ArrowRight className="ml-2 h-5 w-5" />
                     </Button>
