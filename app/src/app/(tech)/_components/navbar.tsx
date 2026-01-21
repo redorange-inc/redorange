@@ -1,7 +1,6 @@
 'use client';
 
 import type { FC } from 'react';
-import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -14,43 +13,16 @@ const navItems = [
   { href: '/tech/services', label: 'Servicios', exact: false },
   { href: '/tech/projects', label: 'Proyectos', exact: false },
   { href: '/tech/method', label: 'Metodología', exact: false },
-  { href: '/tech#contact', label: 'Contacto', exact: true },
+  { href: '/tech/contact', label: 'Contacto', exact: false },
 ] as const;
 
 export const Navbar: FC = () => {
   const pathname = usePathname();
-  const [scrolledToContact, setScrolledToContact] = useState(false);
-
-  const handleScroll = useCallback(() => {
-    if (pathname !== '/tech') {
-      setScrolledToContact(false);
-      return;
-    }
-
-    const contactSection = document.getElementById('contact');
-    if (contactSection) {
-      const scrollPosition = window.scrollY + window.innerHeight;
-      const contactTop = contactSection.offsetTop;
-      setScrolledToContact(scrollPosition >= contactTop + 100);
-    }
-  }, [pathname]);
-
-  useEffect(() => {
-    if (pathname === '/tech') {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      handleScroll();
-      window.addEventListener('scroll', handleScroll, { passive: true });
-      return () => window.removeEventListener('scroll', handleScroll);
-    } else {
-      setScrolledToContact(false);
-    }
-  }, [pathname, handleScroll]);
 
   const isActive = (item: (typeof navItems)[number]) => {
-    if (item.href === '/tech#contact') return pathname === '/tech' && scrolledToContact;
-
-    if (item.exact) return pathname === item.href;
-
+    if (item.exact) {
+      return pathname === item.href;
+    }
     return pathname === item.href || pathname.startsWith(`${item.href}/`);
   };
 
@@ -73,10 +45,14 @@ export const Navbar: FC = () => {
               <Link
                 key={item.href}
                 href={item.href}
-                className={cn('relative px-3 py-2 font-heading text-sm transition-all duration-200', 'hover:text-tech hover:font-bold', active ? 'text-tech font-bold' : 'text-foreground/80')}
+                className={cn(
+                  'relative px-3 py-2 font-heading text-sm transition-all duration-200',
+                  'hover:text-tech hover:font-bold',
+                  active ? 'text-tech font-bold' : 'text-foreground/80'
+                )}
               >
                 {item.label}
-                {active && <span className="absolute bottom-0 left-1/2 h-0.5 w-3/4 -translate-x-1/2 rounded-full bg-tech-accent" />}
+                {active && <span className="absolute bottom-0 left-1/2 h-0.5 w-3/4 -translate-x-1/2 rounded-full bg-tech" />}
               </Link>
             );
           })}
@@ -98,7 +74,13 @@ export const Navbar: FC = () => {
             const active = isActive(item);
 
             return (
-              <Button key={item.href} asChild size="sm" variant={active ? 'default' : 'secondary'} className={cn('font-heading text-xs', active && 'bg-tech text-white hover:bg-tech-accent')}>
+              <Button
+                key={item.href}
+                asChild
+                size="sm"
+                variant={active ? 'default' : 'secondary'}
+                className={cn('font-heading text-xs', active && 'bg-tech text-white hover:bg-tech-accent')}
+              >
                 <Link href={item.href}>{item.label}</Link>
               </Button>
             );
