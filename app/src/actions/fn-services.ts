@@ -2,6 +2,9 @@
 
 export type ServiceId = 'ti-solutions' | 'equipment-marketing' | 'telecom-services';
 
+// Identificador de tema de color - se mapea a las variables CSS del global.css
+export type ColorTheme = 'tech' | 'infra' | 'digital';
+
 export type ServiceDeliverable = {
   title: string;
   content: string;
@@ -17,8 +20,7 @@ export type ServiceSlide = {
   cta: string;
   image: string;
   deliverables: ServiceDeliverable[];
-  gradient: string;
-  accentColor: string;
+  colorTheme: ColorTheme;
   url: string;
 };
 
@@ -43,8 +45,7 @@ const services: ServiceSlide[] = [
       { title: 'Desarrollo e implementación', content: 'Construcción, despliegue, pruebas, hardening, backups y monitoreo base.' },
       { title: 'Soporte y mejora continua', content: 'Mesa de ayuda, correctivos, preventivos, documentación y capacitación según SLA.' },
     ],
-    gradient: 'from-cyan-500/15 via-blue-500/10 to-transparent',
-    accentColor: 'text-cyan-600 dark:text-cyan-400',
+    colorTheme: 'tech',
     url: '/services/ti-solutions',
   },
   {
@@ -67,8 +68,7 @@ const services: ServiceSlide[] = [
       { title: 'Provisión e instalación', content: 'Suministro, instalación, configuración, pruebas, etiquetado y documentación técnica.' },
       { title: 'Postventa y mantenimiento', content: 'Garantías, mantenimiento preventivo/correctivo, reposiciones y soporte postventa.' },
     ],
-    gradient: 'from-rose-500/15 via-orange-500/10 to-transparent',
-    accentColor: 'text-rose-600 dark:text-rose-400',
+    colorTheme: 'infra',
     url: '/services/equipment-marketing',
   },
   {
@@ -91,8 +91,7 @@ const services: ServiceSlide[] = [
       { title: 'Canales y plataformas', content: 'Dominios, hosting, correo corporativo, intranet/extranet y presencia digital.' },
       { title: 'Operación y energía', content: 'Mantenimiento, monitoreo, soporte continuo y soluciones energéticas/medición.' },
     ],
-    gradient: 'from-orange-500/15 via-amber-500/10 to-transparent',
-    accentColor: 'text-orange-600 dark:text-orange-400',
+    colorTheme: 'digital',
     url: '/services/telecom-services-energy',
   },
 ];
@@ -136,7 +135,7 @@ export type AboutFeature = {
   key: AboutFeatureKey;
   title: string;
   description: string;
-  accentColor: string; // mismas clases tailwind que usas
+  colorTheme: ColorTheme;
   iconKey: 'code2' | 'boxes' | 'globe';
   items: AboutFeatureItem[];
 };
@@ -144,19 +143,19 @@ export type AboutFeature = {
 export type AboutFooterBadge = {
   iconKey: 'target' | 'shield' | 'rocket';
   label: string;
-  iconColorClass: string; // para los 3 iconos del footer
+  colorTheme: ColorTheme | 'primary'; // primary para colores base
 };
 
 export type AboutFooterCard = {
   iconKey: 'messageSquareText' | 'badgeCheck' | 'timer' | 'clipboardCheck' | 'refreshCw' | 'zap';
   title: string;
   description: string;
-  iconColorClass: string;
+  colorTheme: ColorTheme | 'primary' | 'secondary' | 'accent';
 };
 
 export type AboutContent = {
-  badgeLabel: string; // "Nosotros"
-  brandTitle: string; // "REDORANGE E.I.R.L."
+  badgeLabel: string;
+  brandTitle: string;
   intro: string;
   features: AboutFeature[];
   footer: {
@@ -178,7 +177,7 @@ const about: AboutContent = {
       iconKey: 'code2',
       title: 'Tecnología y Soluciones Informáticas (TI)',
       description: 'Consultoría, desarrollo y operación de software/sistemas, con soporte y mejora continua para asegurar continuidad operativa.',
-      accentColor: 'text-cyan-600 dark:text-cyan-400',
+      colorTheme: 'tech',
       items: [
         { iconKey: 'clipboardCheck', text: 'Consultoría y asesoría en informática y cómputo' },
         { iconKey: 'code2', text: 'Desarrollo de software, sistemas y aplicaciones' },
@@ -195,7 +194,7 @@ const about: AboutContent = {
       iconKey: 'boxes',
       title: 'Comercialización, Importación y Servicios Técnicos de Equipos',
       description: 'Provisión de tecnología con enfoque en compatibilidad, instalación, mantenimiento y postventa: desde cotización hasta puesta en marcha.',
-      accentColor: 'text-rose-600 dark:text-rose-400',
+      colorTheme: 'infra',
       items: [
         { iconKey: 'hardDrive', text: 'Importación y exportación de equipos tecnológicos' },
         { iconKey: 'boxes', text: 'Distribución y comercialización de equipos, suministros y periféricos' },
@@ -210,7 +209,7 @@ const about: AboutContent = {
       iconKey: 'globe',
       title: 'Telecomunicaciones, Servicios Digitales y Energía Tecnológica',
       description: 'Conectividad, servicios digitales y soluciones energéticas: operación segura, disponibilidad y soporte continuo para empresas.',
-      accentColor: 'text-orange-600 dark:text-orange-400',
+      colorTheme: 'digital',
       items: [
         { iconKey: 'network', text: 'Servicios de telecomunicaciones e internet (incluye línea dedicada)' },
         { iconKey: 'shield', text: 'Hosting, cloud, storage y servidores de seguridad' },
@@ -225,46 +224,46 @@ const about: AboutContent = {
     title: 'Una forma de trabajo clara y medible',
     subtitle: 'Alineamos alcance, ejecución y soporte con comunicación constante. Así aseguramos trazabilidad, calidad de entregables y continuidad operativa.',
     badges: [
-      { iconKey: 'target', label: 'Alcance definido', iconColorClass: 'text-blue-500' },
-      { iconKey: 'shield', label: 'Operación segura', iconColorClass: 'text-purple-500' },
-      { iconKey: 'rocket', label: 'Listo para escalar', iconColorClass: 'text-orange-500' },
+      { iconKey: 'target', label: 'Alcance definido', colorTheme: 'tech' },
+      { iconKey: 'shield', label: 'Operación segura', colorTheme: 'infra' },
+      { iconKey: 'rocket', label: 'Listo para escalar', colorTheme: 'digital' },
     ],
     cards: [
       {
         iconKey: 'messageSquareText',
         title: 'Comunicación y trazabilidad',
         description: 'Levantamiento, acuerdos, cambios y estado del trabajo documentados para control total.',
-        iconColorClass: 'text-primary',
+        colorTheme: 'primary',
       },
       {
         iconKey: 'badgeCheck',
         title: 'Calidad en entregables',
         description: 'Criterios definidos, validación por hitos y mejora continua por iteraciones.',
-        iconColorClass: 'text-accent',
+        colorTheme: 'accent',
       },
       {
         iconKey: 'timer',
         title: 'Continuidad operativa',
         description: 'Soporte, mantenimiento y evolución para sostener la operación y reducir riesgos.',
-        iconColorClass: 'text-secondary',
+        colorTheme: 'secondary',
       },
       {
         iconKey: 'clipboardCheck',
         title: 'Plan y responsables',
         description: 'Cronograma, responsables y criterios de aceptación por entrega para evitar ambigüedades.',
-        iconColorClass: 'text-blue-500',
+        colorTheme: 'tech',
       },
       {
         iconKey: 'refreshCw',
         title: 'Soporte por SLA',
         description: 'Atención por niveles, correctivos y preventivos con seguimiento y reportes.',
-        iconColorClass: 'text-purple-500',
+        colorTheme: 'infra',
       },
       {
         iconKey: 'zap',
         title: 'Optimización continua',
         description: 'Estandarización, automatización y mejoras para rendimiento y escalabilidad.',
-        iconColorClass: 'text-orange-500',
+        colorTheme: 'digital',
       },
     ],
   },
@@ -276,16 +275,6 @@ export const fn_get_about = async (): Promise<AboutContent> => {
 };
 
 export type ContactLineKey = 'ti' | 'equipos' | 'telecom';
-
-export type ContactLineAccent = {
-  ring: string;
-  text: string;
-  chipBg: string;
-  chipText: string;
-  badgeBg: string;
-  badgeText: string;
-  iconKey: 'cpu' | 'boxes' | 'globe';
-};
 
 export type ContactBullet = {
   iconKey: 'checkCircle2';
@@ -299,14 +288,15 @@ export type ContactLine = {
   title: string;
   subtitle: string;
   emailBodyLine: string;
-  accent: ContactLineAccent;
+  colorTheme: ColorTheme;
+  iconKey: 'cpu' | 'boxes' | 'globe';
   bullets: ContactBullet[];
   subjectPlaceholder: string;
 };
 
 export type ContactMeta = {
-  whatsappNumber: string; // "+519999..."
-  salesEmail: string; // "ventas@..."
+  whatsappNumber: string;
+  salesEmail: string;
   chips: Array<{ iconKey: 'clock' | 'mapPin' | 'mail'; text: string }>;
 };
 
@@ -343,15 +333,8 @@ const contact: ContactContent = {
       title: 'Tecnología y Soluciones Informáticas (TI)',
       subtitle: 'Consultoría, desarrollo de software y sistemas, soporte y continuidad operativa.',
       emailBodyLine: 'Línea: Tecnología y Soluciones Informáticas (TI)',
-      accent: {
-        ring: 'ring-cyan-500/25',
-        text: 'text-cyan-700 dark:text-cyan-300',
-        chipBg: 'bg-cyan-500/10',
-        chipText: 'text-cyan-800 dark:text-cyan-200',
-        badgeBg: 'bg-cyan-500/12',
-        badgeText: 'text-cyan-800 dark:text-cyan-200',
-        iconKey: 'cpu',
-      },
+      colorTheme: 'tech',
+      iconKey: 'cpu',
       bullets: [
         { iconKey: 'checkCircle2', text: 'Consultoría y asesoría en informática y cómputo' },
         { iconKey: 'checkCircle2', text: 'Desarrollo de software, sistemas y aplicaciones' },
@@ -367,15 +350,8 @@ const contact: ContactContent = {
       title: 'Comercialización, Importación y Servicios Técnicos de Equipos',
       subtitle: 'Provisión, cotización, instalación, mantenimiento y postventa de equipos y redes.',
       emailBodyLine: 'Línea: Comercialización, Importación y Servicios Técnicos de Equipos',
-      accent: {
-        ring: 'ring-rose-500/25',
-        text: 'text-rose-700 dark:text-rose-300',
-        chipBg: 'bg-rose-500/10',
-        chipText: 'text-rose-800 dark:text-rose-200',
-        badgeBg: 'bg-rose-500/12',
-        badgeText: 'text-rose-800 dark:text-rose-200',
-        iconKey: 'boxes',
-      },
+      colorTheme: 'infra',
+      iconKey: 'boxes',
       bullets: [
         { iconKey: 'checkCircle2', text: 'Importación y exportación de equipos tecnológicos' },
         { iconKey: 'checkCircle2', text: 'Distribución y comercialización de equipos y suministros' },
@@ -391,15 +367,8 @@ const contact: ContactContent = {
       title: 'Telecomunicaciones, Servicios Digitales y Energía Tecnológica',
       subtitle: 'Conectividad, cloud/hosting, servicios digitales y soluciones energéticas.',
       emailBodyLine: 'Línea: Telecomunicaciones, Servicios Digitales y Energía Tecnológica',
-      accent: {
-        ring: 'ring-orange-500/25',
-        text: 'text-orange-700 dark:text-orange-300',
-        chipBg: 'bg-orange-500/10',
-        chipText: 'text-orange-800 dark:text-orange-200',
-        badgeBg: 'bg-orange-500/12',
-        badgeText: 'text-orange-800 dark:text-orange-200',
-        iconKey: 'globe',
-      },
+      colorTheme: 'digital',
+      iconKey: 'globe',
       bullets: [
         { iconKey: 'checkCircle2', text: 'Telecomunicaciones e internet (incluye línea dedicada)' },
         { iconKey: 'checkCircle2', text: 'Hosting, cloud, storage y servidores de seguridad' },

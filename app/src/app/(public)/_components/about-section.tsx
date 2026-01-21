@@ -7,25 +7,23 @@ import { Badge } from '@/components/ui/badge';
 import { Users, Target, Shield, Rocket, ClipboardCheck, FileText, HeadphonesIcon, Wrench, Database, Network, TrendingUp, Zap } from 'lucide-react';
 import { RefreshCw, Lightbulb, MessageSquareText, BadgeCheck, Timer, Code2, Workflow, GraduationCap, HardDrive, Boxes, Router, Globe, Mail, Megaphone, SolarPanel } from 'lucide-react';
 
-import { fn_get_about, type AboutContent, type AboutFeatureItem } from '@/actions/fn-services';
+import { fn_get_about, type AboutContent, type AboutFeatureItem, type ColorTheme } from '@/actions/fn-services';
+import { getBaseColorClass, getThemeClasses } from '@/helpers/theme-helpers';
 
 interface FeatureCardUI {
   icon: FC<{ className?: string }>;
   title: string;
   description: string;
-  iconColor: string;
+  colorTheme: ColorTheme;
   items: Array<{ icon: FC<{ className?: string }>; text: string }>;
 }
 
 const prefersReducedMotion = (): boolean => typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const ICONS: Record<string, FC<{ className?: string }>> = {
-  // about feature main icons
   code2: Code2,
   boxes: Boxes,
   globe: Globe,
-
-  // about feature item icons
   clipboardCheck: ClipboardCheck,
   workflow: Workflow,
   database: Database,
@@ -41,25 +39,16 @@ const ICONS: Record<string, FC<{ className?: string }>> = {
   mail: Mail,
   megaphone: Megaphone,
   solarPanel: SolarPanel,
-
-  // footer cards
   messageSquareText: MessageSquareText,
   badgeCheck: BadgeCheck,
   timer: Timer,
   refreshCw: RefreshCw,
   zap: Zap,
-
-  // footer badges
   target: Target,
   rocket: Rocket,
 };
 
-const toUIItems = (items: AboutFeatureItem[], fallbackColor: string) =>
-  items.map((it) => ({
-    icon: ICONS[it.iconKey] ?? CheckCircle2Fallback,
-    text: it.text,
-    _color: fallbackColor,
-  }));
+const toUIItems = (items: AboutFeatureItem[]) => items.map((it) => ({ icon: ICONS[it.iconKey] ?? CheckCircle2Fallback, text: it.text }));
 
 const CheckCircle2Fallback: FC<{ className?: string }> = ({ className }) => (
   <span className={className} aria-hidden="true">
@@ -99,13 +88,7 @@ export const AboutSection: FC = () => {
     return data.features.map((f) => {
       const MainIcon = ICONS[f.iconKey] ?? Code2;
 
-      return {
-        icon: MainIcon,
-        title: f.title,
-        description: f.description,
-        iconColor: f.accentColor,
-        items: toUIItems(f.items, f.accentColor).map(({ icon, text }) => ({ icon, text })),
-      };
+      return { icon: MainIcon, title: f.title, description: f.description, colorTheme: f.colorTheme, items: toUIItems(f.items) };
     });
   }, [data]);
 
@@ -116,7 +99,6 @@ export const AboutSection: FC = () => {
     if (!data || features.length === 0) return;
 
     if (prefersReducedMotion()) {
-      // fallback: muestra sin animación
       const show = root.querySelectorAll<HTMLElement>('[data-about="header"],[data-about="card"],[data-about="footer-wrap"],[data-about="footer"]');
       show.forEach((el) => (el.style.opacity = '1'));
       return;
@@ -156,30 +138,28 @@ export const AboutSection: FC = () => {
         <div className="relative z-10 mx-auto flex max-w-xl items-center justify-center">
           <div className="w-full rounded-2xl border border-border/60 bg-background/60 p-6 text-center backdrop-blur">
             <p className="font-heading text-base font-extrabold">Cargando sección...</p>
-            <p className="mt-1 text-sm text-muted-foreground">Preparando contenido de “Sobre nosotros”.</p>
+            <p className="mt-1 text-sm text-muted-foreground">Preparando contenido de &quot;Sobre nosotros&ldquo;.</p>
           </div>
         </div>
       </section>
     );
   }
 
-  const footerBadges = data.footer.badges.map((b) => ({
-    Icon: ICONS[b.iconKey] ?? Target,
-    label: b.label,
-    iconColorClass: b.iconColorClass,
-  }));
+  const getIconColorClass = (colorTheme: ColorTheme | 'primary' | 'secondary' | 'accent'): string => {
+    if (colorTheme === 'primary' || colorTheme === 'secondary' || colorTheme === 'accent') {
+      return getBaseColorClass(colorTheme);
+    }
+    return getThemeClasses(colorTheme).text;
+  };
 
-  const footerCards = data.footer.cards.map((c) => ({
-    Icon: ICONS[c.iconKey] ?? MessageSquareText,
-    title: c.title,
-    description: c.description,
-    iconColorClass: c.iconColorClass,
-  }));
+  const footerBadges = data.footer.badges.map((b) => ({ Icon: ICONS[b.iconKey] ?? Target, label: b.label, iconColorClass: getIconColorClass(b.colorTheme) }));
+
+  const footerCards = data.footer.cards.map((c) => ({ Icon: ICONS[c.iconKey] ?? MessageSquareText, title: c.title, description: c.description, iconColorClass: getIconColorClass(c.colorTheme) }));
 
   return (
     <section id="about" ref={sectionRef} className="relative mx-auto max-w-7xl px-6 py-14 md:px-10 md:py-20 min-h-screen scroll-mt-0">
-      <div data-about="glow" className="pointer-events-none absolute -right-24 top-16 h-[420px] w-[420px] rounded-full bg-cyan-500/6 blur-3xl" />
-      <div data-about="glow" className="pointer-events-none absolute -left-24 bottom-16 h-[420px] w-[420px] rounded-full bg-orange-500/6 blur-3xl" />
+      <div data-about="glow" className="pointer-events-none absolute -right-24 top-16 h-[420px] w-[420px] rounded-full bg-(--tech-bg) blur-3xl" />
+      <div data-about="glow" className="pointer-events-none absolute -left-24 bottom-16 h-[420px] w-[420px] rounded-full bg-(--digital-bg) blur-3xl" />
 
       <div ref={headerRef} className="mb-10 text-center md:mb-12">
         <Badge variant="secondary" className="mb-3 font-heading opacity-0" data-about="header">
@@ -199,6 +179,7 @@ export const AboutSection: FC = () => {
       <div ref={cardsRef} className="grid gap-5 md:grid-cols-2 lg:grid-cols-3 md:gap-6">
         {features.map((feature) => {
           const MainIcon = feature.icon;
+          const theme = getThemeClasses(feature.colorTheme);
 
           return (
             <div
@@ -212,7 +193,7 @@ export const AboutSection: FC = () => {
 
               <div className="mb-4 flex items-start gap-3">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center md:h-12 md:w-12">
-                  <MainIcon className={`h-7 w-7 md:h-8 md:w-8 ${feature.iconColor}`} />
+                  <MainIcon className={`h-7 w-7 md:h-8 md:w-8 ${theme.text}`} />
                 </div>
                 <div className="flex-1">
                   <h3 className="mb-1.5 font-heading text-base font-extrabold md:text-lg">{feature.title}</h3>
@@ -227,7 +208,7 @@ export const AboutSection: FC = () => {
                   return (
                     <div key={item.text} className="flex items-start gap-2.5 rounded-lg bg-muted/50 p-2 transition-all hover:bg-muted hover:-translate-y-px md:p-2.5">
                       <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center md:h-7 md:w-7">
-                        <ItemIcon className={`h-3.5 w-3.5 md:h-4 md:w-4 ${feature.iconColor}`} />
+                        <ItemIcon className={`h-3.5 w-3.5 md:h-4 md:w-4 ${theme.text}`} />
                       </div>
                       <span className="text-xs leading-relaxed text-foreground md:text-sm">{item.text}</span>
                     </div>

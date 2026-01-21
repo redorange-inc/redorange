@@ -9,9 +9,17 @@ import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ArrowRight, Sparkles, MapPin, Clock, Mail, Phone, Cpu, Boxes, Globe, CheckCircle2, Hash, MessageCircle } from 'lucide-react';
 
-import { fn_get_contact, type ContactContent, type ContactLine as ContactLineDTO } from '@/actions/fn-services';
+import { fn_get_contact, type ContactContent, type ContactLine as ContactLineDTO, type ColorTheme } from '@/actions/fn-services';
+import { getThemeClasses } from '@/helpers/theme-helpers';
 
 const prefersReducedMotion = (): boolean => typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+
+interface ThemeStyles {
+  text: string;
+  bg: string;
+  border: string;
+  ring: string;
+}
 
 type ContactLineUI = {
   key: ContactLineDTO['key'];
@@ -20,20 +28,14 @@ type ContactLineUI = {
   title: string;
   subtitle: string;
   emailBodyLine: string;
-  accent: {
-    ring: string;
-    text: string;
-    chipBg: string;
-    chipText: string;
-    badgeBg: string;
-    badgeText: string;
-    icon: FC<{ className?: string }>;
-  };
+  colorTheme: ColorTheme;
+  theme: ThemeStyles;
+  icon: FC<{ className?: string }>;
   bullets: Array<{ icon: FC<{ className?: string }>; text: string }>;
   subjectPlaceholder: string;
 };
 
-const ICONS: Record<ContactLineDTO['accent']['iconKey'], FC<{ className?: string }>> = {
+const ICONS: Record<ContactLineDTO['iconKey'], FC<{ className?: string }>> = {
   cpu: Cpu,
   boxes: Boxes,
   globe: Globe,
@@ -101,8 +103,8 @@ const EllipsisMarquee: FC<{
 
 const AnimatedTextSlider: FC<{
   bullets: Array<{ icon: FC<{ className?: string }>; text: string }>;
-  accentText: string;
-}> = ({ bullets, accentText }) => {
+  textClass: string;
+}> = ({ bullets, textClass }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const textContainerRef = useRef<HTMLParagraphElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
@@ -160,8 +162,8 @@ const AnimatedTextSlider: FC<{
   return (
     <div className="relative min-h-[88px] w-full">
       <div ref={cardRef} key={currentIndex} className="flex items-start gap-3 sm:gap-3.5 rounded-2xl bg-muted/50 p-3 sm:p-4 border border-border/40 transition-all duration-500 ease-out">
-        <Icon className={`mt-0.5 sm:mt-1 h-4 w-4 sm:h-5 sm:w-5 shrink-0 ${accentText}`} />
-        <p ref={textContainerRef} className={`text-xs sm:text-sm text-muted-foreground leading-relaxed flex-1 ${accentText}`} />
+        <Icon className={`mt-0.5 sm:mt-1 h-4 w-4 sm:h-5 sm:w-5 shrink-0 ${textClass}`} />
+        <p ref={textContainerRef} className={`text-xs sm:text-sm text-muted-foreground leading-relaxed flex-1 ${textClass}`} />
       </div>
 
       <div className="flex justify-center gap-2 sm:gap-2.5 mt-3 sm:mt-4">
@@ -213,7 +215,8 @@ export const ContactSection: FC = () => {
     const raw = data?.lines ?? [];
 
     return raw.map((line) => {
-      const LineIcon = ICONS[line.accent.iconKey];
+      const LineIcon = ICONS[line.iconKey];
+      const themeClasses = getThemeClasses(line.colorTheme);
 
       return {
         key: line.key,
@@ -222,15 +225,9 @@ export const ContactSection: FC = () => {
         title: line.title,
         subtitle: line.subtitle,
         emailBodyLine: line.emailBodyLine,
-        accent: {
-          ring: line.accent.ring,
-          text: line.accent.text,
-          chipBg: line.accent.chipBg,
-          chipText: line.accent.chipText,
-          badgeBg: line.accent.badgeBg,
-          badgeText: line.accent.badgeText,
-          icon: LineIcon,
-        },
+        colorTheme: line.colorTheme,
+        theme: { text: themeClasses.text, bg: themeClasses.bg, border: themeClasses.border, ring: themeClasses.ring },
+        icon: LineIcon,
         bullets: line.bullets.map((b) => {
           const BulletIcon = BULLET_ICONS[b.iconKey];
           return { icon: BulletIcon, text: b.text };
@@ -362,7 +359,7 @@ export const ContactSection: FC = () => {
         <Tabs defaultValue={defaultLine.key} className="w-full">
           <TabsList className="grid w-full grid-cols-3 rounded-2xl bg-muted/40 p-1 sm:p-1.5 border border-border/60 gap-0.5 sm:gap-1">
             {lines.map((line) => {
-              const LineIcon = line.accent.icon;
+              const LineIcon = line.icon;
               return (
                 <TabsTrigger
                   key={line.key}
@@ -371,7 +368,7 @@ export const ContactSection: FC = () => {
                 >
                   <div className="flex items-center gap-2 sm:gap-2.5 w-full min-w-0 justify-start">
                     <span className="inline-flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-xl bg-background/60 border border-border/60 shrink-0">
-                      <LineIcon className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${line.accent.text}`} />
+                      <LineIcon className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${line.theme.text}`} />
                     </span>
 
                     <EllipsisMarquee text={line.title} className="text-[10px] sm:text-xs font-semibold text-left leading-tight" speed={22} />
@@ -382,20 +379,20 @@ export const ContactSection: FC = () => {
           </TabsList>
 
           {lines.map((line) => {
-            const LineIcon = line.accent.icon;
+            const LineIcon = line.icon;
             const mailtoHref = mailtoHrefFor(line);
 
             return (
               <TabsContent key={line.key} value={line.key} className="mt-4 sm:mt-6">
-                <div className={`rounded-2xl sm:rounded-3xl border border-border/70 bg-background/60 p-4 sm:p-5 md:p-7 ring-1 ${line.accent.ring}`}>
+                <div className={`rounded-2xl sm:rounded-3xl border border-border/70 bg-background/60 p-4 sm:p-5 md:p-7 ring-1 ${line.theme.ring}`}>
                   <div className="space-y-2 sm:space-y-2.5">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold border border-border/60 ${line.accent.badgeBg} ${line.accent.badgeText}`}>
+                      <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-semibold border border-border/60 ${line.theme.bg} ${line.theme.text}`}>
                         <Hash className="h-3.5 w-3.5" />
                         {line.number}
                       </span>
 
-                      <span className={`inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[11px] font-semibold border border-border/60 ${line.accent.chipBg} ${line.accent.chipText}`}>
+                      <span className={`inline-flex items-center gap-2 rounded-full px-2.5 py-1 text-[11px] font-semibold border border-border/60 ${line.theme.bg} ${line.theme.text}`}>
                         <LineIcon className="h-3.5 w-3.5" />
                         {line.tabLabel}
                       </span>
@@ -406,7 +403,7 @@ export const ContactSection: FC = () => {
                   </div>
 
                   <div className="mt-4 sm:mt-5">
-                    <AnimatedTextSlider bullets={line.bullets} accentText={line.accent.text} />
+                    <AnimatedTextSlider bullets={line.bullets} textClass={line.theme.text} />
                   </div>
 
                   <div className="mt-5 sm:mt-6 grid gap-3 sm:gap-4 sm:grid-cols-2">
