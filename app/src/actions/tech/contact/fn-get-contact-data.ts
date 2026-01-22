@@ -14,7 +14,7 @@ export const getContactData = async (): Promise<ApiResponse<ContactPageData>> =>
     },
     info: {
       email: ' informes@redorange.net.pe',
-      phone: '+51 999 999 999',
+      phone: '+51 987 370 699',
       whatsapp: '+51987370699',
       address: 'Lima, Perú',
       schedule: 'Lunes a Viernes: 9:00 - 18:00',
