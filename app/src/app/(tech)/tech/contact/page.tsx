@@ -1,5 +1,3 @@
-'use server';
-
 import { Separator } from '@/components/ui/separator';
 import { getContactData } from '@/actions/tech/contact/fn-get-contact-data';
 import { PageWrapper } from './_components/page-wrapper';

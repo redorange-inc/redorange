@@ -37,10 +37,10 @@ export const getContactData = async (): Promise<ApiResponse<ContactPageData>> =>
       { id: 'message', label: 'Mensaje', type: 'textarea', placeholder: 'Describe tu proyecto, necesidades, plazos estimados y cualquier detalle relevante...', required: true },
     ],
     features: [
-      { title: 'Respuesta Rápida', description: 'Respondemos en menos de 24 horas hábiles', iconName: 'Zap' },
-      { title: 'Evaluación Gratuita', description: 'Análisis inicial sin compromiso', iconName: 'CheckCircle' },
-      { title: 'Equipo Especializado', description: 'Profesionales certificados en TI', iconName: 'Shield' },
-      { title: 'Soporte Continuo', description: 'Acompañamiento durante todo el proyecto', iconName: 'Headphones' },
+      { title: 'Respuesta Rápida', description: 'Respondemos en menos de 24 horas hábiles', iconName: 'zap' },
+      { title: 'Evaluación Gratuita', description: 'Análisis inicial sin compromiso', iconName: 'circle-check' },
+      { title: 'Equipo Especializado', description: 'Profesionales certificados en TI', iconName: 'shield' },
+      { title: 'Soporte Continuo', description: 'Acompañamiento durante todo el proyecto', iconName: 'headphones' },
     ],
   };
 
