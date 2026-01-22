@@ -43,7 +43,6 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
-  /* Service Theme Colors - para usar con Tailwind */
   --color-tech: var(--tech);
   --color-tech-accent: var(--tech-accent);
   --color-tech-muted: var(--tech-muted);
@@ -101,43 +100,38 @@
   --color-primary: var(--primary);
   --color-secondary: var(--secondary);
 
-  /* -- service theme colors - light mode */
+  --tech: #0891b2;
+  --tech-accent: #0891b2;
+  --tech-muted: #06b6d4;
+  --tech-light: #22d3ee;
+  --tech-foreground: #ffffff;
+  --tech-gradient-from: rgba(6, 182, 212, 0.15);
+  --tech-gradient-via: rgba(59, 130, 246, 0.1);
+  --tech-bg: rgba(6, 182, 212, 0.08);
+  --tech-bg-hover: rgba(6, 182, 212, 0.12);
+  --tech-border: rgba(6, 182, 212, 0.25);
 
-  /* Tech (ti-solutions) - Cyan/Blue theme */
-  --tech: #0891b2; /* cyan-600 */
-  --tech-accent: #0891b2; /* cyan-600 */
-  --tech-muted: #06b6d4; /* cyan-500 */
-  --tech-light: #22d3ee; /* cyan-400 */
-  --tech-foreground: #ffffff; /* white text on tech bg */
-  --tech-gradient-from: rgba(6, 182, 212, 0.15); /* cyan-500/15 */
-  --tech-gradient-via: rgba(59, 130, 246, 0.1); /* blue-500/10 */
-  --tech-bg: rgba(6, 182, 212, 0.08); /* cyan-500/8 */
-  --tech-bg-hover: rgba(6, 182, 212, 0.12); /* cyan-500/12 */
-  --tech-border: rgba(6, 182, 212, 0.25); /* cyan-500/25 */
+  --infra: #e11d48;
+  --infra-accent: #e11d48;
+  --infra-muted: #f43f5e;
+  --infra-light: #fb7185;
+  --infra-foreground: #ffffff;
+  --infra-gradient-from: rgba(244, 63, 94, 0.15);
+  --infra-gradient-via: rgba(249, 115, 22, 0.1);
+  --infra-bg: rgba(244, 63, 94, 0.08);
+  --infra-bg-hover: rgba(244, 63, 94, 0.12);
+  --infra-border: rgba(244, 63, 94, 0.25);
 
-  /* Infra (equipment-marketing) - Rose/Orange theme */
-  --infra: #e11d48; /* rose-600 */
-  --infra-accent: #e11d48; /* rose-600 */
-  --infra-muted: #f43f5e; /* rose-500 */
-  --infra-light: #fb7185; /* rose-400 */
-  --infra-foreground: #ffffff; /* white text on infra bg */
-  --infra-gradient-from: rgba(244, 63, 94, 0.15); /* rose-500/15 */
-  --infra-gradient-via: rgba(249, 115, 22, 0.1); /* orange-500/10 */
-  --infra-bg: rgba(244, 63, 94, 0.08); /* rose-500/8 */
-  --infra-bg-hover: rgba(244, 63, 94, 0.12); /* rose-500/12 */
-  --infra-border: rgba(244, 63, 94, 0.25); /* rose-500/25 */
-
-  /* Digital (telecom-services) - Orange/Amber theme */
-  --digital: #ea580c; /* orange-600 */
-  --digital-accent: #ea580c; /* orange-600 */
-  --digital-muted: #f97316; /* orange-500 */
-  --digital-light: #fb923c; /* orange-400 */
-  --digital-foreground: #ffffff; /* white text on digital bg */
-  --digital-gradient-from: rgba(249, 115, 22, 0.15); /* orange-500/15 */
-  --digital-gradient-via: rgba(245, 158, 11, 0.1); /* amber-500/10 */
-  --digital-bg: rgba(249, 115, 22, 0.08); /* orange-500/8 */
-  --digital-bg-hover: rgba(249, 115, 22, 0.12); /* orange-500/12 */
-  --digital-border: rgba(249, 115, 22, 0.25); /* orange-500/25 */
+  --digital: #ea580c;
+  --digital-accent: #ea580c;
+  --digital-muted: #f97316;
+  --digital-light: #fb923c;
+  --digital-foreground: #ffffff;
+  --digital-gradient-from: rgba(249, 115, 22, 0.15);
+  --digital-gradient-via: rgba(245, 158, 11, 0.1);
+  --digital-bg: rgba(249, 115, 22, 0.08);
+  --digital-bg-hover: rgba(249, 115, 22, 0.12);
+  --digital-border: rgba(249, 115, 22, 0.25);
 }
 
 .dark {
@@ -181,50 +175,43 @@
   --color-primary: var(--primary);
   --color-secondary: var(--secondary);
 
-  /* -- service theme colors - dark mode */
+  --tech: #22d3ee;
+  --tech-accent: #22d3ee;
+  --tech-muted: #06b6d4;
+  --tech-light: #67e8f9;
+  --tech-foreground: #0a0605;
+  --tech-gradient-from: rgba(6, 182, 212, 0.15);
+  --tech-gradient-via: rgba(59, 130, 246, 0.1);
+  --tech-bg: rgba(6, 182, 212, 0.1);
+  --tech-bg-hover: rgba(6, 182, 212, 0.18);
+  --tech-border: rgba(34, 211, 238, 0.3);
 
-  /* Tech (ti-solutions) - Cyan/Blue theme */
-  --tech: #22d3ee; /* cyan-400 */
-  --tech-accent: #22d3ee; /* cyan-400 */
-  --tech-muted: #06b6d4; /* cyan-500 */
-  --tech-light: #67e8f9; /* cyan-300 */
-  --tech-foreground: #0a0605; /* dark text on tech bg in dark mode */
-  --tech-gradient-from: rgba(6, 182, 212, 0.15); /* cyan-500/15 */
-  --tech-gradient-via: rgba(59, 130, 246, 0.1); /* blue-500/10 */
-  --tech-bg: rgba(6, 182, 212, 0.1); /* cyan-500/10 */
-  --tech-bg-hover: rgba(6, 182, 212, 0.18); /* cyan-500/18 */
-  --tech-border: rgba(34, 211, 238, 0.3); /* cyan-400/30 */
+  --infra: #fb7185;
+  --infra-accent: #fb7185;
+  --infra-muted: #f43f5e;
+  --infra-light: #fda4af;
+  --infra-foreground: #0a0605;
+  --infra-gradient-from: rgba(244, 63, 94, 0.15);
+  --infra-gradient-via: rgba(249, 115, 22, 0.1);
+  --infra-bg: rgba(244, 63, 94, 0.1);
+  --infra-bg-hover: rgba(244, 63, 94, 0.18);
+  --infra-border: rgba(251, 113, 133, 0.3);
 
-  /* Infra (equipment-marketing) - Rose/Orange theme */
-  --infra: #fb7185; /* rose-400 */
-  --infra-accent: #fb7185; /* rose-400 */
-  --infra-muted: #f43f5e; /* rose-500 */
-  --infra-light: #fda4af; /* rose-300 */
-  --infra-foreground: #0a0605; /* dark text on infra bg in dark mode */
-  --infra-gradient-from: rgba(244, 63, 94, 0.15); /* rose-500/15 */
-  --infra-gradient-via: rgba(249, 115, 22, 0.1); /* orange-500/10 */
-  --infra-bg: rgba(244, 63, 94, 0.1); /* rose-500/10 */
-  --infra-bg-hover: rgba(244, 63, 94, 0.18); /* rose-500/18 */
-  --infra-border: rgba(251, 113, 133, 0.3); /* rose-400/30 */
-
-  /* Digital (telecom-services) - Orange/Amber theme */
-  --digital: #fb923c; /* orange-400 */
-  --digital-accent: #fb923c; /* orange-400 */
-  --digital-muted: #f97316; /* orange-500 */
-  --digital-light: #fdba74; /* orange-300 */
-  --digital-foreground: #0a0605; /* dark text on digital bg in dark mode */
-  --digital-gradient-from: rgba(249, 115, 22, 0.15); /* orange-500/15 */
-  --digital-gradient-via: rgba(245, 158, 11, 0.1); /* amber-500/10 */
-  --digital-bg: rgba(249, 115, 22, 0.1); /* orange-500/10 */
-  --digital-bg-hover: rgba(249, 115, 22, 0.18); /* orange-500/18 */
-  --digital-border: rgba(251, 146, 60, 0.3); /* orange-400/30 */
+  --digital: #fb923c;
+  --digital-accent: #fb923c;
+  --digital-muted: #f97316;
+  --digital-light: #fdba74;
+  --digital-foreground: #0a0605;
+  --digital-gradient-from: rgba(249, 115, 22, 0.15);
+  --digital-gradient-via: rgba(245, 158, 11, 0.1);
+  --digital-bg: rgba(249, 115, 22, 0.1);
+  --digital-bg-hover: rgba(249, 115, 22, 0.18);
+  --digital-border: rgba(251, 146, 60, 0.3);
 }
 
 html {
   font-size: var(--font-size);
   scroll-behavior: smooth;
-  /* Scroll snap para secciones principales */
-  scroll-snap-type: y mandatory;
 }
 
 body {
@@ -234,14 +221,6 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-}
-
-#home,
-#services,
-#about,
-#contact {
-  scroll-snap-align: start;
-  scroll-snap-stop: always;
 }
 
 h1,
@@ -298,9 +277,6 @@ samp {
   border-color: rgba(255, 255, 255, 0.12);
 }
 
-/* -- service theme utility classes */
-
-/* Tech Theme Classes */
 .text-tech {
   color: var(--tech);
 }
@@ -333,7 +309,6 @@ samp {
   background: linear-gradient(135deg, var(--tech-gradient-from), var(--tech-gradient-via), transparent);
 }
 
-/* Infra Theme Classes */
 .text-infra {
   color: var(--infra);
 }
@@ -366,7 +341,6 @@ samp {
   background: linear-gradient(135deg, var(--infra-gradient-from), var(--infra-gradient-via), transparent);
 }
 
-/* Digital Theme Classes */
 .text-digital {
   color: var(--digital);
 }
@@ -399,26 +373,6 @@ samp {
   background: linear-gradient(135deg, var(--digital-gradient-from), var(--digital-gradient-via), transparent);
 }
 
-/* -- scrollbar styles */
-
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: var(--color-surface-elevated);
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--color-primary);
-  border-radius: 9999px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--color-primary-dark);
-}
-
 :focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 2px;
@@ -434,10 +388,7 @@ html {
 }
 
 #services {
-  height: 100vh;
-  height: 100dvh;
   min-height: 600px;
-  overflow: hidden;
 }
 
 #about {
@@ -475,16 +426,6 @@ html {
 
 .animate-pulse-glow {
   animation: pulse-glow 2s ease-in-out infinite;
-}
-
-@media (max-height: 700px) {
-  #services .space-y-4 {
-    gap: 0.5rem;
-  }
-
-  #services .space-y-2 {
-    gap: 0.25rem;
-  }
 }
 
 @media (max-width: 640px) {
