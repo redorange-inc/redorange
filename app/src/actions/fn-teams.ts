@@ -81,8 +81,8 @@ const teamMembers: TeamMember[] = [
     name: 'Wendy Sofía Chávez Hidalgo',
     role: 'Licenciada en Administración',
     department: 'Gestión Pública',
-    bio: 'Lic. en Administración - colegiada, con conocimientos de los principios fundamentales de la Administración, sistemas administrativos de Gestión Pública y atención al cliente. Con experiencia en liderazgo, trabajo en equipo, planeación y toma de decisiones, ha desempeñado cargos en municipalidades, el INEI y programas sociales, orientada al desarrollo humano, inclusión social y control interno en entidades del Estado.',
-    tags: ['Gestión Pública', 'Liderazgo', 'Trabajo en equipo', 'Resolución de problemas', 'Responsabilidad', 'Escucha activa', 'INEI'],
+    bio: 'Lic. en Administración - colegiada, con conocimientos de los principios fundamentales de la Administración, sistemas administrativos de Gestión Pública y atención al cliente. Egresada de la Maestría en Gestión Pública de la Escuela de Posgrado de la Universidad Nacional José Faustino Sánchez Carrión (Huacho), habiendo desarrollado estudios hasta el 22 de julio de 2025 con un total de 50,00 créditos. Con experiencia en liderazgo, trabajo en equipo, planeación y toma de decisiones, ha desempeñado cargos en municipalidades, el INEI y programas sociales, orientada al desarrollo humano, inclusión social y control interno en entidades del Estado.',
+    tags: ['Gestión Pública', 'Liderazgo', 'Trabajo en equipo', 'Resolución de problemas', 'Responsabilidad', 'Escucha activa', 'INEI', 'Maestría en Gestión Pública'],
     stats: {
       projects: '10+',
       experience: '3+ años',
