@@ -92,13 +92,15 @@ export const Navbar: FC = () => {
         </div>
       </div>
 
+      {isMenuOpen && <div className="fixed inset-0 z-40 bg-black/50 lg:hidden" onClick={() => setIsMenuOpen(false)} aria-hidden="true" />}
+
       <div
         className={cn(
-          'fixed inset-x-0 top-[61px] bottom-0 z-40 bg-background/95 backdrop-blur-lg transition-all duration-300 lg:hidden',
-          isMenuOpen ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none',
+          'fixed inset-x-0 top-[61px] z-50 max-h-[calc(100vh-61px)] overflow-y-auto bg-background border-b border-border shadow-xl transition-all duration-300 lg:hidden',
+          isMenuOpen ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0 pointer-events-none',
         )}
       >
-        <nav className="mx-auto flex w-full max-w-6xl flex-col px-4 py-6">
+        <nav className="mx-auto flex w-full max-w-6xl flex-col px-6 py-4">
           {navItems.map((item) => {
             const active = isActive(item);
 
@@ -119,7 +121,7 @@ export const Navbar: FC = () => {
             );
           })}
 
-          <div className="mt-6 pt-4 border-t border-border/50">
+          <div className="mt-4 pt-4 border-t border-border/50">
             <Button asChild className="w-full font-heading bg-tech-muted text-white hover:bg-tech-accent">
               <Link href="/auth/sign-in" onClick={() => setIsMenuOpen(false)}>
                 Iniciar Sesión
