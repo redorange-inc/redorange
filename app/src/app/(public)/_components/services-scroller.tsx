@@ -6,6 +6,7 @@ import Image from 'next/image';
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ArrowRight, Cpu, Globe, Network, ChevronLeft, ChevronRight, CheckCircle2, Pause, Play } from 'lucide-react';
 import { fn_get_services, type ServiceSlide, type ServiceId } from '@/actions/fn-services';
@@ -16,6 +17,107 @@ const AUTOPLAY_INTERVAL = 4000;
 const prefersReducedMotion = (): boolean => typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const ICONS: Record<ServiceSlide['id'], FC<{ className?: string }>> = { 'ti-solutions': Cpu, 'equipment-marketing': Network, 'telecom-services': Globe };
+
+const ServicesScrollerSkeleton: FC = () => (
+  <section id="services" className="relative w-full min-h-screen flex items-center overflow-hidden py-10 sm:py-12 md:py-16" aria-busy="true" aria-live="polite">
+    <div className="relative z-10 w-full mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
+      <div className="mb-4 sm:mb-6 text-center">
+        <Skeleton className="mx-auto h-6 w-32 rounded-full" />
+        <Skeleton className="mx-auto mt-3 h-8 w-[min(420px,85%)] rounded-xl" />
+      </div>
+
+      <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-border/60 bg-background/80 backdrop-blur-sm min-h-[70vh]">
+        <div className="w-full p-4 sm:p-6 md:p-10 lg:p-12">
+          <div className="grid gap-6 lg:grid-cols-12 lg:gap-10">
+            <div className="lg:col-span-5 space-y-4">
+              <Skeleton className="h-6 w-44 rounded-full" />
+
+              <div className="space-y-2">
+                <Skeleton className="h-9 w-[min(520px,95%)] rounded-xl" />
+                <Skeleton className="h-5 w-[min(480px,90%)] rounded-lg" />
+              </div>
+
+              <ul className="space-y-2">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <li key={i} className="flex items-start gap-2">
+                    <Skeleton className="mt-0.5 h-4 w-4 rounded" />
+                    <Skeleton className="h-4 w-[85%] rounded-lg" />
+                  </li>
+                ))}
+              </ul>
+
+              <div className="flex flex-col gap-3 pt-2 sm:flex-row">
+                <Skeleton className="h-10 w-full sm:w-40 rounded-xl" />
+                <Skeleton className="h-10 w-full sm:w-28 rounded-xl" />
+              </div>
+            </div>
+
+            <div className="hidden lg:flex lg:col-span-4 items-center justify-center">
+              <div className="relative">
+                <Skeleton className="h-[360px] w-[360px] rounded-2xl" />
+                <Skeleton className="absolute -bottom-4 -right-4 h-16 w-16 rounded-2xl" />
+              </div>
+            </div>
+
+            <div className="lg:col-span-3">
+              <div className="rounded-2xl border border-border/60 bg-background/80 p-4 shadow-sm backdrop-blur-md">
+                <div className="mb-3 flex items-center gap-2">
+                  <Skeleton className="h-9 w-9 rounded-xl" />
+                  <div className="space-y-1">
+                    <Skeleton className="h-3.5 w-28 rounded" />
+                    <Skeleton className="h-3.5 w-36 rounded" />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="flex items-center justify-between gap-3 rounded-lg border border-border/40 bg-background/50 px-3 py-2">
+                      <Skeleton className="h-4 w-[70%] rounded" />
+                      <Skeleton className="h-4 w-4 rounded" />
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-3 rounded-xl bg-muted/50 p-3 space-y-2">
+                  <Skeleton className="h-4 w-24 rounded" />
+                  <Skeleton className="h-3.5 w-[90%] rounded" />
+                  <Skeleton className="h-3.5 w-[70%] rounded" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="lg:hidden mt-6 flex justify-center">
+            <Skeleton className="h-[180px] w-[180px] rounded-2xl" />
+          </div>
+        </div>
+
+        <div className="absolute bottom-4 left-0 right-0 z-20">
+          <div className="mx-auto flex max-w-7xl flex-col items-center gap-3 px-4 sm:px-6">
+            <div className="flex items-center gap-2">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Skeleton key={i} className="h-9 w-16 rounded-full" />
+              ))}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-7 w-7 rounded-full" />
+              <Skeleton className="h-7 w-7 rounded-full" />
+              <Skeleton className="h-4 w-16 rounded" />
+              <Skeleton className="h-7 w-7 rounded-full" />
+            </div>
+
+            <div className="flex gap-1">
+              <Skeleton className="h-1 w-6 rounded-full" />
+              <Skeleton className="h-1 w-1.5 rounded-full" />
+              <Skeleton className="h-1 w-1.5 rounded-full" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+);
 
 export const ServicesScroller: FC = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -100,10 +202,6 @@ export const ServicesScroller: FC = () => {
     };
   }, [isPlaying, isHovered, slideCount, nextSlide]);
 
-  const toggleAutoplay = () => {
-    setIsPlaying((prev) => !prev);
-  };
-
   const touchStartRef = useRef<number | null>(null);
   const touchEndRef = useRef<number | null>(null);
 
@@ -130,18 +228,7 @@ export const ServicesScroller: FC = () => {
     touchEndRef.current = null;
   };
 
-  if (slides.length === 0) {
-    return (
-      <section id="services" className="relative w-full min-h-screen flex items-center py-12 sm:py-16 md:py-20">
-        <div className="mx-auto flex max-w-xl items-center justify-center px-4 sm:px-6 w-full">
-          <div className="w-full rounded-2xl border border-border/60 bg-background/60 p-6 text-center backdrop-blur">
-            <p className="font-heading text-sm sm:text-base font-extrabold">Cargando servicios...</p>
-            <p className="mt-1 text-xs sm:text-sm text-muted-foreground">Preparando las líneas de negocio.</p>
-          </div>
-        </div>
-      </section>
-    );
-  }
+  if (slides.length === 0) return <ServicesScrollerSkeleton />;
 
   const currentTheme = getThemeClasses(slides[currentSlide].colorTheme);
 
@@ -303,7 +390,7 @@ export const ServicesScroller: FC = () => {
 
                 <button
                   type="button"
-                  onClick={toggleAutoplay}
+                  onClick={() => setIsPlaying((prev) => !prev)}
                   className="flex h-7 w-7 items-center justify-center rounded-full border border-border/60 bg-background/60 text-muted-foreground backdrop-blur transition-all hover:bg-background hover:text-foreground active:scale-95"
                   aria-label={isPlaying ? 'Pausar' : 'Reproducir'}
                 >

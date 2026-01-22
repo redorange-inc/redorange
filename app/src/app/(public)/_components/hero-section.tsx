@@ -2,15 +2,98 @@
 
 import type { FC } from 'react';
 import Link from 'next/link';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { animate } from 'animejs';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowRight, ChevronDown, ShieldCheck, Layers, Cpu, Globe, Network, Sparkles } from 'lucide-react';
 
 import { getThemeClasses, type ColorTheme } from '@/helpers/theme-helpers';
 
 const prefersReducedMotion = (): boolean => typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+const HeroSkeleton: FC = () => (
+  <section className="relative flex min-h-screen items-center overflow-hidden scroll-mt-0 pt-16">
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 bg-pattern opacity-30" />
+      <div className="absolute inset-0 bg-linear-to-b from-background/35 via-transparent to-background" />
+    </div>
+
+    <div className="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-6 md:px-10 py-8 sm:py-12 md:py-16">
+      <div className="grid items-center gap-8 sm:gap-10 lg:grid-cols-2 lg:gap-14">
+        <div className="space-y-4 sm:space-y-5 text-center lg:text-left">
+          <div className="flex justify-center lg:justify-start">
+            <Skeleton className="h-6 w-64 sm:w-80 rounded-full" />
+          </div>
+
+          <div className="space-y-2 sm:space-y-3">
+            <Skeleton className="h-8 sm:h-10 md:h-12 lg:h-14 w-full max-w-xl mx-auto lg:mx-0" />
+            <Skeleton className="h-8 sm:h-10 md:h-12 lg:h-14 w-3/4 max-w-md mx-auto lg:mx-0" />
+            <div className="pt-2">
+              <Skeleton className="h-4 sm:h-5 w-full max-w-2xl mx-auto lg:mx-0" />
+              <Skeleton className="h-4 sm:h-5 w-5/6 max-w-xl mx-auto lg:mx-0 mt-2" />
+            </div>
+          </div>
+
+          <div className="flex flex-col gap-2 sm:gap-3 sm:flex-row sm:items-center sm:justify-center lg:justify-start">
+            <Skeleton className="h-10 sm:h-11 w-full sm:w-32 rounded-lg" />
+            <Skeleton className="h-10 sm:h-11 w-full sm:w-40 rounded-lg" />
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-1.5 sm:gap-2 pt-1 lg:justify-start">
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="h-7 sm:h-8 w-20 sm:w-24 rounded-full" />
+            ))}
+          </div>
+        </div>
+
+        <div className="relative">
+          <div className="rounded-2xl sm:rounded-3xl border border-border/40 bg-background/40 p-4 sm:p-5 md:p-6">
+            <div className="flex items-start justify-between gap-3 sm:gap-4">
+              <div className="space-y-2 flex-1">
+                <Skeleton className="h-5 sm:h-6 w-48 sm:w-56" />
+                <Skeleton className="h-3 sm:h-4 w-full max-w-xs" />
+              </div>
+              <Skeleton className="h-9 w-9 sm:h-10 sm:w-10 rounded-xl shrink-0" />
+            </div>
+
+            <div className="mt-4 sm:mt-5 grid gap-2 sm:gap-2.5">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="rounded-xl sm:rounded-2xl border border-border/40 bg-background/30 p-3 sm:p-3.5">
+                  <div className="flex items-start sm:items-center justify-between gap-2 sm:gap-3">
+                    <div className="flex-1 space-y-1.5">
+                      <Skeleton className="h-4 sm:h-5 w-3/4" />
+                      <Skeleton className="h-3 sm:h-4 w-full" />
+                    </div>
+                    <Skeleton className="h-8 w-8 sm:h-9 sm:w-9 rounded-lg sm:rounded-xl shrink-0" />
+                  </div>
+                  <div className="mt-2 sm:mt-2.5">
+                    <Skeleton className="h-3 w-40" />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-4 sm:mt-5 grid grid-cols-3 gap-1.5 sm:gap-2.5">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="rounded-xl sm:rounded-2xl border border-border/40 bg-muted/20 p-2 sm:p-2.5">
+                  <Skeleton className="h-3 sm:h-4 w-16 mx-auto" />
+                  <Skeleton className="h-3 w-12 mx-auto mt-1" />
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-4 sm:mt-5 flex items-center justify-between gap-2 sm:gap-3 rounded-xl sm:rounded-2xl border border-border/40 bg-muted/20 p-3 sm:p-3.5">
+              <Skeleton className="h-3 w-32" />
+              <Skeleton className="h-8 sm:h-9 w-20 rounded-lg" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+);
 
 export const HeroSection: FC = () => {
   const heroRef = useRef<HTMLElement | null>(null);
@@ -19,8 +102,16 @@ export const HeroSection: FC = () => {
   const glowBottomRef = useRef<HTMLDivElement | null>(null);
   const chipRowRef = useRef<HTMLDivElement | null>(null);
   const statsRef = useRef<HTMLDivElement | null>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
+    const timer = setTimeout(() => setIsLoaded(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+
     const hero = heroRef.current;
     if (!hero) return;
     if (prefersReducedMotion()) return;
@@ -58,7 +149,7 @@ export const HeroSection: FC = () => {
     if (chipRowRef.current) {
       animate(chipRowRef.current, { opacity: [0, 1], duration: 850, easing: 'easeOutQuad', delay: 280 });
     }
-  }, []);
+  }, [isLoaded]);
 
   const serviceLines: Array<{
     title: string;
@@ -85,6 +176,10 @@ export const HeroSection: FC = () => {
       colorTheme: 'digital',
     },
   ];
+
+  if (!isLoaded) {
+    return <HeroSkeleton />;
+  }
 
   return (
     <section id="home" ref={heroRef} className="relative flex min-h-screen items-center overflow-hidden scroll-mt-0 pt-16">

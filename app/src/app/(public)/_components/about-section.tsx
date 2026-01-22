@@ -4,6 +4,7 @@ import type { FC } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { animate } from 'animejs';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Users, Target, Shield, Rocket, ClipboardCheck, FileText, HeadphonesIcon, Wrench, Database, Network, TrendingUp, Zap } from 'lucide-react';
 import { RefreshCw, Lightbulb, MessageSquareText, BadgeCheck, Timer, Code2, Workflow, GraduationCap, HardDrive, Boxes, Router, Globe, Mail, Megaphone, SolarPanel } from 'lucide-react';
 
@@ -48,16 +49,105 @@ const ICONS: Record<string, FC<{ className?: string }>> = {
   rocket: Rocket,
 };
 
+const CheckCircle2Fallback: FC<{ className?: string }> = ({ className }) => (
+  <span className={className} aria-hidden="true">
+    •
+  </span>
+);
+
 const toUIItems = (items: AboutFeatureItem[]) =>
   items.map((it) => ({
     icon: ICONS[it.iconKey] ?? CheckCircle2Fallback,
     text: it.text,
   }));
 
-const CheckCircle2Fallback: FC<{ className?: string }> = ({ className }) => (
-  <span className={className} aria-hidden="true">
-    •
-  </span>
+const AboutSectionSkeleton: FC = () => (
+  <section id="about" className="relative mx-auto max-w-7xl px-4 sm:px-6 md:px-10 py-10 sm:py-14 md:py-20 min-h-[50vh] sm:min-h-screen scroll-mt-0" aria-busy="true" aria-live="polite">
+    <div className="pointer-events-none absolute -right-16 sm:-right-24 top-12 sm:top-16 h-[250px] sm:h-[420px] w-[250px] sm:w-[420px] rounded-full bg-(--tech-bg) blur-3xl opacity-30" aria-hidden="true" />
+    <div
+      className="pointer-events-none absolute -left-16 sm:-left-24 bottom-12 sm:bottom-16 h-[250px] sm:h-[420px] w-[250px] sm:w-[420px] rounded-full bg-(--digital-bg) blur-3xl opacity-30"
+      aria-hidden="true"
+    />
+
+    <div className="mb-8 sm:mb-10 md:mb-12 text-center">
+      <div className="mx-auto mb-3 flex w-fit items-center justify-center gap-2">
+        <Skeleton className="h-6 w-32 rounded-full" />
+      </div>
+
+      <div className="mx-auto space-y-2">
+        <Skeleton className="mx-auto h-9 w-[min(520px,90%)] rounded-xl" />
+        <Skeleton className="mx-auto h-4 w-[min(760px,92%)] rounded-lg" />
+        <Skeleton className="mx-auto h-4 w-[min(680px,88%)] rounded-lg" />
+      </div>
+    </div>
+
+    <div className="grid gap-3 sm:gap-4 md:gap-5 md:grid-cols-2 lg:grid-cols-3">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <div key={i} className="relative overflow-hidden rounded-xl sm:rounded-2xl border border-border/70 bg-background/60 p-3.5 sm:p-4 md:p-5 shadow-sm backdrop-blur" aria-hidden="true">
+          <div className="mb-3 sm:mb-4 flex items-start gap-2.5 sm:gap-3">
+            <Skeleton className="h-10 w-10 sm:h-11 sm:w-11 md:h-12 md:w-12 rounded-xl" />
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-5 w-[80%] rounded-lg" />
+              <Skeleton className="h-3.5 w-[95%] rounded-lg" />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-start gap-2 rounded-lg bg-muted/40 p-2 sm:p-2.5">
+              <Skeleton className="h-6 w-6 rounded-lg" />
+              <Skeleton className="h-4 w-[85%] rounded-lg" />
+            </div>
+            <div className="flex items-start gap-2 rounded-lg bg-muted/40 p-2 sm:p-2.5">
+              <Skeleton className="h-6 w-6 rounded-lg" />
+              <Skeleton className="h-4 w-[78%] rounded-lg" />
+            </div>
+            <div className="flex items-start gap-2 rounded-lg bg-muted/40 p-2 sm:p-2.5">
+              <Skeleton className="h-6 w-6 rounded-lg" />
+              <Skeleton className="h-4 w-[70%] rounded-lg" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div className="mt-8 sm:mt-10 md:mt-14">
+      <div className="overflow-hidden rounded-xl sm:rounded-2xl border border-border/70 bg-linear-to-br from-primary/5 via-background/60 to-accent/5 p-4 sm:p-5 md:p-6 lg:p-8 text-center backdrop-blur">
+        <div className="mx-auto max-w-4xl space-y-4">
+          <div className="mx-auto flex items-center justify-center gap-2">
+            <Skeleton className="h-6 w-6 rounded-lg" />
+            <Skeleton className="h-6 w-[min(360px,70%)] rounded-lg" />
+          </div>
+
+          <div className="space-y-2">
+            <Skeleton className="mx-auto h-4 w-[min(740px,92%)] rounded-lg" />
+            <Skeleton className="mx-auto h-4 w-[min(640px,86%)] rounded-lg" />
+          </div>
+
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-1">
+            {Array.from({ length: 6 }).map((_, j) => (
+              <div key={j} className="flex items-center gap-2">
+                <Skeleton className="h-5 w-5 rounded-lg" />
+                <Skeleton className="h-4 w-20 rounded-lg" />
+              </div>
+            ))}
+          </div>
+
+          <div className="mx-auto mt-3 grid max-w-5xl gap-2 sm:gap-2.5 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, k) => (
+              <div key={k} className="rounded-lg sm:rounded-xl border border-border/70 bg-background/60 p-2 sm:p-2.5 md:p-3 text-left">
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-4 w-4 rounded" />
+                  <Skeleton className="h-4 w-[70%] rounded-lg" />
+                </div>
+                <Skeleton className="mt-2 h-3.5 w-[95%] rounded-lg" />
+                <Skeleton className="mt-1.5 h-3.5 w-[85%] rounded-lg" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 );
 
 export const AboutSection: FC = () => {
@@ -88,10 +178,8 @@ export const AboutSection: FC = () => {
 
   const features = useMemo<FeatureCardUI[]>(() => {
     if (!data) return [];
-
     return data.features.map((f) => {
       const MainIcon = ICONS[f.iconKey] ?? Code2;
-
       return { icon: MainIcon, title: f.title, description: f.description, colorTheme: f.colorTheme, items: toUIItems(f.items) };
     });
   }, [data]);
@@ -136,23 +224,11 @@ export const AboutSection: FC = () => {
     return () => io.disconnect();
   }, [data, features.length]);
 
-  if (!data) {
-    return (
-      <section id="about" ref={sectionRef} className="relative mx-auto max-w-7xl px-4 sm:px-6 md:px-10 py-10 sm:py-14 md:py-20 min-h-[50vh] sm:min-h-screen scroll-mt-0">
-        <div className="relative z-10 mx-auto flex max-w-xl items-center justify-center">
-          <div className="w-full rounded-2xl border border-border/60 bg-background/60 p-6 text-center backdrop-blur">
-            <p className="font-heading text-sm sm:text-base font-extrabold">Cargando sección...</p>
-            <p className="mt-1 text-xs sm:text-sm text-muted-foreground">Preparando contenido de &quot;Sobre nosotros&ldquo;.</p>
-          </div>
-        </div>
-      </section>
-    );
-  }
+  if (!data) return <AboutSectionSkeleton />;
 
   const getIconColorClass = (colorTheme: ColorTheme | 'primary' | 'secondary' | 'accent'): string => {
-    if (colorTheme === 'primary' || colorTheme === 'secondary' || colorTheme === 'accent') {
-      return getBaseColorClass(colorTheme);
-    }
+    if (colorTheme === 'primary' || colorTheme === 'secondary' || colorTheme === 'accent') return getBaseColorClass(colorTheme);
+
     return getThemeClasses(colorTheme).text;
   };
 
