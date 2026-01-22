@@ -1,8 +1,7 @@
 'use client';
 
-import React from 'react';
+import { DynamicIcon } from 'lucide-react/dynamic';
 import { Badge } from '@/components/ui/badge';
-import { MessageCircle, Sparkles } from 'lucide-react';
 
 interface HeroContactProps {
   badge: string;
@@ -16,7 +15,7 @@ export const HeroContact = ({ badge, title, subtitle, description }: HeroContact
     <section data-anim="fade-up" className="mb-10 text-center">
       <div className="flex flex-wrap items-center justify-center gap-2 font-mono text-xs mb-4">
         <Badge className="rounded-full bg-background/60 text-foreground shadow-sm backdrop-blur transition-all hover:scale-105">
-          <Sparkles className="mr-1 h-3.5 w-3.5 text-tech animate-pulse" />
+          <DynamicIcon name="sparkles" size={14} className="mr-1 text-tech animate-pulse" />
           {badge}
         </Badge>
         <Badge className="rounded-full bg-tech-solid">{subtitle}</Badge>
@@ -24,7 +23,7 @@ export const HeroContact = ({ badge, title, subtitle, description }: HeroContact
 
       <div className="flex items-center justify-center gap-4 mb-4">
         <div className="rounded-2xl bg-tech p-4 text-tech">
-          <MessageCircle className="h-8 w-8" />
+          <DynamicIcon name="message-circle" size={32} />
         </div>
       </div>
 

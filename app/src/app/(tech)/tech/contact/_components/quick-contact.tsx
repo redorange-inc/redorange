@@ -2,9 +2,9 @@
 
 import { useEffect, useRef } from 'react';
 import { animate } from 'animejs';
+import { DynamicIcon } from 'lucide-react/dynamic';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { MessageCircle, Mail, ArrowRight } from 'lucide-react';
 import type { ContactInfo } from './types';
 
 interface QuickContactProps {
@@ -66,20 +66,20 @@ export const QuickContact = ({ info }: QuickContactProps) => {
               <Button asChild size="lg" className="font-heading bg-green-600 hover:bg-green-700 text-white group">
                 <a href={whatsappHref} target="_blank" rel="noreferrer">
                   <span data-icon className="inline-flex items-center justify-center mr-2" style={{ transform: 'scale(0)' }}>
-                    <MessageCircle className="h-5 w-5" />
+                    <DynamicIcon name="message-circle" size={20} />
                   </span>
                   WhatsApp
-                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  <DynamicIcon name="arrow-right" size={16} className="ml-2 transition-transform group-hover:translate-x-1" />
                 </a>
               </Button>
 
               <Button asChild size="lg" variant="outline" className="font-heading bg-background/50 backdrop-blur hover:bg-background/70 group">
                 <a href={`mailto:${info.email}`}>
                   <span data-icon className="inline-flex items-center justify-center mr-2" style={{ transform: 'scale(0)' }}>
-                    <Mail className="h-5 w-5" />
+                    <DynamicIcon name="mail" size={20} />
                   </span>
                   Enviar correo
-                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  <DynamicIcon name="arrow-right" size={16} className="ml-2 transition-transform group-hover:translate-x-1" />
                 </a>
               </Button>
             </div>

@@ -2,12 +2,12 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { animate } from 'animejs';
+import { DynamicIcon } from 'lucide-react/dynamic';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowRight, Send, CheckCircle, MessageCircle } from 'lucide-react';
 import { ui } from './constants';
 import type { ServiceOption, ContactInfo } from './types';
 
@@ -35,12 +35,7 @@ export const ContactForm = ({ services, info }: ContactFormProps) => {
       setIsSubmitted(true);
 
       if (successRef.current) {
-        animate(successRef.current, {
-          scale: [0.8, 1],
-          opacity: [0, 1],
-          duration: 600,
-          easing: 'easeOutBack',
-        });
+        animate(successRef.current, { scale: [0.8, 1], opacity: [0, 1], duration: 600, easing: 'easeOutBack' });
       }
     }, 1500);
   };
@@ -89,7 +84,7 @@ export const ContactForm = ({ services, info }: ContactFormProps) => {
         <CardContent className="p-8">
           <div ref={successRef} className="text-center py-8">
             <div className="mx-auto w-16 h-16 rounded-full bg-tech/20 flex items-center justify-center mb-4">
-              <CheckCircle className="h-8 w-8 text-tech" />
+              <DynamicIcon name="circle-check" size={32} className="text-tech" />
             </div>
             <h3 className="text-xl font-bold text-foreground mb-2">¡Mensaje Recibido!</h3>
             <p className="text-sm text-muted-foreground mb-6">Gracias por contactarnos. Nuestro equipo revisará tu solicitud y te responderá a la brevedad.</p>
@@ -100,7 +95,7 @@ export const ContactForm = ({ services, info }: ContactFormProps) => {
               <Button asChild className="font-heading bg-tech-muted hover:bg-tech-accent text-white">
                 <a href={whatsappHref} target="_blank" rel="noreferrer">
                   Contactar por WhatsApp
-                  <MessageCircle className="ml-2 h-4 w-4" />
+                  <DynamicIcon name="message-circle" size={16} className="ml-2" />
                 </a>
               </Button>
             </div>
@@ -114,7 +109,7 @@ export const ContactForm = ({ services, info }: ContactFormProps) => {
     <Card className={`rounded-3xl ${ui.glassCard}`}>
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2 text-xl text-foreground">
-          <Send className="h-5 w-5 text-tech" />
+          <DynamicIcon name="send" size={20} className="text-tech" />
           Envíanos un Mensaje
         </CardTitle>
       </CardHeader>
@@ -166,7 +161,7 @@ export const ContactForm = ({ services, info }: ContactFormProps) => {
           {selectedService && (
             <div className="rounded-xl bg-tech/10 border border-tech/20 p-3 text-sm" data-field>
               <div className="flex items-center gap-2 text-tech font-medium">
-                <CheckCircle className="h-4 w-4" />
+                <DynamicIcon name="circle-check" size={16} />
                 {services.find((s) => s.value === selectedService)?.label}
               </div>
               <p className="mt-1 text-xs text-muted-foreground">{services.find((s) => s.value === selectedService)?.description}</p>
@@ -183,13 +178,11 @@ export const ContactForm = ({ services, info }: ContactFormProps) => {
           <div className="flex flex-col sm:flex-row gap-3 pt-2" data-field>
             <Button type="submit" disabled={isSubmitting} className="font-heading bg-tech-muted hover:bg-tech-accent text-white group flex-1">
               {isSubmitting ? (
-                <>
-                  <span className="animate-pulse">Enviando...</span>
-                </>
+                <span className="animate-pulse">Enviando...</span>
               ) : (
                 <>
                   Enviar mensaje
-                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                  <DynamicIcon name="arrow-right" size={16} className="ml-2 transition-transform group-hover:translate-x-1" />
                 </>
               )}
             </Button>
@@ -198,7 +191,7 @@ export const ContactForm = ({ services, info }: ContactFormProps) => {
               {/* eslint-disable-next-line react-hooks/refs */}
               <a href={generateMailto()}>
                 Abrir en cliente de correo
-                <Send className="ml-2 h-4 w-4" />
+                <DynamicIcon name="send" size={16} className="ml-2" />
               </a>
             </Button>
           </div>
