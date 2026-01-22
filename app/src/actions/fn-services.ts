@@ -317,8 +317,8 @@ const contact: ContactContent = {
     subtitle: 'Elige una línea y envíanos tu requerimiento. Te responderemos con una propuesta de alcance y opciones de servicio.',
   },
   meta: {
-    whatsappNumber: '+51999999999',
-    salesEmail: 'ventas@redorange.net.pe',
+    whatsappNumber: '+51987370699',
+    salesEmail: ' informes@redorange.net.pe',
     chips: [
       { iconKey: 'clock', text: 'Respuesta rápida' },
       { iconKey: 'mapPin', text: 'Cobertura por proyecto' },

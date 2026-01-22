@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { animate } from 'animejs';
 import { DynamicIcon } from 'lucide-react/dynamic';
 import { Card, CardContent } from '@/components/ui/card';
@@ -66,7 +67,7 @@ export const QuickContact = ({ info }: QuickContactProps) => {
               <Button asChild size="lg" className="font-heading bg-green-600 hover:bg-green-700 text-white group">
                 <a href={whatsappHref} target="_blank" rel="noreferrer">
                   <span data-icon className="inline-flex items-center justify-center mr-2" style={{ transform: 'scale(0)' }}>
-                    <DynamicIcon name="message-circle" size={20} />
+                    <Image src="/icons/whatsapp-icon.svg" alt="WhatsApp" width={16} height={16} className="brightness-0 invert" />
                   </span>
                   WhatsApp
                   <DynamicIcon name="arrow-right" size={16} className="ml-2 transition-transform group-hover:translate-x-1" />

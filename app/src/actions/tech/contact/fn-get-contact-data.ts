@@ -13,9 +13,9 @@ export const getContactData = async (): Promise<ApiResponse<ContactPageData>> =>
       description: 'Cuéntanos sobre tus necesidades tecnológicas. Nuestro equipo de especialistas está listo para ayudarte a encontrar la solución ideal para tu organización.',
     },
     info: {
-      email: 'ti@redorange.net.pe',
+      email: ' informes@redorange.net.pe',
       phone: '+51 999 999 999',
-      whatsapp: '+51999999999',
+      whatsapp: '+51987370699',
       address: 'Lima, Perú',
       schedule: 'Lunes a Viernes: 9:00 - 18:00',
       mapUrl: 'https://maps.google.com/?q=Lima,Peru',

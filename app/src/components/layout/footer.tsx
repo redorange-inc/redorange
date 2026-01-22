@@ -5,7 +5,7 @@ import { Separator } from '@/components/ui/separator';
 import { Mail, Phone, MessageCircle, Clock, MapPin, Cpu, Boxes, Globe } from 'lucide-react';
 
 export const Footer: FC = () => {
-  const whatsappNumber = '+51999999999';
+  const whatsappNumber = '+51987370699';
   const waDigits = whatsappNumber.replace(/[^\d]/g, '');
   const whatsappHref = `https://wa.me/${waDigits}`;
 
@@ -87,9 +87,9 @@ export const Footer: FC = () => {
             <p className="font-heading text-sm font-bold">Contacto</p>
 
             <div className="space-y-2 text-sm text-muted-foreground">
-              <a href="mailto:ventas@redorange.net.pe" className="flex items-center gap-2 hover:text-foreground transition-colors">
+              <a href="mailto: informes@redorange.net.pe" className="flex items-center gap-2 hover:text-foreground transition-colors">
                 <Mail className="h-4 w-4 text-foreground/70" />
-                ventas@redorange.net.pe
+                informes@redorange.net.pe
               </a>
 
               <a href={whatsappHref} target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-foreground transition-colors">

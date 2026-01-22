@@ -26,8 +26,6 @@ export const ContactInfoSection = ({ info }: ContactInfoSectionProps) => {
     { iconName: 'mail', label: 'Correo electrónico', value: info.email, href: `mailto:${info.email}` },
     { iconName: 'phone', label: 'Teléfono', value: info.phone, href: `tel:${info.phone.replace(/\s/g, '')}` },
     { iconName: 'message-circle', label: 'WhatsApp', value: info.phone, href: whatsappHref, external: true },
-    { iconName: 'map-pin', label: 'Ubicación', value: info.address, href: info.mapUrl, external: true },
-    { iconName: 'clock', label: 'Horario de atención', value: info.schedule, href: null },
   ];
 
   return (
@@ -40,7 +38,7 @@ export const ContactInfoSection = ({ info }: ContactInfoSectionProps) => {
             <CardContent className="p-4">
               {item.href ? (
                 <a href={item.href} target={item.external ? '_blank' : undefined} rel={item.external ? 'noreferrer' : undefined} className="flex items-center gap-3">
-                  <div className="rounded-xl bg-tech/20 p-2.5 text-tech group-hover:scale-110 transition-transform">
+                  <div className="rounded-full bg-tech/20 p-2.5 text-tech group-hover:scale-110 transition-transform">
                     <DynamicIcon name={item.iconName} size={20} />
                   </div>
                   <div>
