@@ -92,13 +92,7 @@ export const AboutSection: FC = () => {
     return data.features.map((f) => {
       const MainIcon = ICONS[f.iconKey] ?? Code2;
 
-      return {
-        icon: MainIcon,
-        title: f.title,
-        description: f.description,
-        colorTheme: f.colorTheme,
-        items: toUIItems(f.items),
-      };
+      return { icon: MainIcon, title: f.title, description: f.description, colorTheme: f.colorTheme, items: toUIItems(f.items) };
     });
   }, [data]);
 
@@ -123,47 +117,10 @@ export const AboutSection: FC = () => {
       (entries) => {
         for (const entry of entries) {
           if (!entry.isIntersecting) continue;
-
-          if (headerEls && headerEls.length > 0) {
-            animate(headerEls, {
-              opacity: [0, 1],
-              translateY: [14, 0],
-              duration: 800,
-              easing: 'easeOutExpo',
-              delay: (_, i) => i * 90,
-            });
-          }
-
-          if (cardEls && cardEls.length > 0) {
-            animate(cardEls, {
-              opacity: [0, 1],
-              translateY: [18, 0],
-              scale: [0.98, 1],
-              duration: 900,
-              easing: 'easeOutExpo',
-              delay: (_, i) => 220 + i * 120,
-            });
-          }
-
-          if (footerWrapEls && footerWrapEls.length > 0) {
-            animate(footerWrapEls, {
-              opacity: [0, 1],
-              translateY: [14, 0],
-              duration: 850,
-              easing: 'easeOutExpo',
-              delay: 520,
-            });
-          }
-
-          if (footerEls && footerEls.length > 0) {
-            animate(footerEls, {
-              opacity: [0, 1],
-              translateY: [10, 0],
-              duration: 700,
-              easing: 'easeOutExpo',
-              delay: (_, i) => 640 + i * 90,
-            });
-          }
+          if (headerEls && headerEls.length > 0) animate(headerEls, { opacity: [0, 1], translateY: [14, 0], duration: 800, easing: 'easeOutExpo', delay: (_, i) => i * 90 });
+          if (cardEls && cardEls.length > 0) animate(cardEls, { opacity: [0, 1], translateY: [18, 0], scale: [0.98, 1], duration: 900, easing: 'easeOutExpo', delay: (_, i) => 220 + i * 120 });
+          if (footerWrapEls && footerWrapEls.length > 0) animate(footerWrapEls, { opacity: [0, 1], translateY: [14, 0], duration: 850, easing: 'easeOutExpo', delay: 520 });
+          if (footerEls && footerEls.length > 0) animate(footerEls, { opacity: [0, 1], translateY: [10, 0], duration: 700, easing: 'easeOutExpo', delay: (_, i) => 640 + i * 90 });
 
           io.disconnect();
         }
@@ -174,16 +131,7 @@ export const AboutSection: FC = () => {
     io.observe(root);
 
     const glows = root.querySelectorAll('[data-about="glow"]');
-    if (glows.length > 0) {
-      animate(glows, {
-        translateY: [0, 10],
-        direction: 'alternate',
-        loop: true,
-        easing: 'easeInOutSine',
-        duration: 4200,
-        delay: (_, i) => i * 300,
-      });
-    }
+    if (glows.length > 0) animate(glows, { translateY: [0, 10], direction: 'alternate', loop: true, easing: 'easeInOutSine', duration: 4200, delay: (_, i) => i * 300 });
 
     return () => io.disconnect();
   }, [data, features.length]);
@@ -247,7 +195,7 @@ export const AboutSection: FC = () => {
         </p>
       </div>
 
-      <div ref={cardsRef} className="grid gap-3 sm:gap-4 md:gap-5 md:grid-cols-2 lg:grid-cols-3 md:gap-6">
+      <div ref={cardsRef} className="grid gap-3 sm:gap-4 md:gap-5 md:grid-cols-2 lg:grid-cols-3">
         {features.map((feature) => {
           const MainIcon = feature.icon;
           const theme = getThemeClasses(feature.colorTheme);

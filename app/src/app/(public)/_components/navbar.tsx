@@ -82,7 +82,7 @@ export const Navbar: FC = () => {
   };
 
   return (
-    <header className={cn('fixed top-0 left-0 right-0 z-[100] w-full transition-all duration-300', 'border-b border-border/70 bg-background', isScrolled && 'shadow-sm')}>
+    <header className={cn('fixed top-0 left-0 right-0 z-100 w-full transition-all duration-300', 'border-b border-border/70 bg-background', isScrolled && 'shadow-sm')}>
       <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-2 px-4 py-3 sm:gap-3 sm:px-6 lg:px-8">
         <Link href="/#home" className="flex items-center gap-2 shrink-0">
           <Image src="/img/logo.webp" alt="Red Orange" width={36} height={36} className="rounded-md w-8 h-8 sm:w-9 sm:h-9" priority />
@@ -116,7 +116,7 @@ export const Navbar: FC = () => {
             </Button>
           </div>
 
-          <div className="relative z-[110]">
+          <div className="relative z-110">
             <ThemeToggle />
           </div>
 
@@ -124,7 +124,7 @@ export const Navbar: FC = () => {
             type="button"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className={cn(
-              'relative z-[110] flex h-10 w-10 items-center justify-center rounded-lg',
+              'relative z-110 flex h-10 w-10 items-center justify-center rounded-lg',
               'border border-border/60 bg-background',
               'transition-all duration-200 hover:bg-muted active:scale-95',
               'lg:hidden',
@@ -140,7 +140,7 @@ export const Navbar: FC = () => {
         </div>
       </div>
 
-      <div className={cn('fixed inset-0 top-[61px] z-[90] bg-background lg:hidden', 'transition-all duration-300 ease-out', isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none')}>
+      <div className={cn('fixed inset-0 top-[61px] z-90 bg-background lg:hidden', 'transition-all duration-300 ease-out', isMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none')}>
         <nav className="flex h-full w-full flex-col px-4 py-6 sm:px-6">
           <div className="flex-1 space-y-1">
             {navItems.map((item, index) => (
