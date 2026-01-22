@@ -15,7 +15,7 @@ const navItems = [
   { href: '/#services', label: 'Líneas', sectionId: 'services' },
   { href: '/#about', label: 'Sobre Nosotros', sectionId: 'about' },
   { href: '/team', label: 'Nuestro Equipo', sectionId: 'team' },
-  { href: '/#contact', label: 'Contactarnos', sectionId: 'contact' },
+  { href: '/#contact', label: 'Contacto', sectionId: 'contact' },
 ] as const;
 
 export const Navbar: FC = () => {
