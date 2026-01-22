@@ -42,7 +42,9 @@ export const HeroSection: FC = () => {
     animate(panelNodes, { translateY: [16, 0], opacity: [0, 1], duration: 820, easing: 'easeOutExpo', delay: 420 });
     animate(lineNodes, { opacity: [0, 1], translateY: [10, 0], duration: 650, easing: 'easeOutExpo', delay: (el, i) => 560 + i * 90 });
 
-    if (statNodes.length) animate(statNodes, { translateY: [10, 0], opacity: [0, 1], duration: 650, easing: 'easeOutExpo', delay: (el, i) => 720 + i * 120 });
+    if (statNodes.length) {
+      animate(statNodes, { translateY: [10, 0], opacity: [0, 1], duration: 650, easing: 'easeOutExpo', delay: (el, i) => 720 + i * 120 });
+    }
 
     const float = (el: HTMLDivElement | null, dx: number, dy: number, duration: number) => {
       if (!el) return;
@@ -53,7 +55,9 @@ export const HeroSection: FC = () => {
     float(glowRightRef.current, 12, -10, 5200);
     float(glowBottomRef.current, 8, 12, 5600);
 
-    if (chipRowRef.current) animate(chipRowRef.current, { opacity: [0, 1], duration: 850, easing: 'easeOutQuad', delay: 280 });
+    if (chipRowRef.current) {
+      animate(chipRowRef.current, { opacity: [0, 1], duration: 850, easing: 'easeOutQuad', delay: 280 });
+    }
   }, []);
 
   const serviceLines: Array<{
@@ -83,80 +87,74 @@ export const HeroSection: FC = () => {
   ];
 
   return (
-    <section id="home" ref={heroRef} className="relative flex h-screen min-h-[700px] items-center overflow-hidden scroll-mt-0">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-pattern" />
+    <section id="home" ref={heroRef} className="relative flex min-h-screen items-center overflow-hidden scroll-mt-0 pt-16">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 bg-pattern opacity-50 sm:opacity-100" />
 
-        <div ref={glowLeftRef} className="absolute -left-44 top-[-120px] h-[520px] w-[520px] rounded-full bg-(--tech-gradient-from) blur-3xl animate-in fade-in duration-700" />
-        <div ref={glowRightRef} className="absolute -right-44 top-[-40px] h-[560px] w-[560px] rounded-full bg-(--infra-gradient-from) blur-3xl animate-in fade-in duration-700 delay-150" />
+        <div
+          ref={glowLeftRef}
+          className="absolute -left-32 sm:-left-44 top-[-80px] sm:top-[-120px] h-[300px] sm:h-[520px] w-[300px] sm:w-[520px] rounded-full bg-(--tech-gradient-from) blur-3xl opacity-60 sm:opacity-100 animate-in fade-in duration-700"
+        />
+        <div
+          ref={glowRightRef}
+          className="absolute -right-32 sm:-right-44 top-[-20px] sm:top-[-40px] h-[320px] sm:h-[560px] w-[320px] sm:w-[560px] rounded-full bg-(--infra-gradient-from) blur-3xl opacity-60 sm:opacity-100 animate-in fade-in duration-700 delay-150"
+        />
         <div
           ref={glowBottomRef}
-          className="absolute bottom-[-220px] left-1/2 h-[560px] w-[560px] -translate-x-1/2 rounded-full bg-(--digital-gradient-from) blur-3xl animate-in fade-in duration-700 delay-300"
+          className="absolute bottom-[-120px] sm:bottom-[-220px] left-1/2 h-[320px] sm:h-[560px] w-[320px] sm:w-[560px] -translate-x-1/2 rounded-full bg-(--digital-gradient-from) blur-3xl opacity-60 sm:opacity-100 animate-in fade-in duration-700 delay-300"
         />
 
         <div className="absolute inset-0 bg-linear-to-b from-background/35 via-transparent to-background" />
       </div>
 
-      <div className="relative z-10 mx-auto w-full max-w-7xl px-6 pt-20 md:px-10 md:pt-16">
-        <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-14">
-          <div className="space-y-5 text-center lg:text-left">
+      <div className="relative z-10 mx-auto w-full max-w-7xl px-4 sm:px-6 md:px-10 py-8 sm:py-12 md:py-16">
+        <div className="grid items-center gap-8 sm:gap-10 lg:grid-cols-2 lg:gap-14">
+          <div className="space-y-4 sm:space-y-5 text-center lg:text-left">
             <Badge
               variant="secondary"
-              className={[
-                'inline-flex items-center gap-2',
-                'border border-border/60 bg-background/60',
-                'backdrop-blur font-heading text-xs',
-                'opacity-0',
-                'animate-in fade-in slide-in-from-top-2 duration-700',
-              ].join(' ')}
+              className="inline-flex items-center gap-1.5 sm:gap-2 border border-border/60 bg-background/60 backdrop-blur font-heading text-[10px] sm:text-xs opacity-0 animate-in fade-in slide-in-from-top-2 duration-700"
               data-hero="badge"
             >
-              <ShieldCheck className="h-3.5 w-3.5 text-primary" />
-              Tecnología para operación, crecimiento y continuidad
+              <ShieldCheck className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-primary" />
+              <span className="max-w-[200px] sm:max-w-none truncate sm:whitespace-normal">Tecnología para operación, crecimiento y continuidad</span>
             </Badge>
 
-            <div className="space-y-3">
-              <h1 className={['text-4xl font-extrabold tracking-tight md:text-5xl lg:text-6xl', 'opacity-0 animate-in fade-in slide-in-from-bottom-3 duration-700'].join(' ')} data-hero="title">
+            <div className="space-y-2 sm:space-y-3">
+              <h1
+                className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold tracking-tight leading-tight opacity-0 animate-in fade-in slide-in-from-bottom-3 duration-700"
+                data-hero="title"
+              >
                 Soluciones integrales en <span className="text-tech">TI</span>, <span className="text-infra">equipamiento</span> y <span className="text-digital">conectividad</span>
               </h1>
 
-              <p
-                className={['mx-auto max-w-2xl text-base text-muted-foreground md:text-lg lg:mx-0', 'opacity-0 animate-in fade-in slide-in-from-bottom-2 duration-700 delay-150'].join(' ')}
-                data-hero="subtitle"
-              >
+              <p className="mx-auto max-w-2xl text-sm sm:text-base md:text-lg text-muted-foreground lg:mx-0 opacity-0 animate-in fade-in slide-in-from-bottom-2 duration-700 delay-150" data-hero="subtitle">
                 Integramos consultoría, desarrollo, soporte, comercialización de equipos y servicios digitales para impulsar tus procesos con disponibilidad, seguridad y escalabilidad.
               </p>
             </div>
 
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-center lg:justify-start">
+            <div className="flex flex-col gap-2 sm:gap-3 sm:flex-row sm:items-center sm:justify-center lg:justify-start">
               <div className="opacity-0 animate-in fade-in slide-in-from-bottom-2 duration-700 delay-200" data-hero="cta">
-                <Button asChild size="lg" className="font-heading group">
+                <Button asChild size="lg" className="font-heading group w-full sm:w-auto">
                   <Link href="/#services">
                     Ver líneas
-                    <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                    <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover:translate-x-1" />
                   </Link>
                 </Button>
               </div>
 
               <div className="opacity-0 animate-in fade-in slide-in-from-bottom-2 duration-700 delay-300" data-hero="cta">
-                <Button asChild size="lg" variant="outline" className="font-heading">
+                <Button asChild size="lg" variant="outline" className="font-heading w-full sm:w-auto">
                   <Link href="/#contact">Hablar con un asesor</Link>
                 </Button>
               </div>
             </div>
 
-            <div ref={chipRowRef} className="flex flex-wrap justify-center gap-2 pt-1 lg:justify-start">
+            <div ref={chipRowRef} className="flex flex-wrap justify-center gap-1.5 sm:gap-2 pt-1 lg:justify-start">
               {['Consultoría', 'Implementación', 'Soporte', 'Mantenimiento'].map((tag, i) => (
                 <span
                   key={tag}
                   data-hero="chip"
-                  className={[
-                    'opacity-0',
-                    'rounded-full border border-border/60',
-                    'bg-background/60 px-3 py-1.5 text-xs',
-                    'text-muted-foreground backdrop-blur',
-                    'animate-in fade-in slide-in-from-bottom-1 duration-700',
-                  ].join(' ')}
+                  className="opacity-0 rounded-full border border-border/60 bg-background/60 px-2.5 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs text-muted-foreground backdrop-blur animate-in fade-in slide-in-from-bottom-1 duration-700"
                   style={{ animationDelay: `${260 + i * 90}ms` }}
                 >
                   {tag}
@@ -164,7 +162,7 @@ export const HeroSection: FC = () => {
               ))}
             </div>
 
-            <div className="pt-2 opacity-0 animate-in fade-in slide-in-from-bottom-1 duration-700 delay-500" data-hero="subtitle">
+            <div className="hidden sm:block pt-2 opacity-0 animate-in fade-in slide-in-from-bottom-1 duration-700 delay-500" data-hero="subtitle">
               <Link href="/#services" className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-foreground transition-colors" aria-label="Ir a líneas">
                 Ver servicios
                 <ChevronDown className="h-4 w-4 animate-bounce" />
@@ -173,19 +171,19 @@ export const HeroSection: FC = () => {
           </div>
 
           <div className="relative opacity-0 animate-in fade-in slide-in-from-right-4 duration-700 delay-200" data-hero="panel">
-            <div className="rounded-3xl border border-border/70 bg-background/70 p-5 shadow-sm backdrop-blur md:p-6">
-              <div className="flex items-start justify-between gap-4">
-                <div className="space-y-1">
-                  <p className="font-heading text-sm font-extrabold">Tres líneas, una sola experiencia</p>
-                  <p className="text-xs text-muted-foreground">Recorre cada línea en pantalla completa y elige la que necesitas.</p>
+            <div className="rounded-2xl sm:rounded-3xl border border-border/70 bg-background/70 p-4 sm:p-5 md:p-6 shadow-sm backdrop-blur">
+              <div className="flex items-start justify-between gap-3 sm:gap-4">
+                <div className="space-y-0.5 sm:space-y-1 min-w-0 flex-1">
+                  <p className="font-heading text-sm sm:text-base font-extrabold truncate">Tres líneas, una sola experiencia</p>
+                  <p className="text-[11px] sm:text-xs text-muted-foreground line-clamp-2">Recorre cada línea en pantalla completa y elige la que necesitas.</p>
                 </div>
 
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-muted">
-                  <Layers className="h-5 w-5" />
+                <div className="flex h-9 w-9 sm:h-10 sm:w-10 shrink-0 items-center justify-center rounded-xl bg-muted">
+                  <Layers className="h-4 w-4 sm:h-5 sm:w-5" />
                 </div>
               </div>
 
-              <div className="mt-5 grid gap-2.5">
+              <div className="mt-4 sm:mt-5 grid gap-2 sm:gap-2.5">
                 {serviceLines.map(({ title, desc, icon: Icon, colorTheme }) => {
                   const theme = getThemeClasses(colorTheme);
 
@@ -193,25 +191,31 @@ export const HeroSection: FC = () => {
                     <div
                       key={title}
                       data-hero="line"
-                      className={['group rounded-2xl border border-border/70 bg-background/60 p-3.5', 'transition-all hover:-translate-y-0.5 hover:shadow-sm', `hover:${theme.border}`, 'opacity-0'].join(' ')}
+                      className={[
+                        'group rounded-xl sm:rounded-2xl border border-border/70 bg-background/60 p-3 sm:p-3.5',
+                        'transition-all hover:-translate-y-0.5 hover:shadow-sm',
+                        `hover:${theme.border}`,
+                        'opacity-0',
+                      ].join(' ')}
                     >
-                      <div className="flex items-center justify-between gap-3">
-                        <div>
-                          <p className="font-heading text-sm font-bold">{title}</p>
-                          <p className="mt-0.5 text-xs text-muted-foreground">{desc}</p>
+                      <div className="flex items-start sm:items-center justify-between gap-2 sm:gap-3">
+                        <div className="min-w-0 flex-1">
+                          <p className="font-heading text-xs sm:text-sm font-bold line-clamp-2 sm:line-clamp-1">{title}</p>
+                          <p className="mt-0.5 text-[10px] sm:text-xs text-muted-foreground line-clamp-2 sm:line-clamp-1">{desc}</p>
                         </div>
-                        <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${theme.bg} ${theme.text}`}>
-                          <Icon className="h-4 w-4" />
+                        <div className={`flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded-lg sm:rounded-xl ${theme.bg} ${theme.text}`}>
+                          <Icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                         </div>
                       </div>
 
-                      <div className="mt-2.5 flex items-center justify-between gap-3 text-xs text-muted-foreground">
-                        <span className="inline-flex items-center gap-2">
-                          <Sparkles className="h-3.5 w-3.5" />
-                          Entregables y soporte incluidos
+                      <div className="mt-2 sm:mt-2.5 flex items-center justify-between gap-2 sm:gap-3 text-[10px] sm:text-xs text-muted-foreground">
+                        <span className="inline-flex items-center gap-1.5 sm:gap-2">
+                          <Sparkles className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
+                          <span className="hidden xs:inline">Entregables y soporte incluidos</span>
+                          <span className="xs:hidden">Soporte incluido</span>
                         </span>
                         <span className="opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                          <ArrowRight className="h-4 w-4" />
+                          <ArrowRight className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                         </span>
                       </div>
                     </div>
@@ -219,45 +223,48 @@ export const HeroSection: FC = () => {
                 })}
               </div>
 
-              <div ref={statsRef} className="mt-5 grid grid-cols-3 gap-2.5">
-                <div data-stat className="rounded-2xl border border-border/70 bg-muted/40 p-2.5 text-center opacity-0 animate-in fade-in slide-in-from-bottom-1 duration-700" style={{ animationDelay: '420ms' }}>
-                  <p className="font-heading text-xs font-bold">Respuesta</p>
-                  <p className="mt-0.5 text-xs text-muted-foreground">Rápida</p>
-                </div>
-                <div data-stat className="rounded-2xl border border-border/70 bg-muted/40 p-2.5 text-center opacity-0 animate-in fade-in slide-in-from-bottom-1 duration-700" style={{ animationDelay: '520ms' }}>
-                  <p className="font-heading text-xs font-bold">Entrega</p>
-                  <p className="mt-0.5 text-xs text-muted-foreground">Por SLA</p>
-                </div>
-                <div data-stat className="rounded-2xl border border-border/70 bg-muted/40 p-2.5 text-center opacity-0 animate-in fade-in slide-in-from-bottom-1 duration-700" style={{ animationDelay: '620ms' }}>
-                  <p className="font-heading text-xs font-bold">Soporte</p>
-                  <p className="mt-0.5 text-xs text-muted-foreground">Continuo</p>
-                </div>
+              <div ref={statsRef} className="mt-4 sm:mt-5 grid grid-cols-3 gap-1.5 sm:gap-2.5">
+                {[
+                  { title: 'Respuesta', subtitle: 'Rápida' },
+                  { title: 'Entrega', subtitle: 'Por SLA' },
+                  { title: 'Soporte', subtitle: 'Continuo' },
+                ].map((stat, index) => (
+                  <div
+                    key={stat.title}
+                    data-stat
+                    className="rounded-xl sm:rounded-2xl border border-border/70 bg-muted/40 p-2 sm:p-2.5 text-center opacity-0 animate-in fade-in slide-in-from-bottom-1 duration-700"
+                    style={{ animationDelay: `${420 + index * 100}ms` }}
+                  >
+                    <p className="font-heading text-[10px] sm:text-xs font-bold">{stat.title}</p>
+                    <p className="mt-0.5 text-[10px] sm:text-xs text-muted-foreground">{stat.subtitle}</p>
+                  </div>
+                ))}
               </div>
 
-              <div className="mt-5 flex items-center justify-between gap-3 rounded-2xl border border-border/70 bg-muted/30 p-3.5">
-                <p className="text-xs text-muted-foreground">Empieza por las líneas</p>
-                <Button asChild size="sm" className="font-heading group">
+              <div className="mt-4 sm:mt-5 flex items-center justify-between gap-2 sm:gap-3 rounded-xl sm:rounded-2xl border border-border/70 bg-muted/30 p-3 sm:p-3.5">
+                <p className="text-[10px] sm:text-xs text-muted-foreground">Empieza por las líneas</p>
+                <Button asChild size="sm" className="font-heading group h-8 sm:h-9 text-xs sm:text-sm">
                   <Link href="/#services">
                     Explorar
-                    <ArrowRight className="ml-2 h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                    <ArrowRight className="ml-1.5 sm:ml-2 h-3 w-3 sm:h-3.5 sm:w-3.5 transition-transform group-hover:translate-x-1" />
                   </Link>
                 </Button>
               </div>
             </div>
 
-            <div className="pointer-events-none absolute -right-6 -top-6 hidden rounded-2xl border border-border/60 bg-background/70 p-4 shadow-sm backdrop-blur xl:block animate-in fade-in zoom-in-95 duration-700 delay-500">
-              <p className="text-[10px] font-bold text-muted-foreground tracking-wide">RED ORANGE</p>
-              <p className="mt-1 text-sm font-extrabold">Soluciones</p>
-              <p className="text-xs text-muted-foreground">TI · Equipos · Telecom</p>
+            <div className="pointer-events-none absolute -right-4 -top-4 hidden rounded-xl sm:rounded-2xl border border-border/60 bg-background/70 p-3 sm:p-4 shadow-sm backdrop-blur xl:block animate-in fade-in zoom-in-95 duration-700 delay-500">
+              <p className="text-[9px] sm:text-[10px] font-bold text-muted-foreground tracking-wide">RED ORANGE</p>
+              <p className="mt-1 text-xs sm:text-sm font-extrabold">Soluciones</p>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">TI · Equipos · Telecom</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 opacity-0 animate-in fade-in duration-700 delay-700">
-        <Link href="/#services" className="flex flex-col items-center gap-2 text-muted-foreground hover:text-foreground transition-colors">
-          <span className="text-xs">Scroll</span>
-          <ChevronDown className="h-5 w-5 animate-bounce" />
+      <div className="absolute bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 opacity-0 animate-in fade-in duration-700 delay-700">
+        <Link href="/#services" className="flex flex-col items-center gap-1.5 sm:gap-2 text-muted-foreground hover:text-foreground transition-colors">
+          <span className="text-[10px] sm:text-xs">Scroll</span>
+          <ChevronDown className="h-4 w-4 sm:h-5 sm:w-5 animate-bounce" />
         </Link>
       </div>
     </section>

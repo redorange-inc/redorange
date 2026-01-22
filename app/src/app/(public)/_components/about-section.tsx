@@ -48,7 +48,11 @@ const ICONS: Record<string, FC<{ className?: string }>> = {
   rocket: Rocket,
 };
 
-const toUIItems = (items: AboutFeatureItem[]) => items.map((it) => ({ icon: ICONS[it.iconKey] ?? CheckCircle2Fallback, text: it.text }));
+const toUIItems = (items: AboutFeatureItem[]) =>
+  items.map((it) => ({
+    icon: ICONS[it.iconKey] ?? CheckCircle2Fallback,
+    text: it.text,
+  }));
 
 const CheckCircle2Fallback: FC<{ className?: string }> = ({ className }) => (
   <span className={className} aria-hidden="true">
@@ -88,7 +92,13 @@ export const AboutSection: FC = () => {
     return data.features.map((f) => {
       const MainIcon = ICONS[f.iconKey] ?? Code2;
 
-      return { icon: MainIcon, title: f.title, description: f.description, colorTheme: f.colorTheme, items: toUIItems(f.items) };
+      return {
+        icon: MainIcon,
+        title: f.title,
+        description: f.description,
+        colorTheme: f.colorTheme,
+        items: toUIItems(f.items),
+      };
     });
   }, [data]);
 
@@ -113,10 +123,47 @@ export const AboutSection: FC = () => {
       (entries) => {
         for (const entry of entries) {
           if (!entry.isIntersecting) continue;
-          if (headerEls && headerEls.length > 0) animate(headerEls, { opacity: [0, 1], translateY: [14, 0], duration: 800, easing: 'easeOutExpo', delay: (_, i) => i * 90 });
-          if (cardEls && cardEls.length > 0) animate(cardEls, { opacity: [0, 1], translateY: [18, 0], scale: [0.98, 1], duration: 900, easing: 'easeOutExpo', delay: (_, i) => 220 + i * 120 });
-          if (footerWrapEls && footerWrapEls.length > 0) animate(footerWrapEls, { opacity: [0, 1], translateY: [14, 0], duration: 850, easing: 'easeOutExpo', delay: 520 });
-          if (footerEls && footerEls.length > 0) animate(footerEls, { opacity: [0, 1], translateY: [10, 0], duration: 700, easing: 'easeOutExpo', delay: (_, i) => 640 + i * 90 });
+
+          if (headerEls && headerEls.length > 0) {
+            animate(headerEls, {
+              opacity: [0, 1],
+              translateY: [14, 0],
+              duration: 800,
+              easing: 'easeOutExpo',
+              delay: (_, i) => i * 90,
+            });
+          }
+
+          if (cardEls && cardEls.length > 0) {
+            animate(cardEls, {
+              opacity: [0, 1],
+              translateY: [18, 0],
+              scale: [0.98, 1],
+              duration: 900,
+              easing: 'easeOutExpo',
+              delay: (_, i) => 220 + i * 120,
+            });
+          }
+
+          if (footerWrapEls && footerWrapEls.length > 0) {
+            animate(footerWrapEls, {
+              opacity: [0, 1],
+              translateY: [14, 0],
+              duration: 850,
+              easing: 'easeOutExpo',
+              delay: 520,
+            });
+          }
+
+          if (footerEls && footerEls.length > 0) {
+            animate(footerEls, {
+              opacity: [0, 1],
+              translateY: [10, 0],
+              duration: 700,
+              easing: 'easeOutExpo',
+              delay: (_, i) => 640 + i * 90,
+            });
+          }
 
           io.disconnect();
         }
@@ -127,18 +174,27 @@ export const AboutSection: FC = () => {
     io.observe(root);
 
     const glows = root.querySelectorAll('[data-about="glow"]');
-    if (glows.length > 0) animate(glows, { translateY: [0, 10], direction: 'alternate', loop: true, easing: 'easeInOutSine', duration: 4200, delay: (_, i) => i * 300 });
+    if (glows.length > 0) {
+      animate(glows, {
+        translateY: [0, 10],
+        direction: 'alternate',
+        loop: true,
+        easing: 'easeInOutSine',
+        duration: 4200,
+        delay: (_, i) => i * 300,
+      });
+    }
 
     return () => io.disconnect();
   }, [data, features.length]);
 
   if (!data) {
     return (
-      <section id="about" ref={sectionRef} className="relative mx-auto max-w-7xl px-6 py-14 md:px-10 md:py-20 min-h-screen scroll-mt-0">
+      <section id="about" ref={sectionRef} className="relative mx-auto max-w-7xl px-4 sm:px-6 md:px-10 py-10 sm:py-14 md:py-20 min-h-[50vh] sm:min-h-screen scroll-mt-0">
         <div className="relative z-10 mx-auto flex max-w-xl items-center justify-center">
           <div className="w-full rounded-2xl border border-border/60 bg-background/60 p-6 text-center backdrop-blur">
-            <p className="font-heading text-base font-extrabold">Cargando sección...</p>
-            <p className="mt-1 text-sm text-muted-foreground">Preparando contenido de &quot;Sobre nosotros&ldquo;.</p>
+            <p className="font-heading text-sm sm:text-base font-extrabold">Cargando sección...</p>
+            <p className="mt-1 text-xs sm:text-sm text-muted-foreground">Preparando contenido de &quot;Sobre nosotros&ldquo;.</p>
           </div>
         </div>
       </section>
@@ -152,31 +208,46 @@ export const AboutSection: FC = () => {
     return getThemeClasses(colorTheme).text;
   };
 
-  const footerBadges = data.footer.badges.map((b) => ({ Icon: ICONS[b.iconKey] ?? Target, label: b.label, iconColorClass: getIconColorClass(b.colorTheme) }));
+  const footerBadges = data.footer.badges.map((b) => ({
+    Icon: ICONS[b.iconKey] ?? Target,
+    label: b.label,
+    iconColorClass: getIconColorClass(b.colorTheme),
+  }));
 
-  const footerCards = data.footer.cards.map((c) => ({ Icon: ICONS[c.iconKey] ?? MessageSquareText, title: c.title, description: c.description, iconColorClass: getIconColorClass(c.colorTheme) }));
+  const footerCards = data.footer.cards.map((c) => ({
+    Icon: ICONS[c.iconKey] ?? MessageSquareText,
+    title: c.title,
+    description: c.description,
+    iconColorClass: getIconColorClass(c.colorTheme),
+  }));
 
   return (
-    <section id="about" ref={sectionRef} className="relative mx-auto max-w-7xl px-6 py-14 md:px-10 md:py-20 min-h-screen scroll-mt-0">
-      <div data-about="glow" className="pointer-events-none absolute -right-24 top-16 h-[420px] w-[420px] rounded-full bg-(--tech-bg) blur-3xl" />
-      <div data-about="glow" className="pointer-events-none absolute -left-24 bottom-16 h-[420px] w-[420px] rounded-full bg-(--digital-bg) blur-3xl" />
+    <section id="about" ref={sectionRef} className="relative mx-auto max-w-7xl px-4 sm:px-6 md:px-10 py-10 sm:py-14 md:py-20 min-h-[50vh] sm:min-h-screen scroll-mt-0">
+      <div
+        data-about="glow"
+        className="pointer-events-none absolute -right-16 sm:-right-24 top-12 sm:top-16 h-[250px] sm:h-[420px] w-[250px] sm:w-[420px] rounded-full bg-(--tech-bg) blur-3xl opacity-50 sm:opacity-100"
+      />
+      <div
+        data-about="glow"
+        className="pointer-events-none absolute -left-16 sm:-left-24 bottom-12 sm:bottom-16 h-[250px] sm:h-[420px] w-[250px] sm:w-[420px] rounded-full bg-(--digital-bg) blur-3xl opacity-50 sm:opacity-100"
+      />
 
-      <div ref={headerRef} className="mb-10 text-center md:mb-12">
-        <Badge variant="secondary" className="mb-3 font-heading opacity-0" data-about="header">
-          <Users className="mr-1.5 h-3.5 w-3.5" />
+      <div ref={headerRef} className="mb-8 sm:mb-10 md:mb-12 text-center">
+        <Badge variant="secondary" className="mb-2 sm:mb-3 font-heading text-xs opacity-0" data-about="header">
+          <Users className="mr-1 sm:mr-1.5 h-3 w-3 sm:h-3.5 sm:w-3.5" />
           {data.badgeLabel}
         </Badge>
 
-        <h2 className="mb-3 text-2xl font-extrabold md:text-3xl lg:text-4xl opacity-0" data-about="header">
+        <h2 className="mb-2 sm:mb-3 text-xl sm:text-2xl md:text-3xl lg:text-4xl font-extrabold opacity-0" data-about="header">
           <span className="bg-linear-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">REDORANGE</span> E.I.R.L.
         </h2>
 
-        <p className="mx-auto max-w-3xl text-sm text-muted-foreground md:text-base opacity-0" data-about="header">
+        <p className="mx-auto max-w-3xl text-xs sm:text-sm md:text-base text-muted-foreground opacity-0" data-about="header">
           {data.intro}
         </p>
       </div>
 
-      <div ref={cardsRef} className="grid gap-5 md:grid-cols-2 lg:grid-cols-3 md:gap-6">
+      <div ref={cardsRef} className="grid gap-3 sm:gap-4 md:gap-5 md:grid-cols-2 lg:grid-cols-3 md:gap-6">
         {features.map((feature) => {
           const MainIcon = feature.icon;
           const theme = getThemeClasses(feature.colorTheme);
@@ -185,32 +256,32 @@ export const AboutSection: FC = () => {
             <div
               key={feature.title}
               data-about="card"
-              className="group relative overflow-hidden rounded-2xl border border-border/70 bg-background/60 p-4 shadow-sm backdrop-blur transition-all hover:shadow-lg hover:scale-[1.02] opacity-0 md:p-5"
+              className="group relative overflow-hidden rounded-xl sm:rounded-2xl border border-border/70 bg-background/60 p-3.5 sm:p-4 md:p-5 shadow-sm backdrop-blur transition-all hover:shadow-lg hover:scale-[1.02] opacity-0"
             >
               <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                 <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-primary/10 blur-2xl" />
               </div>
 
-              <div className="mb-4 flex items-start gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center md:h-12 md:w-12">
-                  <MainIcon className={`h-7 w-7 md:h-8 md:w-8 ${theme.text}`} />
+              <div className="mb-3 sm:mb-4 flex items-start gap-2.5 sm:gap-3">
+                <div className="flex h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 shrink-0 items-center justify-center">
+                  <MainIcon className={`h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 ${theme.text}`} />
                 </div>
-                <div className="flex-1">
-                  <h3 className="mb-1.5 font-heading text-base font-extrabold md:text-lg">{feature.title}</h3>
-                  <p className="text-xs text-muted-foreground leading-relaxed md:text-xs">{feature.description}</p>
+                <div className="flex-1 min-w-0">
+                  <h3 className="mb-1 sm:mb-1.5 font-heading text-sm sm:text-base md:text-lg font-extrabold line-clamp-2">{feature.title}</h3>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground leading-relaxed line-clamp-2 sm:line-clamp-none">{feature.description}</p>
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5 sm:space-y-2">
                 {feature.items.map((item) => {
                   const ItemIcon = item.icon;
 
                   return (
-                    <div key={item.text} className="flex items-start gap-2.5 rounded-lg bg-muted/50 p-2 transition-all hover:bg-muted hover:-translate-y-px md:p-2.5">
-                      <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center md:h-7 md:w-7">
-                        <ItemIcon className={`h-3.5 w-3.5 md:h-4 md:w-4 ${theme.text}`} />
+                    <div key={item.text} className="flex items-start gap-2 sm:gap-2.5 rounded-lg bg-muted/50 p-2 sm:p-2.5 transition-all hover:bg-muted hover:-translate-y-px">
+                      <div className="mt-0.5 flex h-5 w-5 sm:h-6 sm:w-6 md:h-7 md:w-7 shrink-0 items-center justify-center">
+                        <ItemIcon className={`h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 ${theme.text}`} />
                       </div>
-                      <span className="text-xs leading-relaxed text-foreground md:text-sm">{item.text}</span>
+                      <span className="text-[10px] sm:text-xs md:text-sm leading-relaxed text-foreground line-clamp-2 sm:line-clamp-none">{item.text}</span>
                     </div>
                   );
                 })}
@@ -220,50 +291,50 @@ export const AboutSection: FC = () => {
         })}
       </div>
 
-      <div ref={footerRef} className="mt-10 md:mt-14">
+      <div ref={footerRef} className="mt-8 sm:mt-10 md:mt-14">
         <div
           data-about="footer-wrap"
-          className="overflow-hidden rounded-2xl border border-border/70 bg-linear-to-br from-primary/5 via-background/60 to-accent/5 p-5 text-center backdrop-blur opacity-0 md:p-6 lg:p-8"
+          className="overflow-hidden rounded-xl sm:rounded-2xl border border-border/70 bg-linear-to-br from-primary/5 via-background/60 to-accent/5 p-4 sm:p-5 md:p-6 lg:p-8 text-center backdrop-blur opacity-0"
         >
-          <div className="mx-auto max-w-4xl space-y-3 md:space-y-4">
-            <div className="flex items-center justify-center gap-2 opacity-0" data-about="footer">
-              <Lightbulb className="h-4 w-4 text-primary md:h-5 md:w-5" />
-              <h3 className="font-heading text-lg font-extrabold md:text-xl lg:text-2xl">{data.footer.title}</h3>
+          <div className="mx-auto max-w-4xl space-y-2.5 sm:space-y-3 md:space-y-4">
+            <div className="flex items-center justify-center gap-1.5 sm:gap-2 opacity-0" data-about="footer">
+              <Lightbulb className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+              <h3 className="font-heading text-base sm:text-lg md:text-xl lg:text-2xl font-extrabold">{data.footer.title}</h3>
             </div>
 
-            <p className="text-xs text-muted-foreground opacity-0 md:text-sm" data-about="footer">
+            <p className="text-[10px] sm:text-xs md:text-sm text-muted-foreground opacity-0" data-about="footer">
               {data.footer.subtitle}
             </p>
 
-            <div className="flex flex-wrap items-center justify-center gap-3 pt-1 opacity-0 md:gap-5" data-about="footer">
+            <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 md:gap-5 pt-1 opacity-0" data-about="footer">
               {footerBadges.map(({ Icon, label, iconColorClass }) => (
-                <div key={label} className="flex items-center gap-1.5">
-                  <Icon className={`h-5 w-5 md:h-6 md:w-6 ${iconColorClass}`} />
-                  <span className="text-[10px] font-semibold md:text-xs">{label}</span>
+                <div key={label} className="flex items-center gap-1 sm:gap-1.5">
+                  <Icon className={`h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 ${iconColorClass}`} />
+                  <span className="text-[9px] sm:text-[10px] md:text-xs font-semibold">{label}</span>
                 </div>
               ))}
             </div>
 
-            <div className="mx-auto mt-3 grid max-w-5xl gap-2.5 opacity-0 md:mt-5 md:grid-cols-3" data-about="footer">
+            <div className="mx-auto mt-2.5 sm:mt-3 md:mt-5 grid max-w-5xl gap-2 sm:gap-2.5 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 opacity-0" data-about="footer">
               {footerCards.slice(0, 3).map(({ Icon, title, description, iconColorClass }) => (
-                <div key={title} className="rounded-xl border border-border/70 bg-background/60 p-2.5 text-left md:p-3">
-                  <div className="flex items-center gap-1.5">
-                    <Icon className={`h-3.5 w-3.5 md:h-4 md:w-4 ${iconColorClass}`} />
-                    <p className="font-heading text-[10px] font-extrabold md:text-xs">{title}</p>
+                <div key={title} className="rounded-lg sm:rounded-xl border border-border/70 bg-background/60 p-2 sm:p-2.5 md:p-3 text-left">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <Icon className={`h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 ${iconColorClass}`} />
+                    <p className="font-heading text-[9px] sm:text-[10px] md:text-xs font-extrabold truncate">{title}</p>
                   </div>
-                  <p className="mt-1 text-[10px] text-muted-foreground md:mt-1.5 md:text-xs">{description}</p>
+                  <p className="mt-0.5 sm:mt-1 md:mt-1.5 text-[9px] sm:text-[10px] md:text-xs text-muted-foreground line-clamp-2">{description}</p>
                 </div>
               ))}
             </div>
 
-            <div className="mx-auto mt-3 grid max-w-5xl gap-2.5 opacity-0 md:mt-5 md:grid-cols-3" data-about="footer">
+            <div className="mx-auto mt-2 sm:mt-2.5 md:mt-5 grid max-w-5xl gap-2 sm:gap-2.5 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 opacity-0" data-about="footer">
               {footerCards.slice(3, 6).map(({ Icon, title, description, iconColorClass }) => (
-                <div key={title} className="rounded-xl border border-border/70 bg-background/60 p-2.5 text-left md:p-3">
-                  <div className="flex items-center gap-1.5">
-                    <Icon className={`h-3.5 w-3.5 md:h-4 md:w-4 ${iconColorClass}`} />
-                    <p className="font-heading text-[10px] font-extrabold md:text-xs">{title}</p>
+                <div key={title} className="rounded-lg sm:rounded-xl border border-border/70 bg-background/60 p-2 sm:p-2.5 md:p-3 text-left">
+                  <div className="flex items-center gap-1 sm:gap-1.5">
+                    <Icon className={`h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 ${iconColorClass}`} />
+                    <p className="font-heading text-[9px] sm:text-[10px] md:text-xs font-extrabold truncate">{title}</p>
                   </div>
-                  <p className="mt-1 text-[10px] text-muted-foreground md:mt-1.5 md:text-xs">{description}</p>
+                  <p className="mt-0.5 sm:mt-1 md:mt-1.5 text-[9px] sm:text-[10px] md:text-xs text-muted-foreground line-clamp-2">{description}</p>
                 </div>
               ))}
             </div>
