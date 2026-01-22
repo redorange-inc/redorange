@@ -7,32 +7,14 @@ export const getFutureTech = async (): Promise<ApiResponse<FutureResponse>> => {
 
   const mockData: FutureResponse = {
     items: [
-      {
-        name: 'Rust',
-        description: 'Implementación de servicios críticos con máximo rendimiento y seguridad de memoria.',
-        expectedDate: '2025',
-        iconName: 'Shield',
-      },
-      {
-        name: 'WebAssembly',
-        description: 'Ejecución de código de alto rendimiento en navegadores para aplicaciones complejas.',
-        expectedDate: '2025',
-        iconName: 'Cpu',
-      },
-      {
-        name: 'Kubernetes',
-        description: 'Orquestación de contenedores para escalabilidad y alta disponibilidad.',
-        expectedDate: '2025',
-        iconName: 'Cloud',
-      },
+      { name: 'Rust', description: 'Lenguaje de sistemas para servicios de alto rendimiento y seguridad de memoria', expectedDate: 'Q2 2025', iconName: 'rust' },
+      { name: 'WebAssembly', description: 'Ejecución de código de alto rendimiento en navegadores y edge computing', expectedDate: 'Q3 2025', iconName: 'webassembly' },
+      { name: 'Kubernetes', description: 'Orquestación de contenedores para despliegues a escala', expectedDate: 'Q4 2025', iconName: 'kubernetes' },
     ],
   };
 
   return {
     data: mockData,
-    meta: {
-      timestamp: new Date().toISOString(),
-      source: 'mock-database',
-    },
+    meta: { timestamp: new Date().toISOString(), source: 'mock-database' },
   };
 };

@@ -183,11 +183,11 @@ export const ContactSection: FC = () => {
     };
   }, []);
 
-  const whatsappNumber = data?.meta.whatsappNumber ?? '+51999999999';
+  const whatsappNumber = data?.meta.whatsappNumber ?? '+51987370699';
   const waDigits = whatsappNumber.replace(/[^\d]/g, '');
   const whatsappHref = `https://wa.me/${waDigits}`;
 
-  const salesEmail = data?.meta.salesEmail ?? 'ventas@redorange.net.pe';
+  const salesEmail = data?.meta.salesEmail ?? ' informes@redorange.net.pe';
 
   const lines = useMemo<ContactLineUI[]>(() => {
     const raw = data?.lines ?? [];
