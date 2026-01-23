@@ -12,50 +12,20 @@ export const INFRA_COLORS = {
   gradient: 'gradient-infra',
 } as const;
 
-export const SECTION_TITLES = {
-  hero: {
-    badge: 'Equipos y Tecnología',
-    title: 'Comercialización e Importación',
-    subtitle: 'de Equipos Tecnológicos',
-  },
-  products: {
-    title: 'Nuestros Productos',
-    subtitle: 'Equipos y soluciones tecnológicas de calidad',
-  },
-  services: {
-    title: 'Servicios Técnicos',
-    subtitle: 'Soporte integral para tu tecnología',
-  },
-  brands: {
-    title: 'Marcas y Proveedores',
-    subtitle: 'Trabajamos con las mejores marcas del mercado',
-  },
+export const CHART_COLORS = {
+  primary: '#f43f5e',
+  secondary: '#fb7185',
+  tertiary: '#fda4af',
+  quaternary: '#fecdd3',
+  quinary: '#ffe4e6',
 } as const;
 
-export const ICON_MAP = {
-  monitor: 'Monitor',
-  cpu: 'Cpu',
-  hardDrive: 'HardDrive',
-  keyboard: 'Keyboard',
-  mouse: 'Mouse',
-  printer: 'Printer',
-  wifi: 'Wifi',
-  router: 'Router',
-  server: 'Server',
-  network: 'Network',
-  cable: 'Cable',
-  wrench: 'Wrench',
-  settings: 'Settings',
-  shield: 'Shield',
-  truck: 'Truck',
-  globe: 'Globe',
-  package: 'Package',
-  box: 'Box',
-  zap: 'Zap',
-  checkCircle: 'CheckCircle',
-  clock: 'Clock',
-  users: 'Users',
-  building: 'Building',
-  headphones: 'Headphones',
-  tool: 'Tool',
+export const SECTION_IDS = {
+  hero: 'hero',
+  overview: 'overview',
+  products: 'products',
+  charts: 'charts',
+  achievements: 'achievements',
+  brands: 'brands',
+  cta: 'cta',
 } as const;
