@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import type { BrandsData } from './types';
 
 interface BrandsSectionProps {
@@ -24,8 +25,9 @@ export const BrandsSection = ({ brands }: BrandsSectionProps) => {
           {duplicatedBrands.map((brand, index) => (
             <div
               key={`${brand.id}-${index}`}
-              className="flex h-14 min-w-[120px] shrink-0 items-center justify-center rounded-lg border border-infra/15 bg-background/70 backdrop-blur-sm px-6 transition-all hover:border-infra/40 hover:bg-infra/5"
+              className="flex h-14 min-w-[140px] shrink-0 items-center justify-center gap-2 rounded-lg border border-infra/15 bg-background/70 backdrop-blur-sm px-4 transition-all hover:border-infra/40 hover:bg-infra/5"
             >
+              {brand.icon && <Image src={brand.icon} alt={brand.name} width={24} height={24} className="h-6 w-6 object-contain" />}
               <span className="font-heading font-semibold text-muted-foreground whitespace-nowrap">{brand.name}</span>
             </div>
           ))}

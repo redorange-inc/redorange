@@ -58,69 +58,16 @@ export interface ProductsPreviewData {
   items: ProductPreview[];
 }
 
-// Impact Chart Data (Donut)
-export interface ImpactItem {
-  name: string;
-  value: number;
-  color: string;
-}
-
-export interface ImpactData {
-  title: string;
-  subtitle: string;
-  items: ImpactItem[];
-}
-
-// Time Series Data (Area/Line Chart)
-export interface TimeSeriesPoint {
-  month: string;
-  ventas: number;
-  importaciones: number;
-}
-
-export interface TimeSeriesData {
-  title: string;
-  subtitle: string;
-  items: TimeSeriesPoint[];
-}
-
-// Achievements
-export interface Achievement {
-  title: string;
-  subtitle: string;
-  value: string;
-  iconName: string;
-}
-
-export interface AchievementsData {
-  title: string;
-  items: Achievement[];
-}
-
 // Brands
 export interface BrandItem {
   id: string;
   name: string;
   category: string;
+  icon?: string;
 }
 
 export interface BrandsData {
   title: string;
   subtitle: string;
   items: BrandItem[];
-}
-
-// CTA Section
-export interface CtaData {
-  title: string;
-  description: string;
-  primaryAction: {
-    label: string;
-    href: string;
-  };
-  secondaryAction: {
-    label: string;
-    href: string;
-  };
-  features: string[];
 }
