@@ -46,7 +46,7 @@ export const HeroSection = ({ hero, highlights }: HeroSectionProps) => {
       </div>
 
       <div className="flex flex-wrap gap-3">
-        <Button asChild size="lg" className="font-heading bg-infra hover:bg-infra-accent text-white">
+        <Button asChild size="lg" className="font-heading bg-infra-accent hover:bg-infra-muted text-white">
           <Link href="/infra/products">
             Ir a productos
             <ArrowRight className="ml-2 h-4 w-4" />

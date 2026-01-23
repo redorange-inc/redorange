@@ -80,33 +80,6 @@ export const ProductsCarouselSkeleton = () => {
   );
 };
 
-export const AchievementsSkeleton = () => {
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <Skeleton className="h-8 w-48" />
-        <Skeleton className="h-6 w-12 rounded-full" />
-      </div>
-      <div className="grid gap-4 sm:grid-cols-3">
-        {[1, 2, 3].map((i) => (
-          <Card key={i} className="border-infra/20 bg-card/60 backdrop-blur-md">
-            <CardContent className="flex items-center justify-between p-5">
-              <div className="flex items-center gap-3">
-                <Skeleton className="h-10 w-10 rounded-lg" />
-                <div className="space-y-1.5">
-                  <Skeleton className="h-4 w-28" />
-                  <Skeleton className="h-3 w-20" />
-                </div>
-              </div>
-              <Skeleton className="h-8 w-16 rounded" />
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    </div>
-  );
-};
-
 export const BrandsSkeleton = () => {
   return (
     <div className="space-y-6">

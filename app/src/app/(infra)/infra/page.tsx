@@ -5,7 +5,6 @@ import { getInfraHero } from '@/actions/infra/fn-get-infra-hero';
 import { getInfraStats } from '@/actions/infra/fn-get-infra-stats';
 import { getInfraHighlights } from '@/actions/infra/fn-get-infra-highlights';
 import { getInfraProductsPreview } from '@/actions/infra/fn-get-infra-products-preview';
-import { getInfraAchievements } from '@/actions/infra/fn-get-infra-achievements';
 import { getInfraBrands } from '@/actions/infra/fn-get-infra-brands';
 
 import { PageAnimations } from './_components/page-animations';
@@ -13,16 +12,14 @@ import { BackgroundEffects } from './_components/background-effects';
 import { HeroSection } from './_components/hero-section';
 import { OverviewCard } from './_components/overview-card';
 import { ProductsCarousel } from './_components/products-carousel';
-import { AchievementsSection } from './_components/achievements-section';
 import { BrandsSection } from './_components/brands-section';
 
 const InfraPage = async () => {
-  const [heroResponse, statsResponse, highlightsResponse, productsResponse, achievementsResponse, brandsResponse] = await Promise.all([
+  const [heroResponse, statsResponse, highlightsResponse, productsResponse, brandsResponse] = await Promise.all([
     getInfraHero(),
     getInfraStats(),
     getInfraHighlights(),
     getInfraProductsPreview(),
-    getInfraAchievements(),
     getInfraBrands(),
   ]);
 
@@ -45,10 +42,6 @@ const InfraPage = async () => {
         <section data-anim="fade-up">
           <ProductsCarousel products={productsResponse.data} />
         </section>
-
-        <Separator className="my-10" />
-
-        <AchievementsSection achievements={achievementsResponse.data} />
 
         <Separator className="my-10" />
 

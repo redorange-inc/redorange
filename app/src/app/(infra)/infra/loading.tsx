@@ -1,7 +1,5 @@
-'use client';
-
 import { Separator } from '@/components/ui/separator';
-import { HeroSkeleton, OverviewCardSkeleton, ProductsCarouselSkeleton, AchievementsSkeleton, BrandsSkeleton } from './_components/skeletons';
+import { HeroSkeleton, OverviewCardSkeleton, ProductsCarouselSkeleton, BrandsSkeleton } from './_components/skeletons';
 
 export default function Loading() {
   return (
@@ -20,10 +18,6 @@ export default function Loading() {
       <section>
         <ProductsCarouselSkeleton />
       </section>
-
-      <Separator className="my-10" />
-
-      <AchievementsSkeleton />
 
       <Separator className="my-10" />
 
