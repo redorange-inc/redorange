@@ -62,7 +62,7 @@ export const OverviewCardSkeleton = () => {
 export const ProductsCarouselSkeleton = () => {
   return (
     <div className="space-y-4">
-      <Card className="border-none bg-gradient-to-br from-infra/5 via-transparent to-transparent backdrop-blur-sm">
+      <Card className="border-none bg-linear-to-br from-infra/5 via-transparent to-transparent backdrop-blur-sm">
         <CardContent className="flex items-center gap-4 p-6">
           <Skeleton className="h-12 w-12 rounded-xl" />
           <div className="space-y-2">
@@ -77,30 +77,6 @@ export const ProductsCarouselSkeleton = () => {
         ))}
       </div>
     </div>
-  );
-};
-
-export const ImpactChartSkeleton = () => {
-  return (
-    <Card className="border-infra/20 bg-card/60 backdrop-blur-md">
-      <CardHeader className="pb-2">
-        <div className="flex items-center gap-2">
-          <Skeleton className="h-4 w-4" />
-          <div className="space-y-1">
-            <Skeleton className="h-4 w-32" />
-            <Skeleton className="h-3 w-40" />
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <Skeleton className="h-[280px] w-full rounded-lg" />
-        <div className="flex flex-wrap justify-center gap-4 mt-4">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <Skeleton key={i} className="h-4 w-24" />
-          ))}
-        </div>
-      </CardContent>
-    </Card>
   );
 };
 
@@ -138,10 +114,12 @@ export const BrandsSkeleton = () => {
         <Skeleton className="h-8 w-56 mx-auto" />
         <Skeleton className="h-4 w-72 mx-auto" />
       </div>
-      <div className="flex justify-center gap-4 overflow-hidden">
-        {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-          <Skeleton key={i} className="h-14 w-[120px] rounded-lg flex-shrink-0" />
-        ))}
+      <div className="relative overflow-hidden py-4">
+        <div className="flex gap-4">
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+            <Skeleton key={i} className="h-14 w-[120px] rounded-lg shrink-0" />
+          ))}
+        </div>
       </div>
     </div>
   );

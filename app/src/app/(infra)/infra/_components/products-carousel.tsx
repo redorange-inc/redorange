@@ -59,7 +59,7 @@ export const ProductsCarousel = ({ products }: ProductsCarouselProps) => {
           const IconComponent = iconMap[product.iconName] || Monitor;
 
           return (
-            <Card key={product.id} className="min-w-full snap-start border-none bg-gradient-to-br from-infra/5 via-transparent to-transparent backdrop-blur-sm">
+            <Card key={product.id} className="min-w-full snap-start border-none bg-linear-to-br from-infra/5 via-transparent to-transparent backdrop-blur-sm">
               <CardContent className="flex items-center gap-4 p-6">
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-infra/10">
                   <IconComponent className="h-6 w-6 text-infra" />

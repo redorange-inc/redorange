@@ -30,7 +30,7 @@ export const HeroSection = ({ hero, highlights }: HeroSectionProps) => {
           </Badge>
           <div className="flex gap-1">
             {hero.tags.map((tag, index) => (
-              <Badge key={index} className="bg-gradient-to-r from-infra to-infra-muted text-white text-xs">
+              <Badge key={index} className="bg-linear-to-r from-infra to-infra-muted text-white text-xs">
                 {tag}
               </Badge>
             ))}
@@ -42,9 +42,7 @@ export const HeroSection = ({ hero, highlights }: HeroSectionProps) => {
           <span className="block text-infra">{hero.titleHighlight}</span>
         </h1>
 
-        <p className="max-w-xl text-base text-muted-foreground leading-relaxed">
-          {hero.description}
-        </p>
+        <p className="max-w-xl text-base text-muted-foreground leading-relaxed">{hero.description}</p>
       </div>
 
       <div className="flex flex-wrap gap-3">
@@ -66,10 +64,7 @@ export const HeroSection = ({ hero, highlights }: HeroSectionProps) => {
         {highlights.items.map((highlight, index) => {
           const IconComponent = iconMap[highlight.iconName] || Globe;
           return (
-            <div
-              key={index}
-              className="flex items-center gap-2 rounded-lg border border-infra/15 bg-background/50 px-3 py-2 text-sm"
-            >
+            <div key={index} className="flex items-center gap-2 rounded-lg border border-infra/15 bg-background/50 px-3 py-2 text-sm">
               <IconComponent className="h-4 w-4 text-infra" />
               <div>
                 <span className="font-medium text-foreground">{highlight.text}</span>
