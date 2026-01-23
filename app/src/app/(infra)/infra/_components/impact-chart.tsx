@@ -1,60 +1,99 @@
 'use client';
 
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import React, { useMemo } from 'react';
+import { PieChart, Pie, Cell, Tooltip as ReTooltip, ResponsiveContainer } from 'recharts';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { TrendingUp } from 'lucide-react';
+import { PieCustomTooltip } from './chart-tooltips';
 import type { ImpactData } from './types';
 
 interface ImpactChartProps {
   impactData: ImpactData;
 }
 
-const CustomTooltip = ({ active, payload }: { active?: boolean; payload?: Array<{ name: string; value: number; payload: { color: string } }> }) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="rounded-lg border border-border bg-background/95 backdrop-blur p-3 shadow-lg">
-        <p className="font-medium">{payload[0].name}</p>
-        <p className="text-sm text-muted-foreground">{payload[0].value}%</p>
-      </div>
-    );
-  }
-  return null;
-};
+const PIE_COLORS = ['#e11d48', '#f43f5e', '#fb7185', '#fda4af', '#fecdd3'];
+
+interface ImpactRow {
+  area: string;
+  value: number;
+}
 
 export const ImpactChart = ({ impactData }: ImpactChartProps) => {
+  const data = useMemo<ImpactRow[]>(() => (impactData.items ?? []).map((d) => ({ area: d.name, value: Number(d.value ?? 0) })), [impactData.items]);
+
   return (
-    <Card className="lg:col-span-5 border-infra/20 overflow-hidden">
-      <CardHeader className="pb-2">
-        <div className="flex items-center gap-2">
-          <TrendingUp className="h-4 w-4 text-infra" />
-          <div>
-            <CardTitle className="text-base font-heading">{impactData.title}</CardTitle>
-            <p className="text-sm text-muted-foreground">{impactData.subtitle}</p>
-          </div>
-        </div>
+    <Card className="rounded-3xl border-infra/20 bg-card/60 backdrop-blur-md overflow-hidden">
+      <CardHeader className="pb-4">
+        <CardTitle className="flex items-center gap-2 text-xl text-foreground">
+          <TrendingUp className="h-5 w-5 text-infra" />
+          {impactData.title}
+        </CardTitle>
+        <CardDescription className="text-sm">{impactData.subtitle}</CardDescription>
       </CardHeader>
+
       <CardContent>
-        <div className="h-[280px]">
+        <div className="h-[300px] min-h-[300px] w-full min-w-0">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
-              <Pie data={impactData.items} cx="50%" cy="45%" innerRadius={60} outerRadius={90} paddingAngle={2} dataKey="value" nameKey="name">
-                {impactData.items.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={entry.color} />
+              <defs>
+                {PIE_COLORS.map((color, index) => (
+                  <linearGradient key={`gradient-${index}`} id={`pieGradientInfra-${index}`} x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={color} stopOpacity={1} />
+                    <stop offset="100%" stopColor={color} stopOpacity={0.7} />
+                  </linearGradient>
+                ))}
+              </defs>
+
+              <Pie
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                data={data as any}
+                cx="50%"
+                cy="50%"
+                innerRadius={60}
+                outerRadius={100}
+                paddingAngle={3}
+                dataKey="value"
+                nameKey="area"
+                stroke="none"
+                labelLine={false}
+                label={(props) => {
+                  const { cx, cy, midAngle, outerRadius, payload } = props as {
+                    cx: number;
+                    cy: number;
+                    midAngle: number;
+                    outerRadius: number;
+                    payload: ImpactRow;
+                  };
+
+                  const RADIAN = Math.PI / 180;
+                  const radius = (outerRadius ?? 100) + 25;
+                  const angle = midAngle ?? 0;
+
+                  const x = (cx ?? 0) + radius * Math.cos(-angle * RADIAN);
+                  const y = (cy ?? 0) + radius * Math.sin(-angle * RADIAN);
+
+                  return (
+                    <text x={x} y={y} fill="currentColor" className="text-[10px] fill-muted-foreground" textAnchor={x > (cx ?? 0) ? 'start' : 'end'} dominantBaseline="central">
+                      {payload.area} ({payload.value}%)
+                    </text>
+                  );
+                }}
+              >
+                {data.map((_, index) => (
+                  <Cell key={`cell-${index}`} fill={`url(#pieGradientInfra-${index})`} className="transition-all duration-300 hover:opacity-80" style={{ filter: 'drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1))' }} />
                 ))}
               </Pie>
-              <Tooltip content={<CustomTooltip />} />
+
+              <ReTooltip content={<PieCustomTooltip />} />
             </PieChart>
           </ResponsiveContainer>
         </div>
 
-        {/* Legend */}
-        <div className="flex flex-wrap justify-center gap-x-4 gap-y-1 mt-2">
-          {impactData.items.map((item, index) => (
-            <div key={index} className="flex items-center gap-1.5 text-xs">
-              <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: item.color }} />
-              <span className="text-muted-foreground">
-                {item.name} ({item.value}%)
-              </span>
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-3">
+          {data.map((item, idx) => (
+            <div key={item.area} className="flex items-center gap-1.5">
+              <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: PIE_COLORS[idx % PIE_COLORS.length] }} />
+              <span className="text-[10px] text-muted-foreground">{item.area}</span>
             </div>
           ))}
         </div>

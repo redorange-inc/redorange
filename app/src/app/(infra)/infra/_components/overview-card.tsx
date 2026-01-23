@@ -18,7 +18,7 @@ const iconMap: Record<string, React.ElementType> = {
 
 export const OverviewCard = ({ stats }: OverviewCardProps) => {
   return (
-    <Card className="h-full border-infra/20 bg-card/80 backdrop-blur">
+    <Card className="h-full border-infra/20 bg-card/60 backdrop-blur-md">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <div>
@@ -35,7 +35,7 @@ export const OverviewCard = ({ stats }: OverviewCardProps) => {
             const TrendIcon = stat.trend === 'up' ? TrendingUp : stat.trend === 'down' ? TrendingDown : null;
 
             return (
-              <div key={index} className="flex items-center gap-3 rounded-lg border border-infra/10 bg-background/50 p-3 transition-colors hover:bg-infra/5">
+              <div key={index} className="flex items-center gap-3 rounded-lg border border-infra/10 bg-background/40 backdrop-blur-sm p-3 transition-colors hover:bg-infra/5">
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-infra/10">
                   <IconComponent className="h-4 w-4 text-infra" />
                 </div>
@@ -57,7 +57,7 @@ export const OverviewCard = ({ stats }: OverviewCardProps) => {
         </div>
 
         {stats.flexibility && (
-          <div className="rounded-lg border border-infra/10 bg-infra/5 p-3">
+          <div className="rounded-lg border border-infra/10 bg-infra/5 backdrop-blur-sm p-3">
             <div className="flex items-start gap-2">
               <Settings className="h-4 w-4 text-infra mt-0.5" />
               <div>

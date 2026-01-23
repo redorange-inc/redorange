@@ -21,6 +21,22 @@ export const ProductsCarousel = ({ products }: ProductsCarouselProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [activeIndex, setActiveIndex] = useState(0);
 
+  // Auto-scroll cada 2 segundos
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => {
+        const nextIndex = (prev + 1) % products.items.length;
+        scrollRef.current?.scrollTo({
+          left: nextIndex * (scrollRef.current?.offsetWidth || 0),
+          behavior: 'smooth',
+        });
+        return nextIndex;
+      });
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [products.items.length]);
+
   useEffect(() => {
     const container = scrollRef.current;
     if (!container) return;
@@ -43,7 +59,7 @@ export const ProductsCarousel = ({ products }: ProductsCarouselProps) => {
           const IconComponent = iconMap[product.iconName] || Monitor;
 
           return (
-            <Card key={product.id} className="min-w-full snap-start border-none bg-linear-to-br from-infra/5 via-transparent to-transparent">
+            <Card key={product.id} className="min-w-full snap-start border-none bg-gradient-to-br from-infra/5 via-transparent to-transparent backdrop-blur-sm">
               <CardContent className="flex items-center gap-4 p-6">
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-infra/10">
                   <IconComponent className="h-6 w-6 text-infra" />
@@ -58,11 +74,13 @@ export const ProductsCarousel = ({ products }: ProductsCarouselProps) => {
         })}
       </div>
 
+      {/* Dots indicator */}
       <div className="flex justify-center gap-1.5 mt-4">
         {products.items.map((_, index) => (
           <button
             key={index}
             onClick={() => {
+              setActiveIndex(index);
               scrollRef.current?.scrollTo({
                 left: index * (scrollRef.current?.offsetWidth || 0),
                 behavior: 'smooth',

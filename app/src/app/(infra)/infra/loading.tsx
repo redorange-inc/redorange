@@ -3,10 +3,9 @@ import {
   HeroSkeleton,
   OverviewCardSkeleton,
   ProductsCarouselSkeleton,
-  ChartsSkeleton,
+  ImpactChartSkeleton,
   AchievementsSkeleton,
   BrandsSkeleton,
-  CtaSkeleton,
 } from './_components/skeletons';
 
 export default function Loading() {
@@ -31,8 +30,10 @@ export default function Loading() {
 
       <Separator className="my-10" />
 
-      {/* Charts */}
-      <ChartsSkeleton />
+      {/* Impact Chart */}
+      <section className="max-w-xl mx-auto">
+        <ImpactChartSkeleton />
+      </section>
 
       <Separator className="my-10" />
 
@@ -43,11 +44,6 @@ export default function Loading() {
 
       {/* Brands */}
       <BrandsSkeleton />
-
-      <Separator className="my-10" />
-
-      {/* CTA */}
-      <CtaSkeleton />
     </div>
   );
 }

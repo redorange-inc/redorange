@@ -20,7 +20,7 @@ export const AchievementsSection = ({ achievements }: AchievementsSectionProps) 
     <div className="space-y-6" data-anim="fade-up">
       <div className="flex items-center justify-between">
         <h2 className="font-heading text-2xl font-bold">{achievements.title}</h2>
-        <Badge variant="outline" className="border-infra/30 text-muted-foreground">
+        <Badge variant="outline" className="border-infra/30 text-muted-foreground bg-background/50 backdrop-blur-sm">
           KPIs
         </Badge>
       </div>
@@ -30,7 +30,7 @@ export const AchievementsSection = ({ achievements }: AchievementsSectionProps) 
           const IconComponent = iconMap[achievement.iconName] || Clock;
 
           return (
-            <Card key={index} className="border-infra/20 transition-all hover:border-infra/40 hover:shadow-md">
+            <Card key={index} className="border-infra/20 bg-card/60 backdrop-blur-md transition-all hover:border-infra/40 hover:shadow-md">
               <CardContent className="flex items-center justify-between p-5">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-infra/10">

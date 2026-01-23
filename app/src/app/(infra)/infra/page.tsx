@@ -6,7 +6,6 @@ import { getInfraStats } from '@/actions/infra/fn-get-infra-stats';
 import { getInfraHighlights } from '@/actions/infra/fn-get-infra-highlights';
 import { getInfraProductsPreview } from '@/actions/infra/fn-get-infra-products-preview';
 import { getInfraImpactData } from '@/actions/infra/fn-get-infra-impact';
-import { getInfraTimeSeries } from '@/actions/infra/fn-get-infra-time-series';
 import { getInfraAchievements } from '@/actions/infra/fn-get-infra-achievements';
 import { getInfraBrands } from '@/actions/infra/fn-get-infra-brands';
 
@@ -16,19 +15,24 @@ import { HeroSection } from './_components/hero-section';
 import { OverviewCard } from './_components/overview-card';
 import { ProductsCarousel } from './_components/products-carousel';
 import { ImpactChart } from './_components/impact-chart';
-import { TrendChart } from './_components/trend-chart';
 import { AchievementsSection } from './_components/achievements-section';
 import { BrandsSection } from './_components/brands-section';
-import { CtaSection } from './_components/cta-section';
 
 const InfraPage = async () => {
-  const [heroResponse, statsResponse, highlightsResponse, productsResponse, impactResponse, timeSeriesResponse, achievementsResponse, brandsResponse] = await Promise.all([
+  const [
+    heroResponse,
+    statsResponse,
+    highlightsResponse,
+    productsResponse,
+    impactResponse,
+    achievementsResponse,
+    brandsResponse,
+  ] = await Promise.all([
     getInfraHero(),
     getInfraStats(),
     getInfraHighlights(),
     getInfraProductsPreview(),
     getInfraImpactData(),
-    getInfraTimeSeries(),
     getInfraAchievements(),
     getInfraBrands(),
   ]);
@@ -57,10 +61,9 @@ const InfraPage = async () => {
 
         <Separator className="my-10" />
 
-        {/* Charts */}
-        <section className="grid gap-6 lg:grid-cols-12" data-anim="fade-up">
+        {/* Impact Chart */}
+        <section className="max-w-xl mx-auto" data-anim="fade-up">
           <ImpactChart impactData={impactResponse.data} />
-          <TrendChart timeSeriesData={timeSeriesResponse.data} />
         </section>
 
         <Separator className="my-10" />
@@ -72,11 +75,6 @@ const InfraPage = async () => {
 
         {/* Brands */}
         <BrandsSection brands={brandsResponse.data} />
-
-        <Separator className="my-10" />
-
-        {/* CTA */}
-        <CtaSection />
       </div>
     </PageAnimations>
   );
