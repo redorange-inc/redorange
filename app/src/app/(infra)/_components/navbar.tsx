@@ -5,7 +5,7 @@ import type { FC } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Menu, X, ChevronDown } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -13,9 +13,9 @@ import { cn } from '@/lib/utils';
 const navItems = [
   { href: '/infra', label: 'Inicio', exact: true },
   { href: '/infra/products', label: 'Productos', exact: false },
-  { href: '/infra/import-export', label: 'Importación', exact: false },
+  { href: '/infra/import', label: 'Importación', exact: false },
   { href: '/infra/quote', label: 'Cotizar', exact: false },
-  { href: '/infra/technical-services', label: 'Servicios Técnicos', exact: false },
+  { href: '/infra/services', label: 'Servicios Técnicos', exact: false },
   { href: '/infra/networks', label: 'Redes', exact: false },
   { href: '/infra/contact', label: 'Contacto', exact: false },
 ] as const;
