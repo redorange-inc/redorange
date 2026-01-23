@@ -3,9 +3,11 @@
 import type { ApiResponse, BrandsData } from '@/app/(infra)/infra/_components/types';
 
 export const getInfraBrands = async (): Promise<ApiResponse<BrandsData>> => {
-  await new Promise((resolve) => setTimeout(resolve, 100));
+  await new Promise((resolve) => setTimeout(resolve, 50));
 
-  const mockData: BrandsData = {
+  const data: BrandsData = {
+    title: 'Marcas y Proveedores',
+    subtitle: 'Trabajamos con las mejores marcas del mercado',
     items: [
       { id: 'hp', name: 'HP', category: 'computers' },
       { id: 'dell', name: 'Dell', category: 'computers' },
@@ -18,15 +20,12 @@ export const getInfraBrands = async (): Promise<ApiResponse<BrandsData>> => {
       { id: 'mikrotik', name: 'MikroTik', category: 'networking' },
       { id: 'logitech', name: 'Logitech', category: 'peripherals' },
       { id: 'samsung', name: 'Samsung', category: 'storage' },
-      { id: 'western-digital', name: 'Western Digital', category: 'storage' },
       { id: 'kingston', name: 'Kingston', category: 'storage' },
-      { id: 'seagate', name: 'Seagate', category: 'storage' },
-      { id: 'apc', name: 'APC', category: 'power' },
     ],
   };
 
   return {
-    data: mockData,
+    data,
     meta: { timestamp: new Date().toISOString(), source: 'static-data' },
   };
 };

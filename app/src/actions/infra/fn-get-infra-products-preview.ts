@@ -1,18 +1,18 @@
 'use server';
 
-import type { ApiResponse, ProductsData } from '@/app/(infra)/infra/_components/types';
+import type { ApiResponse, ProductsPreviewData } from '@/app/(infra)/infra/_components/types';
 
-export const getInfraProducts = async (): Promise<ApiResponse<ProductsData>> => {
-  await new Promise((resolve) => setTimeout(resolve, 100));
+export const getInfraProductsPreview = async (): Promise<ApiResponse<ProductsPreviewData>> => {
+  await new Promise((resolve) => setTimeout(resolve, 50));
 
-  const mockData: ProductsData = {
-    categories: [
+  const data: ProductsPreviewData = {
+    items: [
       {
         id: 'computers',
         title: 'Equipos de Cómputo',
         description: 'Computadoras, laptops, workstations y servidores de alto rendimiento',
         iconName: 'monitor',
-        items: ['Laptops empresariales', 'PCs de escritorio', 'Workstations', 'All-in-One', 'Mini PCs', 'Servidores'],
+        items: ['Laptops empresariales', 'PCs de escritorio', 'Workstations', 'All-in-One'],
         featured: true,
       },
       {
@@ -20,22 +20,23 @@ export const getInfraProducts = async (): Promise<ApiResponse<ProductsData>> => 
         title: 'Accesorios y Periféricos',
         description: 'Teclados, mouse, monitores, webcams y más',
         iconName: 'keyboard',
-        items: ['Monitores', 'Teclados mecánicos', 'Mouse ergonómicos', 'Webcams HD', 'Headsets', 'Docking stations'],
+        items: ['Monitores', 'Teclados mecánicos', 'Mouse ergonómicos', 'Webcams HD'],
         featured: true,
       },
       {
         id: 'supplies',
         title: 'Suministros Tecnológicos',
         description: 'Cables, adaptadores, memorias y almacenamiento',
-        iconName: 'cable',
-        items: ['Memorias RAM', 'Discos SSD/HDD', 'Cables HDMI/USB', 'Adaptadores', 'UPS y reguladores', 'Fuentes de poder'],
+        iconName: 'hardDrive',
+        items: ['Memorias RAM', 'Discos SSD/HDD', 'Cables HDMI/USB', 'Adaptadores'],
+        featured: false,
       },
       {
         id: 'telecom',
         title: 'Telecomunicaciones',
         description: 'Routers, switches, access points y equipos de red',
         iconName: 'router',
-        items: ['Routers empresariales', 'Switches administrables', 'Access Points WiFi 6', 'Firewalls', 'Módems', 'Antenas'],
+        items: ['Routers empresariales', 'Switches administrables', 'Access Points WiFi 6', 'Firewalls'],
         featured: true,
       },
       {
@@ -43,13 +44,14 @@ export const getInfraProducts = async (): Promise<ApiResponse<ProductsData>> => 
         title: 'Robótica',
         description: 'Kits educativos, brazos robóticos y componentes',
         iconName: 'cpu',
-        items: ['Kits Arduino', 'Raspberry Pi', 'Brazos robóticos', 'Sensores', 'Motores y servos', 'Impresoras 3D'],
+        items: ['Kits Arduino', 'Raspberry Pi', 'Brazos robóticos', 'Sensores'],
+        featured: false,
       },
     ],
   };
 
   return {
-    data: mockData,
+    data,
     meta: { timestamp: new Date().toISOString(), source: 'static-data' },
   };
 };

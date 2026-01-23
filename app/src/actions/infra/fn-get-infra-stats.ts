@@ -3,9 +3,11 @@
 import type { ApiResponse, StatsData } from '@/app/(infra)/infra/_components/types';
 
 export const getInfraStats = async (): Promise<ApiResponse<StatsData>> => {
-  await new Promise((resolve) => setTimeout(resolve, 100));
+  await new Promise((resolve) => setTimeout(resolve, 50));
 
-  const mockData: StatsData = {
+  const data: StatsData = {
+    title: 'Resumen de Operaciones',
+    subtitle: 'Métricas y resultados',
     items: [
       {
         label: 'Equipos Vendidos',
@@ -36,10 +38,14 @@ export const getInfraStats = async (): Promise<ApiResponse<StatsData>> => {
         iconName: 'wrench',
       },
     ],
+    flexibility: {
+      title: 'Modalidad flexible',
+      description: 'Venta directa, por volumen o licitación. Adaptamos nuestros servicios a las necesidades de cada cliente.',
+    },
   };
 
   return {
-    data: mockData,
+    data,
     meta: { timestamp: new Date().toISOString(), source: 'static-data' },
   };
 };

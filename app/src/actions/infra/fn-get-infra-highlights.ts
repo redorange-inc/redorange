@@ -3,20 +3,20 @@
 import type { ApiResponse, HighlightsData } from '@/app/(infra)/infra/_components/types';
 
 export const getInfraHighlights = async (): Promise<ApiResponse<HighlightsData>> => {
-  await new Promise((resolve) => setTimeout(resolve, 100));
+  await new Promise((resolve) => setTimeout(resolve, 50));
 
-  const mockData: HighlightsData = {
+  const data: HighlightsData = {
     items: [
-      { text: 'Importación directa de fábrica', iconName: 'globe' },
-      { text: 'Garantía extendida en equipos', iconName: 'shield' },
-      { text: 'Soporte técnico especializado', iconName: 'headphones' },
+      { text: 'Importación directa', iconName: 'globe' },
+      { text: 'Garantía extendida', iconName: 'shield' },
+      { text: 'Soporte técnico', iconName: 'headphones' },
       { text: 'Instalación profesional', iconName: 'wrench' },
-      { text: 'Entrega a nivel nacional', iconName: 'truck' },
+      { text: 'Envío nacional', iconName: 'truck' },
     ],
   };
 
   return {
-    data: mockData,
+    data,
     meta: { timestamp: new Date().toISOString(), source: 'static-data' },
   };
 };
