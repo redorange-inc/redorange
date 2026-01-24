@@ -13,7 +13,6 @@ import { cn } from '@/lib/utils';
 const navItems = [
   { href: '/infra', label: 'Inicio', exact: true },
   { href: '/infra/products', label: 'Productos', exact: false },
-  { href: '/infra/import', label: 'Importación', exact: false },
   { href: '/infra/quote', label: 'Cotizar', exact: false },
   { href: '/infra/services', label: 'Servicios Técnicos', exact: false },
   { href: '/infra/networks', label: 'Redes', exact: false },
@@ -32,6 +31,7 @@ export const Navbar: FC = () => {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsMenuOpen(false);
   }, [pathname]);
 
@@ -65,11 +65,7 @@ export const Navbar: FC = () => {
               <Link
                 key={item.href}
                 href={item.href}
-                className={cn(
-                  'relative px-2.5 py-2 font-heading text-sm transition-all duration-200',
-                  'hover:text-infra hover:font-bold',
-                  active ? 'text-infra font-bold' : 'text-foreground/80'
-                )}
+                className={cn('relative px-2.5 py-2 font-heading text-sm transition-all duration-200', 'hover:text-infra hover:font-bold', active ? 'text-infra font-bold' : 'text-foreground/80')}
               >
                 {item.label}
                 {active && <span className="absolute bottom-0 left-1/2 h-0.5 w-3/4 -translate-x-1/2 rounded-full bg-infra" />}
@@ -102,7 +98,7 @@ export const Navbar: FC = () => {
       <div
         className={cn(
           'fixed inset-x-0 top-[61px] z-50 max-h-[calc(100vh-61px)] overflow-y-auto bg-background border-b border-border shadow-xl transition-all duration-300 xl:hidden',
-          isMenuOpen ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0 pointer-events-none'
+          isMenuOpen ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0 pointer-events-none',
         )}
       >
         <nav className="mx-auto flex w-full max-w-6xl flex-col px-6 py-4">
@@ -117,7 +113,7 @@ export const Navbar: FC = () => {
                 className={cn(
                   'relative py-3 font-heading text-base transition-all duration-200 border-b border-border/30',
                   'hover:text-infra hover:pl-2',
-                  active ? 'text-infra font-bold pl-2' : 'text-foreground/80'
+                  active ? 'text-infra font-bold pl-2' : 'text-foreground/80',
                 )}
               >
                 {active && <span className="absolute left-0 top-1/2 h-4 w-0.5 -translate-y-1/2 rounded-full bg-infra" />}
