@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ArrowRight, Sparkles, MapPin, Clock, Mail, Phone, Cpu, Boxes, Globe, CheckCircle2, Hash, MessageCircle } from 'lucide-react';
 
 import { fn_get_contact, type ContactContent, type ContactLine as ContactLineDTO, type ColorTheme } from '@/actions/fn-services';
@@ -44,6 +45,114 @@ const ICONS: Record<ContactLineDTO['iconKey'], FC<{ className?: string }>> = {
 const BULLET_ICONS: Record<'checkCircle2', FC<{ className?: string }>> = {
   checkCircle2: CheckCircle2,
 };
+
+const ContactSectionSkeleton: FC = () => (
+  <section id="contact" className="relative mx-auto max-w-7xl px-4 sm:px-5 md:px-6 pb-16 sm:pb-20 pt-12 sm:pt-12 md:pb-28 md:pt-20 scroll-mt-24" aria-busy="true" aria-live="polite">
+    <div className="pointer-events-none absolute -right-20 top-12 h-[380px] w-[380px] rounded-full bg-primary/5 blur-3xl opacity-50" aria-hidden="true" />
+    <div className="pointer-events-none absolute -left-20 bottom-12 h-[380px] w-[380px] rounded-full bg-accent/5 blur-3xl opacity-50" aria-hidden="true" />
+
+    <div className="mb-8 sm:mb-10 flex flex-col gap-3">
+      <div className="inline-flex w-fit items-center gap-2 rounded-full border border-border/60 bg-background/60 px-3 py-1.5 backdrop-blur">
+        <Skeleton className="h-4 w-4 rounded" />
+        <Skeleton className="h-4 w-40 rounded" />
+      </div>
+
+      <Skeleton className="h-8 w-[min(520px,92%)] rounded-xl" />
+      <div className="space-y-2">
+        <Skeleton className="h-4 w-[min(760px,95%)] rounded-lg" />
+        <Skeleton className="h-4 w-[min(680px,88%)] rounded-lg" />
+      </div>
+
+      <div className="flex flex-wrap gap-2 pt-2">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <span key={i} className="inline-flex items-center gap-2 rounded-full bg-muted/60 px-3 py-1.5 border border-border/50">
+            <Skeleton className="h-3.5 w-3.5 rounded" />
+            <Skeleton className="h-3.5 w-24 rounded" />
+          </span>
+        ))}
+      </div>
+
+      <div className="flex flex-col sm:flex-row flex-wrap gap-2 pt-2">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <span key={i} className="inline-flex items-center gap-2 rounded-full border border-border/60 bg-background/60 px-3 py-1.5 backdrop-blur">
+            <Skeleton className="h-3.5 w-3.5 rounded" />
+            <Skeleton className="h-3.5 w-44 rounded" />
+          </span>
+        ))}
+      </div>
+    </div>
+
+    <div className="rounded-2xl sm:rounded-3xl border border-border/70 bg-background/60 p-4 sm:p-5 md:p-7">
+      <div className="grid w-full grid-cols-3 rounded-2xl bg-muted/40 p-1 sm:p-1.5 border border-border/60 gap-0.5 sm:gap-1">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="rounded-xl px-2 sm:px-2.5 py-2.5 sm:py-3.5">
+            <div className="flex items-center gap-2 sm:gap-2.5 w-full min-w-0 justify-start">
+              <Skeleton className="h-7 w-7 sm:h-8 sm:w-8 rounded-xl" />
+              <Skeleton className="h-4 w-[70%] rounded" />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-4 sm:mt-6 space-y-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <Skeleton className="h-7 w-20 rounded-full" />
+          <Skeleton className="h-7 w-28 rounded-full" />
+        </div>
+
+        <Skeleton className="h-7 w-[min(420px,90%)] rounded-lg" />
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-[min(760px,95%)] rounded-lg" />
+          <Skeleton className="h-4 w-[min(640px,85%)] rounded-lg" />
+        </div>
+
+        <div className="rounded-2xl bg-muted/50 p-3 sm:p-4 border border-border/40">
+          <div className="flex items-start gap-3">
+            <Skeleton className="h-5 w-5 rounded" />
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-4 w-[90%] rounded-lg" />
+              <Skeleton className="h-4 w-[75%] rounded-lg" />
+            </div>
+          </div>
+          <div className="flex justify-center gap-2 sm:gap-2.5 mt-3 sm:mt-4">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <Skeleton key={i} className={`h-1.5 rounded-full ${i === 0 ? 'w-10' : 'w-1.5'}`} />
+            ))}
+          </div>
+        </div>
+
+        <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-20 rounded" />
+            <Skeleton className="h-10 w-full rounded-xl" />
+          </div>
+          <div className="space-y-2">
+            <Skeleton className="h-4 w-20 rounded" />
+            <Skeleton className="h-10 w-full rounded-xl" />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-20 rounded" />
+          <Skeleton className="h-10 w-full rounded-xl" />
+        </div>
+
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-20 rounded" />
+          <Skeleton className="h-28 w-full rounded-xl" />
+        </div>
+
+        <div className="mt-2 flex flex-col gap-2 sm:gap-3 sm:flex-row sm:flex-wrap">
+          <Skeleton className="h-10 w-full sm:w-44 rounded-xl" />
+          <Skeleton className="h-10 w-full sm:w-32 rounded-xl" />
+          <Skeleton className="h-10 w-full sm:w-32 rounded-xl" />
+        </div>
+
+        <Skeleton className="h-4 w-[min(520px,90%)] rounded mx-auto sm:mx-0" />
+      </div>
+    </div>
+  </section>
+);
 
 const EllipsisMarquee: FC<{ text: string; className?: string; speed?: number }> = ({ text, className = '', speed = 20 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -259,18 +368,7 @@ export const ContactSection: FC = () => {
     return () => io.disconnect();
   }, [data, lines.length]);
 
-  if (!data || lines.length === 0) {
-    return (
-      <section id="contact" ref={sectionRef} className="relative mx-auto max-w-7xl px-4 sm:px-5 md:px-6 pb-16 sm:pb-20 pt-12 sm:pt-16 md:pb-28 md:pt-24 scroll-mt-28">
-        <div className="relative z-10 mx-auto flex max-w-xl items-center justify-center">
-          <div className="w-full rounded-2xl border border-border/60 bg-background/60 p-6 text-center backdrop-blur">
-            <p className="font-heading text-base font-extrabold">Cargando contacto...</p>
-            <p className="mt-1 text-sm text-muted-foreground">Preparando la información de contacto y líneas.</p>
-          </div>
-        </div>
-      </section>
-    );
-  }
+  if (!data || lines.length === 0) return <ContactSectionSkeleton />;
 
   const defaultLine = lines[0];
 

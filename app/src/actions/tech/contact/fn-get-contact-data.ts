@@ -46,9 +46,6 @@ export const getContactData = async (): Promise<ApiResponse<ContactPageData>> =>
 
   return {
     data: mockData,
-    meta: {
-      timestamp: new Date().toISOString(),
-      source: 'static-data',
-    },
+    meta: { timestamp: new Date().toISOString(), source: 'static-data' },
   };
 };

@@ -2,7 +2,6 @@
 
 export type ServiceId = 'ti-solutions' | 'equipment-marketing' | 'telecom-services';
 
-// Identificador de tema de color - se mapea a las variables CSS del global.css
 export type ColorTheme = 'tech' | 'infra' | 'digital';
 
 export type ServiceDeliverable = {

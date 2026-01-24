@@ -8,7 +8,7 @@ import { ContactSection } from './_components/contact-section';
 
 const Page: FC = () => {
   return (
-    <main className="relative">
+    <main>
       <HeroSection />
       <ServicesScroller />
       <AboutSection />
