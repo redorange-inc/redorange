@@ -20,40 +20,34 @@ const ServicesPage = async () => {
   return (
     <PageWrapper>
       <div className="relative mx-auto w-full max-w-6xl px-4 py-8 lg:px-6">
-        {/* Hero */}
         <div data-anim="fade-up">
           <HeroServices hero={data.hero} />
         </div>
 
-        {/* Benefits Stats */}
         <div data-anim="fade-up" className="mt-8">
           <BenefitsStats benefits={data.benefits} />
         </div>
 
         <Separator className="my-10" />
 
-        {/* Services Grid */}
         <div data-anim="fade-up">
           <ServicesGrid services={data.services} />
         </div>
 
         <Separator className="my-10" />
 
-        {/* Process */}
         <div data-anim="fade-up">
           <ProcessSection process={data.process} />
         </div>
 
         <Separator className="my-10" />
 
-        {/* FAQs */}
         <div data-anim="fade-up">
           <FAQSection faqs={data.faqs} />
         </div>
 
         <Separator className="my-10" />
 
-        {/* Contact CTA */}
         <div data-anim="fade-up">
           <ContactCTA phone={data.contactPhone} whatsapp={data.contactWhatsapp} />
         </div>

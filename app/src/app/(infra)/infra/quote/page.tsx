@@ -18,12 +18,10 @@ const QuotePage = async () => {
   return (
     <PageWrapper>
       <div className="relative mx-auto w-full max-w-6xl px-4 py-8 lg:px-6">
-        {/* Hero */}
         <div data-anim="fade-up">
           <HeroQuote hero={data.hero} />
         </div>
 
-        {/* Form + Benefits */}
         <section className="grid gap-8 lg:grid-cols-12 mt-8" data-anim="fade-up">
           <div className="lg:col-span-7">
             <QuoteForm categories={data.categories} purchaseTypes={data.purchaseTypes} />
@@ -35,7 +33,6 @@ const QuotePage = async () => {
 
         <Separator className="my-10" />
 
-        {/* Steps */}
         <div data-anim="fade-up">
           <StepsSection steps={data.steps} />
         </div>

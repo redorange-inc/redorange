@@ -5,7 +5,6 @@ import { Separator } from '@/components/ui/separator';
 export default function Loading() {
   return (
     <div className="relative mx-auto w-full max-w-6xl px-4 py-8 lg:px-6">
-      {/* Hero */}
       <section className="py-12 text-center">
         <div className="mx-auto max-w-3xl space-y-4">
           <div className="flex justify-center gap-2">
@@ -19,7 +18,6 @@ export default function Loading() {
 
       <Separator className="my-10" />
 
-      {/* Services Grid */}
       <section className="space-y-6">
         <Skeleton className="h-8 w-48" />
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -44,7 +42,6 @@ export default function Loading() {
 
       <Separator className="my-10" />
 
-      {/* Benefits */}
       <section className="space-y-6">
         <Skeleton className="h-8 w-48" />
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -62,7 +59,6 @@ export default function Loading() {
 
       <Separator className="my-10" />
 
-      {/* Projects */}
       <section className="space-y-6">
         <Skeleton className="h-8 w-48" />
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -81,7 +77,6 @@ export default function Loading() {
 
       <Separator className="my-10" />
 
-      {/* Technologies */}
       <section className="space-y-6">
         <Skeleton className="h-8 w-56 mx-auto" />
         <div className="flex gap-4 overflow-hidden">
@@ -93,7 +88,6 @@ export default function Loading() {
 
       <Separator className="my-10" />
 
-      {/* CTA */}
       <Card className="border-infra/20">
         <CardContent className="p-6">
           <div className="flex items-center justify-between">

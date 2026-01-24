@@ -5,7 +5,6 @@ import { Separator } from '@/components/ui/separator';
 export default function Loading() {
   return (
     <div className="relative mx-auto w-full max-w-6xl px-4 py-8 lg:px-6">
-      {/* Hero Skeleton */}
       <section className="py-12 text-center">
         <div className="mx-auto max-w-3xl space-y-4">
           <div className="flex justify-center gap-2">
@@ -17,7 +16,6 @@ export default function Loading() {
         </div>
       </section>
 
-      {/* Form + Benefits Skeleton */}
       <section className="grid gap-8 lg:grid-cols-12 mt-8">
         <div className="lg:col-span-7">
           <Card className="border-infra/20">
@@ -61,7 +59,6 @@ export default function Loading() {
 
       <Separator className="my-10" />
 
-      {/* Steps Skeleton */}
       <section className="py-8">
         <Skeleton className="h-8 w-48 mx-auto mb-8" />
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
