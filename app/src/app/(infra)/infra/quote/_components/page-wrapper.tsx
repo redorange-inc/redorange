@@ -17,7 +17,7 @@ export const PageWrapper = ({ children }: PageWrapperProps) => {
           }
         });
       },
-      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' },
     );
 
     const elements = document.querySelectorAll('[data-anim]');
@@ -31,11 +31,8 @@ export const PageWrapper = ({ children }: PageWrapperProps) => {
 
   return (
     <>
-      <div
-        className="pointer-events-none fixed inset-0 -z-20 bg-cover bg-center bg-no-repeat opacity-30 dark:opacity-20"
-        style={{ backgroundImage: 'url(/img/infra.png)' }}
-      />
-      <div className="pointer-events-none fixed inset-0 -z-10 bg-gradient-to-b from-background/80 via-background/60 to-background/90" />
+      <div className="pointer-events-none fixed inset-0 -z-20 bg-cover bg-center bg-no-repeat opacity-30 dark:opacity-20" style={{ backgroundImage: 'url(/img/infra.png)' }} />
+      <div className="pointer-events-none fixed inset-0 -z-10 bg-linear-to-b from-background/80 via-background/60 to-background/90" />
       {children}
     </>
   );

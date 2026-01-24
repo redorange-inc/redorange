@@ -25,10 +25,7 @@ export const BenefitsSection = ({ benefits }: BenefitsSectionProps) => {
           const IconComponent = iconMap[benefit.iconName] || Clock;
 
           return (
-            <Card
-              key={index}
-              className="border-infra/20 bg-card/60 backdrop-blur-md transition-all hover:border-infra/40"
-            >
+            <Card key={index} className="border-infra/20 bg-card/60 backdrop-blur-md transition-all hover:border-infra/40">
               <CardContent className="p-4 flex items-start gap-3">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-infra/10">
                   <IconComponent className="h-5 w-5 text-infra" />

@@ -40,7 +40,6 @@ export const QuoteForm = ({ categories, purchaseTypes }: QuoteFormProps) => {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Row 1: Nombre + Email */}
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <label htmlFor="name" className="text-sm font-medium">
@@ -72,7 +71,6 @@ export const QuoteForm = ({ categories, purchaseTypes }: QuoteFormProps) => {
             </div>
           </div>
 
-          {/* Row 2: Empresa + Teléfono */}
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <label htmlFor="company" className="text-sm font-medium">
@@ -103,16 +101,12 @@ export const QuoteForm = ({ categories, purchaseTypes }: QuoteFormProps) => {
             </div>
           </div>
 
-          {/* Row 3: Categoría + Tipo de compra */}
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="space-y-1.5">
               <label className="text-sm font-medium">
                 Categoría de producto<span className="text-infra ml-0.5">*</span>
               </label>
-              <Select
-                value={formData.category || ''}
-                onValueChange={(value) => handleInputChange('category', value)}
-              >
+              <Select value={formData.category || ''} onValueChange={(value) => handleInputChange('category', value)}>
                 <SelectTrigger className="border-infra/20 focus:border-infra focus:ring-infra/20">
                   <SelectValue placeholder="Selecciona una categoría" />
                 </SelectTrigger>
@@ -129,10 +123,7 @@ export const QuoteForm = ({ categories, purchaseTypes }: QuoteFormProps) => {
               <label className="text-sm font-medium">
                 Tipo de compra<span className="text-infra ml-0.5">*</span>
               </label>
-              <Select
-                value={formData.purchaseType || ''}
-                onValueChange={(value) => handleInputChange('purchaseType', value)}
-              >
+              <Select value={formData.purchaseType || ''} onValueChange={(value) => handleInputChange('purchaseType', value)}>
                 <SelectTrigger className="border-infra/20 focus:border-infra focus:ring-infra/20">
                   <SelectValue placeholder="Selecciona el tipo" />
                 </SelectTrigger>
@@ -147,7 +138,6 @@ export const QuoteForm = ({ categories, purchaseTypes }: QuoteFormProps) => {
             </div>
           </div>
 
-          {/* Descripción */}
           <div className="space-y-1.5">
             <label htmlFor="description" className="text-sm font-medium">
               Descripción del requerimiento<span className="text-infra ml-0.5">*</span>
@@ -163,26 +153,15 @@ export const QuoteForm = ({ categories, purchaseTypes }: QuoteFormProps) => {
             />
           </div>
 
-          {/* Archivo adjunto */}
           <div className="space-y-1.5">
             <label htmlFor="file" className="text-sm font-medium">
               Adjuntar lista de requerimientos (opcional)
             </label>
-            <Input
-              id="file"
-              type="file"
-              accept=".pdf,.doc,.docx,.xls,.xlsx"
-              className="border-infra/20 file:bg-infra/10 file:text-infra file:border-0 file:rounded file:px-3 file:py-1 file:mr-3 file:text-sm"
-            />
+            <Input id="file" type="file" accept=".pdf,.doc,.docx,.xls,.xlsx" className="border-infra/20 file:bg-infra/10 file:text-infra file:border-0 file:rounded file:px-3 file:py-1 file:mr-3 file:text-sm" />
             <p className="text-xs text-muted-foreground">PDF, Word o Excel (máx. 5MB)</p>
           </div>
 
-          {/* Submit */}
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full bg-infra hover:bg-infra-accent text-white font-heading"
-          >
+          <Button type="submit" disabled={isSubmitting} className="w-full bg-infra hover:bg-infra-accent text-white font-heading">
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -196,9 +175,7 @@ export const QuoteForm = ({ categories, purchaseTypes }: QuoteFormProps) => {
             )}
           </Button>
 
-          <p className="text-xs text-muted-foreground text-center pt-2">
-            Te contactaremos en menos de 24 horas hábiles con una cotización detallada.
-          </p>
+          <p className="text-xs text-muted-foreground text-center pt-2">Te contactaremos en menos de 24 horas hábiles con una cotización detallada.</p>
         </form>
       </CardContent>
     </Card>
