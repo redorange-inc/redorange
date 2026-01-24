@@ -25,10 +25,7 @@ export const NetworkBenefits = ({ benefits }: NetworkBenefitsProps) => {
           const IconComponent = iconMap[benefit.iconName] || Signal;
 
           return (
-            <Card
-              key={index}
-              className="border-infra/20 bg-card/60 backdrop-blur-md transition-all hover:border-infra/40 group"
-            >
+            <Card key={index} className="border-infra/20 bg-card/60 backdrop-blur-md transition-all hover:border-infra/40 group">
               <CardContent className="p-5 text-center">
                 <div className="flex justify-center mb-3">
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-infra/10 group-hover:bg-infra/20 transition-colors">

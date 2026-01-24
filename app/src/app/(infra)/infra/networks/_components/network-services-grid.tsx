@@ -27,10 +27,7 @@ export const NetworkServicesGrid = ({ services }: NetworkServicesGridProps) => {
           const IconComponent = iconMap[service.iconName] || Cable;
 
           return (
-            <Card
-              key={service.id}
-              className="border-infra/20 bg-card/60 backdrop-blur-md transition-all hover:border-infra/40 hover:shadow-lg group"
-            >
+            <Card key={service.id} className="border-infra/20 bg-card/60 backdrop-blur-md transition-all hover:border-infra/40 hover:shadow-lg group">
               <CardHeader className="pb-3">
                 <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-infra/10 group-hover:bg-infra/20 transition-colors">
                   <IconComponent className="h-6 w-6 text-infra" />
@@ -41,10 +38,7 @@ export const NetworkServicesGrid = ({ services }: NetworkServicesGridProps) => {
                 <p className="text-sm text-muted-foreground">{service.description}</p>
                 <div className="flex flex-wrap gap-2">
                   {service.features.map((feature, index) => (
-                    <span
-                      key={index}
-                      className="inline-flex items-center gap-1 rounded-full bg-infra/5 border border-infra/20 px-2.5 py-0.5 text-xs"
-                    >
+                    <span key={index} className="inline-flex items-center gap-1 rounded-full bg-infra/5 border border-infra/20 px-2.5 py-0.5 text-xs">
                       <Check className="h-3 w-3 text-infra" />
                       {feature}
                     </span>
