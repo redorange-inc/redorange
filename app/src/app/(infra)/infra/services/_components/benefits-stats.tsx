@@ -21,10 +21,7 @@ export const BenefitsStats = ({ benefits }: BenefitsStatsProps) => {
         const IconComponent = iconMap[benefit.iconName] || Clock;
 
         return (
-          <Card
-            key={index}
-            className="border-infra/20 bg-card/60 backdrop-blur-md text-center"
-          >
+          <Card key={index} className="border-infra/20 bg-card/60 backdrop-blur-md text-center">
             <CardContent className="pt-6 pb-4">
               <div className="flex justify-center mb-3">
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-infra/10">

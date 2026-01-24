@@ -28,20 +28,13 @@ export const ServicesGrid = ({ services }: ServicesGridProps) => {
           const IconComponent = iconMap[service.iconName] || Wrench;
 
           return (
-            <Card
-              key={service.id}
-              className="border-infra/20 bg-card/60 backdrop-blur-md transition-all hover:border-infra/40 hover:shadow-lg group"
-            >
+            <Card key={service.id} className="border-infra/20 bg-card/60 backdrop-blur-md transition-all hover:border-infra/40 hover:shadow-lg group">
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between">
                   <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-infra/10 group-hover:bg-infra/20 transition-colors">
                     <IconComponent className="h-6 w-6 text-infra" />
                   </div>
-                  {service.price && (
-                    <Badge className="bg-green-500/10 text-green-600 border-green-500/20">
-                      {service.price}
-                    </Badge>
-                  )}
+                  {service.price && <Badge className="bg-green-500/10 text-green-600 border-green-500/20">{service.price}</Badge>}
                 </div>
                 <CardTitle className="text-lg mt-3">{service.title}</CardTitle>
               </CardHeader>

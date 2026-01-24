@@ -14,7 +14,7 @@ export const ContactCTA = ({ phone, whatsapp }: ContactCTAProps) => {
   const whatsappUrl = `https://wa.me/${whatsapp}?text=${encodeURIComponent('Hola, necesito servicio técnico para mis equipos.')}`;
 
   return (
-    <Card className="border-infra/20 bg-gradient-to-r from-infra/10 via-infra/5 to-transparent">
+    <Card className="border-infra/20 bg-linear-to-r from-infra/10 via-infra/5 to-transparent">
       <CardContent className="p-6">
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
@@ -28,13 +28,7 @@ export const ContactCTA = ({ phone, whatsapp }: ContactCTAProps) => {
           </div>
           <Button asChild className="bg-green-600 hover:bg-green-700 text-white font-heading">
             <a href={whatsappUrl} target="_blank" rel="noopener noreferrer">
-              <Image
-                src="/icons/whatsapp-icon.svg"
-                alt=""
-                width={16}
-                height={16}
-                className="mr-2 h-4 w-4 brightness-0 invert"
-              />
+              <Image src="/icons/whatsapp-icon.svg" alt="" width={16} height={16} className="mr-2 h-4 w-4 brightness-0 invert" />
               Solicitar Servicio
             </a>
           </Button>
