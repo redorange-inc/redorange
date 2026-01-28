@@ -93,6 +93,10 @@ func App() *buffalo.App {
 		auth.GET("/auth/sessions", AuthSessionsList)
 		auth.DELETE("/auth/sessions/all", AuthSessionsRevokeAll)
 		auth.DELETE("/auth/sessions/{session_id}", AuthSessionsRevoke)
+		auth.GET("/auth/me", AuthMe)
+		auth.PATCH("/auth/me", AuthMeUpdate)
+		auth.POST("/auth/password/change", AuthPasswordChange)
+		auth.POST("/auth/password/set", AuthPasswordSet)
 	})
 
 	return app
