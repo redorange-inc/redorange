@@ -2,6 +2,7 @@ package actions
 
 import (
 	"encoding/json"
+	"net"
 	"net/http"
 	"server/models"
 	"strings"
@@ -305,16 +306,35 @@ func createSession(tx *pop.Connection, userID uuid.UUID, refreshToken string, c 
 }
 
 func logLoginAttempt(tx *pop.Connection, email string, userID *uuid.UUID, success bool, failureReason string, c buffalo.Context) {
+	// Extraer IP sin puerto
+	ipAddress := extractIP(c.Request().RemoteAddr)
+	
 	attempt := models.LoginAttempt{
 		Email:         &email,
 		UserID:        userID,
 		Success:       success,
 		FailureReason: nilIfEmpty(failureReason),
-		IPAddress:      nilIfEmpty(c.Request().RemoteAddr),
+		IPAddress:     nilIfEmpty(ipAddress),
 		UserAgent:     nilIfEmpty(c.Request().UserAgent()),
 	}
 
 	tx.Create(&attempt)
+}
+
+// extractIP extrae la IP sin el puerto
+func extractIP(remoteAddr string) string {
+	// RemoteAddr puede ser "192.168.1.1:54321" o "[::1]:54321" (IPv6)
+	if remoteAddr == "" {
+		return ""
+	}
+	
+	// Intentar separar host:port
+	host, _, err := net.SplitHostPort(remoteAddr)
+	if err != nil {
+		// Si falla, puede que no tenga puerto, devolver tal cual
+		return remoteAddr
+	}
+	return host
 }
 
 func shouldLockAccount(tx *pop.Connection, userID uuid.UUID) bool {
@@ -331,18 +351,14 @@ func shouldLockAccount(tx *pop.Connection, userID uuid.UUID) bool {
 }
 
 func lockAccount(tx *pop.Connection, userID uuid.UUID) {
-	lock := models.AccountLock{
-		UserID:      userID,
-		LockedUntil: time.Now().UTC().Add(LockDuration),
-		Reason:      nilIfEmpty("Multiple failed login attempts"),
-	}
+	lockedUntil := time.Now().UTC().Add(LockDuration)
+	reason := "Multiple failed login attempts"
 
-	// Upsert - si ya existe, actualizar
 	tx.RawQuery(`
 		INSERT INTO auth.account_locks (id, user_id, locked_until, reason, created_at)
 		VALUES (gen_random_uuid(), ?, ?, ?, NOW())
 		ON CONFLICT (user_id) DO UPDATE SET locked_until = ?, reason = ?
-	`, userID, lock.LockedUntil, "Multiple failed login attempts", lock.LockedUntil, "Multiple failed login attempts").Exec()
+	`, userID, lockedUntil, reason, lockedUntil, reason).Exec()
 }
 
 func nilIfEmpty(s string) *string {
