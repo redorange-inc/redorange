@@ -76,6 +76,7 @@ func App() *buffalo.App {
 		v1.POST("/auth/refresh", AuthRefresh)
 		v1.POST("/auth/password/request-reset", AuthRequestPasswordReset)
 		v1.POST("/auth/password/reset", AuthResetPassword)
+		v1.POST("/auth/2fa/verify", Auth2FAVerify)
 
 		auth := v1.Group("")
 		auth.Use(AuthMiddleware)
