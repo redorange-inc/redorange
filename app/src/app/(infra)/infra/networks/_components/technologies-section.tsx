@@ -18,7 +18,7 @@ export const TechnologiesSection = ({ technologies }: TechnologiesSectionProps) 
         <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-24 bg-linear-to-r from-background to-transparent" />
         <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-24 bg-linear-to-l from-background to-transparent" />
 
-        <div className="marquee-techs flex w-max gap-4">
+        <div className="flex w-max gap-4 animate-marquee hover:paused">
           {duplicatedTechs.map((tech, index) => (
             <div
               key={`${tech.id}-${index}`}
@@ -30,25 +30,6 @@ export const TechnologiesSection = ({ technologies }: TechnologiesSectionProps) 
           ))}
         </div>
       </div>
-
-      <style jsx global>{`
-        @keyframes marquee-techs-scroll {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-50%);
-          }
-        }
-
-        .marquee-techs {
-          animation: marquee-techs-scroll 20s linear infinite;
-        }
-
-        .marquee-techs:hover {
-          animation-play-state: paused;
-        }
-      `}</style>
     </section>
   );
 };
