@@ -71,7 +71,8 @@ func App() *buffalo.App {
 		api := app.Group("/api")
 		v1 := api.Group("/v1")
 		v1.POST("/auth/register", AuthRegister)
-		v1.POST("/auth/verify-email", AuthVerifyEmail) 
+		v1.POST("/auth/verify-email", AuthVerifyEmail)
+		v1.POST("/auth/login", AuthLogin)
 	})
 
 	return app

@@ -13,6 +13,7 @@ require (
 	github.com/gobuffalo/suite/v4 v4.0.4
 	github.com/gobuffalo/x v0.1.0
 	github.com/gofrs/uuid v4.3.1+incompatible
+	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/rs/cors v1.11.1
 	github.com/unrolled/secure v1.17.0
 )
