@@ -85,6 +85,7 @@ func App() *buffalo.App {
 		auth.POST("/auth/2fa/enable", Auth2FAEnable)
 		auth.POST("/auth/2fa/verify-enable", Auth2FAVerifyEnable)
 		auth.POST("/auth/2fa/disable", Auth2FADisable)
+		auth.POST("/auth/2fa/regenerate-backup-codes", Auth2FARegenerateBackupCodes)
 	})
 
 	return app
