@@ -90,6 +90,9 @@ func App() *buffalo.App {
 		auth.POST("/auth/2fa/regenerate-backup-codes", Auth2FARegenerateBackupCodes)
 		auth.POST("/auth/oauth/google/link", AuthOAuthGoogleLink)
 		auth.DELETE("/auth/oauth/google/unlink", AuthOAuthGoogleUnlink)
+		auth.GET("/auth/sessions", AuthSessionsList)
+		auth.DELETE("/auth/sessions/all", AuthSessionsRevokeAll)
+		auth.DELETE("/auth/sessions/{session_id}", AuthSessionsRevoke)
 	})
 
 	return app
