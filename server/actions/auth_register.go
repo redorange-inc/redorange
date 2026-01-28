@@ -34,14 +34,13 @@ type RegisterResponse struct {
 }
 
 type ErrorResponse struct {
-	Success   bool                   `json:"success"`
-	Error     string                 `json:"error"`
-	ErrorCode string                 `json:"error_code,omitempty"`
-	Details   map[string]any         `json:"details,omitempty"`
+	Success   bool           `json:"success"`
+	Error     string         `json:"error"`
+	ErrorCode string         `json:"error_code,omitempty"`
+	Details   map[string]any `json:"details,omitempty"`
 }
 
 func AuthRegister(c buffalo.Context) error {
-	// Parse JSON
 	var req RegisterRequest
 	if err := c.Bind(&req); err != nil {
 		return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
@@ -51,14 +50,12 @@ func AuthRegister(c buffalo.Context) error {
 		}))
 	}
 
-	// Basic normalization
 	req.Email = strings.ToLower(strings.TrimSpace(req.Email))
 	req.FirstName = strings.TrimSpace(req.FirstName)
 	req.LastNamePaternal = strings.TrimSpace(req.LastNamePaternal)
 	req.LastNameMaternal = strings.TrimSpace(req.LastNameMaternal)
 	req.Role = strings.TrimSpace(req.Role)
 
-	// Validate (simple, puedes endurecerlo luego)
 	details := map[string]any{}
 	if req.Email == "" {
 		details["email"] = "Email is required"
@@ -84,7 +81,6 @@ func AuthRegister(c buffalo.Context) error {
 		}))
 	}
 
-	// Hash password
 	pwHash, err := argon2id.CreateHash(req.Password, argon2id.DefaultParams)
 	if err != nil {
 		return c.Render(http.StatusInternalServerError, r.JSON(ErrorResponse{
@@ -93,11 +89,9 @@ func AuthRegister(c buffalo.Context) error {
 			ErrorCode: "INTERNAL_ERROR",
 		}))
 	}
-	
-	// DB TX (Buffalo suele poner "tx" en el contexto si está el middleware de transacción)
+
 	tx, ok := c.Value("tx").(*pop.Connection)
 	if !ok || tx == nil {
-		// fallback: sin tx no deberías seguir, pero por seguridad:
 		return c.Render(http.StatusInternalServerError, r.JSON(ErrorResponse{
 			Success:   false,
 			Error:     "Database connection not available",
@@ -105,7 +99,6 @@ func AuthRegister(c buffalo.Context) error {
 		}))
 	}
 
-	// Create user + verification token in one transaction
 	user := models.User{
 		Email:            req.Email,
 		EmailVerified:    false,
@@ -121,9 +114,7 @@ func AuthRegister(c buffalo.Context) error {
 		user.LastNameMaternal = &req.LastNameMaternal
 	}
 
-	// Insert user
 	if err := tx.Create(&user); err != nil {
-		// Email duplicado (unique violation). Pop/pg devuelve error genérico; hacemos heurística simple.
 		if strings.Contains(strings.ToLower(err.Error()), "duplicate") || strings.Contains(strings.ToLower(err.Error()), "unique") {
 			return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
 				Success:   false,
@@ -138,7 +129,6 @@ func AuthRegister(c buffalo.Context) error {
 		}))
 	}
 
-	// Create email verification token (store hash; raw token se manda por email)
 	rawToken, err := randomToken(32)
 	if err != nil {
 		return c.Render(http.StatusInternalServerError, r.JSON(ErrorResponse{
@@ -153,7 +143,7 @@ func AuthRegister(c buffalo.Context) error {
 		UserID:    &user.ID,
 		TokenHash: tokenHash,
 		TokenType: "email_verification",
-		ExpiresAt: time.Now().Add(2 * time.Hour),
+		ExpiresAt: time.Now().UTC().Add(2 * time.Hour),
 		Used:      false,
 	}
 
@@ -165,18 +155,21 @@ func AuthRegister(c buffalo.Context) error {
 		}))
 	}
 
-	// TODO: enviar email con rawToken (no se devuelve por API según tu spec)
-	_ = rawToken
+	response := map[string]any{
+		"success": true,
+		"message": "User registered successfully. Please verify your email.",
+		"data": map[string]any{
+			"user_id":        user.ID.String(),
+			"email":          user.Email,
+			"email_verified": user.EmailVerified,
+		},
+	}
 
-	// Response 201
-	var resp RegisterResponse
-	resp.Success = true
-	resp.Message = "User registered successfully. Please verify your email."
-	resp.Data.UserID = user.ID.String()
-	resp.Data.Email = user.Email
-	resp.Data.EmailVerified = user.EmailVerified
+	if ENV == "development" {
+		response["_dev_verification_token"] = rawToken
+	}
 
-	return c.Render(http.StatusCreated, r.JSON(resp))
+	return c.Render(http.StatusCreated, r.JSON(response))
 }
 
 func isAllowedRole(role string) bool {

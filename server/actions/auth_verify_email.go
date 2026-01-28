@@ -48,10 +48,8 @@ func AuthVerifyEmail(c buffalo.Context) error {
 		}))
 	}
 
-	// Hash the token to compare with stored hash
 	tokenHash := sha256Hex(req.Token)
 
-	// Find verification token
 	var vt models.VerificationToken
 	err := tx.Where("token_hash = ? AND token_type = ? AND used = ?", tokenHash, "email_verification", false).First(&vt)
 	if err != nil {
@@ -62,8 +60,7 @@ func AuthVerifyEmail(c buffalo.Context) error {
 		}))
 	}
 
-	// Check if token is expired
-	if time.Now().After(vt.ExpiresAt) {
+	if time.Now().UTC().After(vt.ExpiresAt) {
 		return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
 			Success:   false,
 			Error:     "Token has expired",
@@ -71,7 +68,6 @@ func AuthVerifyEmail(c buffalo.Context) error {
 		}))
 	}
 
-	// Check if user exists
 	if vt.UserID == nil {
 		return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
 			Success:   false,
@@ -80,7 +76,6 @@ func AuthVerifyEmail(c buffalo.Context) error {
 		}))
 	}
 
-	// Get user
 	var user models.User
 	if err := tx.Find(&user, *vt.UserID); err != nil {
 		return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
@@ -90,7 +85,6 @@ func AuthVerifyEmail(c buffalo.Context) error {
 		}))
 	}
 
-	// Check if already verified
 	if user.EmailVerified {
 		return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
 			Success:   false,
@@ -99,7 +93,6 @@ func AuthVerifyEmail(c buffalo.Context) error {
 		}))
 	}
 
-	// Update user email_verified
 	user.EmailVerified = true
 	if err := tx.Update(&user); err != nil {
 		return c.Render(http.StatusInternalServerError, r.JSON(ErrorResponse{
@@ -109,7 +102,6 @@ func AuthVerifyEmail(c buffalo.Context) error {
 		}))
 	}
 
-	// Mark token as used
 	vt.Used = true
 	now := time.Now()
 	vt.UsedAt = &now
