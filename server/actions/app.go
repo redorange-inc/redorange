@@ -73,6 +73,10 @@ func App() *buffalo.App {
 		v1.POST("/auth/register", AuthRegister)
 		v1.POST("/auth/verify-email", AuthVerifyEmail)
 		v1.POST("/auth/login", AuthLogin)
+
+		auth := v1.Group("")
+		auth.Use(AuthMiddleware)
+		auth.POST("/auth/logout", AuthLogout)											
 	})
 
 	return app
