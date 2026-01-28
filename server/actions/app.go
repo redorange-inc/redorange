@@ -80,6 +80,7 @@ func App() *buffalo.App {
 		v1.POST("/auth/2fa/verify-backup", Auth2FAVerifyBackup)
 		v1.GET("/auth/oauth/google", AuthOAuthGoogleInitiate)
 		v1.GET("/auth/oauth/google/callback", AuthOAuthGoogleCallback)
+		v1.POST("/auth/security/status", AuthSecurityStatus)
 
 		auth := v1.Group("")
 		auth.Use(AuthMiddleware)
@@ -97,6 +98,7 @@ func App() *buffalo.App {
 		auth.PATCH("/auth/me", AuthMeUpdate)
 		auth.POST("/auth/password/change", AuthPasswordChange)
 		auth.POST("/auth/password/set", AuthPasswordSet)
+		auth.GET("/auth/security/login-history", AuthSecurityLoginHistory)
 	})
 
 	return app
