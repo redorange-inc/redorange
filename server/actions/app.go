@@ -78,6 +78,8 @@ func App() *buffalo.App {
 		v1.POST("/auth/password/reset", AuthResetPassword)
 		v1.POST("/auth/2fa/verify", Auth2FAVerify)
 		v1.POST("/auth/2fa/verify-backup", Auth2FAVerifyBackup)
+		v1.GET("/auth/oauth/google", AuthOAuthGoogleInitiate)
+		v1.GET("/auth/oauth/google/callback", AuthOAuthGoogleCallback)
 
 		auth := v1.Group("")
 		auth.Use(AuthMiddleware)
@@ -86,6 +88,8 @@ func App() *buffalo.App {
 		auth.POST("/auth/2fa/verify-enable", Auth2FAVerifyEnable)
 		auth.POST("/auth/2fa/disable", Auth2FADisable)
 		auth.POST("/auth/2fa/regenerate-backup-codes", Auth2FARegenerateBackupCodes)
+		auth.POST("/auth/oauth/google/link", AuthOAuthGoogleLink)
+		auth.DELETE("/auth/oauth/google/unlink", AuthOAuthGoogleUnlink)
 	})
 
 	return app
