@@ -153,7 +153,7 @@ func AuthRegister(c buffalo.Context) error {
 		UserID:    &user.ID,
 		TokenHash: tokenHash,
 		TokenType: "email_verification",
-		ExpiresAt: time.Now().Add(24 * time.Hour),
+		ExpiresAt: time.Now().Add(2 * time.Hour),
 		Used:      false,
 	}
 
