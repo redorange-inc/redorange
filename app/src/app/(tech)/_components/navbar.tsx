@@ -7,8 +7,8 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { AuthStatus } from '@/components/auth/auth-status';
 
 const navItems = [
   { href: '/tech', label: 'Inicio', exact: true },
@@ -75,9 +75,7 @@ export const Navbar: FC = () => {
 
         <div className="flex items-center gap-2">
           <div className="hidden md:block">
-            <Button asChild className="font-heading bg-tech-muted text-white hover:bg-tech-accent">
-              <Link href="/auth/sign-in">Iniciar Sesión</Link>
-            </Button>
+            <AuthStatus signInVariant="default" signInClassName="font-heading bg-tech-muted text-white hover:bg-tech-accent" showUserName={false} />
           </div>
           <ThemeToggle />
           <button
@@ -122,11 +120,7 @@ export const Navbar: FC = () => {
           })}
 
           <div className="mt-4 pt-4 border-t border-border/50">
-            <Button asChild className="w-full font-heading bg-tech-muted text-white hover:bg-tech-accent">
-              <Link href="/auth/sign-in" onClick={() => setIsMenuOpen(false)}>
-                Iniciar Sesión
-              </Link>
-            </Button>
+            <AuthStatus signInVariant="default" signInClassName="w-full font-heading bg-tech-muted text-white hover:bg-tech-accent" showUserName={true} />
           </div>
         </nav>
       </div>
