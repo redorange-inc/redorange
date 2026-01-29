@@ -43,11 +43,22 @@ var (
 // declared after it to never be called.
 func App() *buffalo.App {
 	appOnce.Do(func() {
+		// -- cors configuration
+		corsHandler := cors.New(cors.Options{
+			AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:3001"},
+			AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+			AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+			ExposedHeaders:   []string{"Link"},
+			AllowCredentials: true,
+			MaxAge:           300,
+		})
+
 		app = buffalo.New(buffalo.Options{
 			Env:          ENV,
 			SessionStore: sessions.Null{},
 			PreWares: []buffalo.PreWare{
-				cors.Default().Handler,
+				// cors.Default().Handler,
+				corsHandler.Handler,
 			},
 			SessionName: "_server_session",
 		})
