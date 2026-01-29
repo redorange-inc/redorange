@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next';
 import { Poppins, Montserrat, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import { ThemeProvider } from '@/components/theme/theme-provider';
+import { AuthProvider } from '@/providers/auth-provider';
 
 const poppins = Poppins({ subsets: ['latin'], variable: '--font-poppins', display: 'swap', weight: ['400', '500', '600', '700'], preload: true, fallback: ['system-ui', 'arial'] });
 const montserrat = Montserrat({ subsets: ['latin'], variable: '--font-montserrat', display: 'swap', weight: ['500', '600', '700', '800'], preload: true, fallback: ['system-ui', 'arial'] });
@@ -102,7 +103,9 @@ const RootLayout: FC<RootLayoutProps> = ({ children }): JSX.Element => {
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
       </head>
       <body className="min-h-screen bg-background font-sans antialiased" style={{ fontFamily: 'var(--font-poppins), system-ui, sans-serif' }}>
-        <ThemeProvider>{children}</ThemeProvider>
+        <AuthProvider>
+          <ThemeProvider>{children}</ThemeProvider>
+        </AuthProvider>
       </body>
     </html>
   );
