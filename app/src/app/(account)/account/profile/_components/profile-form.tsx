@@ -8,16 +8,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/hooks/use-auth';
 import { updateProfile } from '@/lib/auth/api';
 import { Loader2, Check, AlertCircle } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const profileSchema = z.object({
-  first_name: z.string().min(1, 'El nombre es requerido'),
-  last_name_paternal: z.string().min(1, 'El apellido paterno es requerido'),
-  last_name_maternal: z.string().optional(),
+  name: z.string().min(1, 'El nombre es requerido'),
+  last_name: z.string().min(1, 'El apellido es requerido'),
+  profile: z.string().url('URL inválida').optional().or(z.literal('')),
 });
 
 type ProfileFormData = z.infer<typeof profileSchema>;
@@ -37,7 +37,11 @@ export const ProfileForm = () => {
 
   useEffect(() => {
     if (user) {
-      reset({ first_name: user.first_name, last_name_paternal: user.last_name_paternal, last_name_maternal: user.last_name_maternal || '' });
+      reset({
+        name: user.name,
+        last_name: user.last_name,
+        profile: user.profile || '',
+      });
     }
   }, [user, reset]);
 
@@ -47,7 +51,11 @@ export const ProfileForm = () => {
     setSuccess(false);
 
     try {
-      const response = await updateProfile(data);
+      const response = await updateProfile({
+        name: data.name,
+        last_name: data.last_name,
+        profile: data.profile || undefined,
+      });
 
       if (response.success) {
         setSuccess(true);
@@ -63,18 +71,19 @@ export const ProfileForm = () => {
 
   if (!user) return null;
 
-  const initials = `${user.first_name[0]}${user.last_name_paternal[0]}`.toUpperCase();
-  const fullName = `${user.first_name} ${user.last_name_paternal}`;
+  const initials = `${user.name[0]}${user.last_name[0]}`.toUpperCase();
+  const fullName = `${user.name} ${user.last_name}`;
 
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
           <CardTitle>Foto de Perfil</CardTitle>
-          <CardDescription>Tu avatar se genera con tus iniciales</CardDescription>
+          <CardDescription>{user.profile ? 'Tu imagen de perfil' : 'Tu avatar se genera con tus iniciales'}</CardDescription>
         </CardHeader>
         <CardContent className="flex items-center gap-4">
           <Avatar className="h-20 w-20">
+            <AvatarImage src={user.profile} alt={fullName} />
             <AvatarFallback className="bg-primary text-primary-foreground text-2xl">{initials}</AvatarFallback>
           </Avatar>
           <div>
@@ -108,21 +117,22 @@ export const ProfileForm = () => {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="first_name">Nombre</Label>
-                <Input id="first_name" {...register('first_name')} disabled={isLoading} />
-                {errors.first_name && <p className="text-sm text-destructive">{errors.first_name.message}</p>}
+                <Label htmlFor="name">Nombre</Label>
+                <Input id="name" {...register('name')} disabled={isLoading} />
+                {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="last_name_paternal">Apellido Paterno</Label>
-                <Input id="last_name_paternal" {...register('last_name_paternal')} disabled={isLoading} />
-                {errors.last_name_paternal && <p className="text-sm text-destructive">{errors.last_name_paternal.message}</p>}
+                <Label htmlFor="last_name">Apellido</Label>
+                <Input id="last_name" {...register('last_name')} disabled={isLoading} />
+                {errors.last_name && <p className="text-sm text-destructive">{errors.last_name.message}</p>}
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="last_name_maternal">Apellido Materno (Opcional)</Label>
-              <Input id="last_name_maternal" {...register('last_name_maternal')} disabled={isLoading} />
+              <Label htmlFor="profile">URL de Imagen de Perfil (Opcional)</Label>
+              <Input id="profile" type="url" placeholder="https://ejemplo.com/imagen.jpg" {...register('profile')} disabled={isLoading} />
+              {errors.profile && <p className="text-sm text-destructive">{errors.profile.message}</p>}
             </div>
 
             <div className="space-y-2">

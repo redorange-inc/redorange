@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { User, Shield, Monitor, Mail, Calendar, Clock, ChevronRight, ShieldCheck, ShieldAlert } from 'lucide-react';
@@ -15,9 +15,7 @@ const AccountPage = () => {
   const { user, isLoading, isAuthenticated } = useAuth();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      router.push('/auth/sign-in');
-    }
+    if (!isLoading && !isAuthenticated) router.push('/auth/sign-in');
   }, [isLoading, isAuthenticated, router]);
 
   if (isLoading || !user) {
@@ -28,8 +26,8 @@ const AccountPage = () => {
     );
   }
 
-  const initials = `${user.first_name[0]}${user.last_name_paternal[0]}`.toUpperCase();
-  const fullName = `${user.first_name} ${user.last_name_paternal}${user.last_name_maternal ? ` ${user.last_name_maternal}` : ''}`;
+  const initials = `${user.name[0]}${user.last_name[0]}`.toUpperCase();
+  const fullName = `${user.name} ${user.last_name}`;
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('es', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -52,6 +50,7 @@ const AccountPage = () => {
         <CardContent className="pt-6">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
             <Avatar className="h-20 w-20">
+              <AvatarImage src={user.profile} alt={fullName} />
               <AvatarFallback className="bg-primary text-primary-foreground text-2xl">{initials}</AvatarFallback>
             </Avatar>
 
@@ -62,7 +61,7 @@ const AccountPage = () => {
                   <Mail className="h-4 w-4" />
                   <span className="text-sm">{user.email}</span>
                 </div>
-                <Badge variant="secondary" className="text-xs capitalize">
+                <Badge variant="secondary" className="text-xs">
                   {user.role}
                 </Badge>
               </div>
@@ -88,7 +87,7 @@ const AccountPage = () => {
                   <span className="text-sm font-medium">2FA Activo</span>
                 </div>
               ) : (
-                <div className="flex items-center gap-1 text-primary">
+                <div className="flex items-center gap-1 text-amber-600">
                   <ShieldAlert className="h-5 w-5" />
                   <span className="text-sm font-medium">2FA Inactivo</span>
                 </div>
@@ -98,7 +97,7 @@ const AccountPage = () => {
         </CardContent>
       </Card>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-3">
         {quickLinks.map((link) => {
           const Icon = link.icon;
           return (
@@ -172,6 +171,24 @@ const AccountPage = () => {
           </div>
         </CardContent>
       </Card>
+
+      {user.oauth_providers.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg">Cuentas Vinculadas</CardTitle>
+            <CardDescription>Proveedores de inicio de sesión conectados</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-wrap gap-2">
+              {user.oauth_providers.map((provider) => (
+                <Badge key={provider} variant="secondary" className="capitalize">
+                  {provider}
+                </Badge>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
