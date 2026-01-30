@@ -1,5 +1,16 @@
 import { getAccessToken, getRefreshToken, setTokens, setAccessToken, clearTokens } from './tokens';
-import type { ApiResponse, LoginRequest, LoginApiResponse, RegisterRequest, RegisterResponse, VerifyEmailRequest, Verify2FARequest, VerifyBackupCodeRequest, LoginResponse } from './types';
+import type {
+  ApiResponse,
+  LoginRequest,
+  LoginApiResponse,
+  RegisterRequest,
+  RegisterResponse,
+  VerifyEmailRequest,
+  Verify2FARequest,
+  VerifyBackupCodeRequest,
+  LoginResponse,
+  BackupCodesStatusResponse,
+} from './types';
 import type { RequestPasswordResetRequest, ResetPasswordRequest, RefreshResponse, User, UpdateProfileRequest, ChangePasswordRequest, SetPasswordRequest, Enable2FAResponse } from './types';
 import type { Enable2FAVerifyRequest, Disable2FARequest, Regenerate2FABackupCodesRequest, RegenerateBackupCodesResponse, SessionInfo, LoginAttemptInfo, AccountStatus } from './types';
 
@@ -125,6 +136,10 @@ export const regenerateBackupCodes = async (data: Regenerate2FABackupCodesReques
   return request<RegenerateBackupCodesResponse>('/auth/2fa/regenerate-backup-codes', { method: 'POST', body: JSON.stringify(data) });
 };
 
+export const getBackupCodesStatus = async (): Promise<ApiResponse<BackupCodesStatusResponse>> => {
+  return request<BackupCodesStatusResponse>('/auth/2fa/backup-codes/status', { method: 'GET' });
+};
+
 // -- password
 
 export const requestPasswordReset = async (data: RequestPasswordResetRequest): Promise<ApiResponse<void>> => {
@@ -151,6 +166,10 @@ export const getCurrentUser = async (): Promise<ApiResponse<User>> => {
 
 export const updateProfile = async (data: UpdateProfileRequest): Promise<ApiResponse<User>> => {
   return request<User>('/auth/me', { method: 'PATCH', body: JSON.stringify(data) });
+};
+
+export const deleteProfileImage = async (): Promise<ApiResponse<void>> => {
+  return request<void>('/auth/me/profile', { method: 'DELETE' });
 };
 
 // -- sessions

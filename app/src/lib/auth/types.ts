@@ -2,9 +2,9 @@ export interface User {
   id: string;
   email: string;
   email_verified: boolean;
-  first_name: string;
-  last_name_paternal: string;
-  last_name_maternal?: string;
+  name: string;
+  last_name: string;
+  profile?: string;
   role: 'support' | 'admin' | 'dev';
   active: boolean;
   two_factor_enabled: boolean;
@@ -17,8 +17,9 @@ export interface User {
 export interface LoginUser {
   id: string;
   email: string;
-  first_name: string;
-  last_name_paternal: string;
+  name: string;
+  last_name: string;
+  profile?: string;
   role: string;
   two_factor_enabled: boolean;
 }
@@ -46,10 +47,9 @@ export interface LoginRequest {
 export interface RegisterRequest {
   email: string;
   password: string;
-  first_name: string;
-  last_name_paternal: string;
-  last_name_maternal?: string;
-  role: string;
+  name: string;
+  last_name: string;
+  role?: string;
 }
 
 export interface VerifyEmailRequest {
@@ -85,9 +85,9 @@ export interface SetPasswordRequest {
 }
 
 export interface UpdateProfileRequest {
-  first_name: string;
-  last_name_paternal: string;
-  last_name_maternal?: string;
+  name?: string;
+  last_name?: string;
+  profile?: string;
 }
 
 export interface Enable2FAVerifyRequest {
@@ -159,6 +159,12 @@ export interface RegenerateBackupCodesResponse {
   backup_codes: string[];
 }
 
+export interface BackupCodesStatusResponse {
+  total_codes: number;
+  used_codes: number;
+  remaining_codes: number;
+}
+
 export interface SessionInfo {
   id: string;
   device_info: {
@@ -180,10 +186,12 @@ export interface LoginAttemptInfo {
 }
 
 export interface AccountStatus {
-  is_locked: boolean;
+  exists: boolean;
+  has_password: boolean;
+  two_factor_enabled: boolean;
+  oauth_providers: string[];
+  account_locked: boolean;
   locked_until?: string;
-  failed_attempts: number;
-  reason?: string;
 }
 
 // -- jwt payload (decoded from access_token)
