@@ -6,7 +6,6 @@ import { HeroContact } from './_components/hero-contact';
 import { ContactForm } from './_components/contact-form';
 import { ContactInfoSection } from './_components/contact-info-section';
 import { FeaturesSection } from './_components/features-section';
-import { QuickContact } from './_components/quick-contact';
 
 const InfraContactPage = async () => {
   const { data } = await getInfraContactData();
@@ -27,10 +26,6 @@ const InfraContactPage = async () => {
       <Separator className="my-10" />
 
       <FeaturesSection features={data.features} />
-
-      <Separator className="my-10" />
-
-      <QuickContact info={data.info} />
     </PageWrapper>
   );
 };
