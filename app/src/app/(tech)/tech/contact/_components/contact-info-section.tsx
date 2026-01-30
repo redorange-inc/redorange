@@ -1,8 +1,9 @@
 'use client';
 
 import React from 'react';
-import { DynamicIcon, type IconName } from 'lucide-react/dynamic';
+import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
+import { Icon } from './icon';
 import { ui } from './constants';
 import type { ContactInfo } from './types';
 
@@ -11,11 +12,12 @@ interface ContactInfoSectionProps {
 }
 
 interface ContactItem {
-  iconName: IconName;
+  iconName: string;
   label: string;
   value: string;
   href: string | null;
   external?: boolean;
+  useWhatsappIcon?: boolean;
 }
 
 export const ContactInfoSection = ({ info }: ContactInfoSectionProps) => {
@@ -25,7 +27,7 @@ export const ContactInfoSection = ({ info }: ContactInfoSectionProps) => {
   const contactItems: ContactItem[] = [
     { iconName: 'mail', label: 'Correo electrónico', value: info.email, href: `mailto:${info.email}` },
     { iconName: 'phone', label: 'Teléfono', value: info.phone, href: `tel:${info.phone.replace(/\s/g, '')}` },
-    { iconName: 'message-circle', label: 'WhatsApp', value: info.phone, href: whatsappHref, external: true },
+    { iconName: 'message-circle', label: 'WhatsApp', value: info.phone, href: whatsappHref, external: true, useWhatsappIcon: true },
   ];
 
   return (
@@ -39,7 +41,7 @@ export const ContactInfoSection = ({ info }: ContactInfoSectionProps) => {
               {item.href ? (
                 <a href={item.href} target={item.external ? '_blank' : undefined} rel={item.external ? 'noreferrer' : undefined} className="flex items-center gap-3">
                   <div className="rounded-full bg-tech/20 p-2.5 text-tech group-hover:scale-110 transition-transform">
-                    <DynamicIcon name={item.iconName} size={20} />
+                    {item.useWhatsappIcon ? <Image src="/icons/whatsapp-icon.svg" alt="WhatsApp" width={20} height={20} /> : <Icon name={item.iconName} size="md" />}
                   </div>
                   <div>
                     <div className="text-[10px] text-muted-foreground uppercase tracking-wide">{item.label}</div>
@@ -49,7 +51,7 @@ export const ContactInfoSection = ({ info }: ContactInfoSectionProps) => {
               ) : (
                 <div className="flex items-center gap-3">
                   <div className="rounded-xl bg-tech/20 p-2.5 text-tech">
-                    <DynamicIcon name={item.iconName} size={20} />
+                    <Icon name={item.iconName} size="md" />
                   </div>
                   <div>
                     <div className="text-[10px] text-muted-foreground uppercase tracking-wide">{item.label}</div>

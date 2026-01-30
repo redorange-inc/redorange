@@ -2,14 +2,14 @@
 
 import { useEffect, useRef } from 'react';
 import { animate } from 'animejs';
-import { DynamicIcon, type IconName } from 'lucide-react/dynamic';
 import { Card, CardContent } from '@/components/ui/card';
+import { Icon } from './icon';
 import { ui } from './constants';
 
 interface Feature {
   title: string;
   description: string;
-  iconName: IconName;
+  iconName: string;
 }
 
 interface FeaturesSectionProps {
@@ -58,7 +58,7 @@ export const FeaturesSection = ({ features }: FeaturesSectionProps) => {
           <Card key={idx} data-feature-card className={`rounded-2xl ${ui.glassCard} ${ui.hoverLift} group`} style={{ opacity: 0 }}>
             <CardContent className="p-5 text-center">
               <div className="mx-auto mb-3 w-12 h-12 rounded-2xl bg-tech/20 flex items-center justify-center text-tech group-hover:scale-110 transition-transform">
-                <DynamicIcon name={feature.iconName} size={24} />
+                <Icon name={feature.iconName} size="lg" />
               </div>
               <h3 className="text-sm font-semibold text-foreground mb-1">{feature.title}</h3>
               <p className="text-xs text-muted-foreground leading-relaxed">{feature.description}</p>

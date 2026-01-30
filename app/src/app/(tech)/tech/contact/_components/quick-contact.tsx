@@ -3,9 +3,9 @@
 import { useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { animate } from 'animejs';
-import { DynamicIcon } from 'lucide-react/dynamic';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Icon } from './icon';
 import type { ContactInfo } from './types';
 
 interface QuickContactProps {
@@ -70,17 +70,17 @@ export const QuickContact = ({ info }: QuickContactProps) => {
                     <Image src="/icons/whatsapp-icon.svg" alt="WhatsApp" width={16} height={16} className="brightness-0 invert" />
                   </span>
                   WhatsApp
-                  <DynamicIcon name="arrow-right" size={16} className="ml-2 transition-transform group-hover:translate-x-1" />
+                  <Icon name="arrow-right" size="sm" className="ml-2 transition-transform group-hover:translate-x-1" />
                 </a>
               </Button>
 
               <Button asChild size="lg" variant="outline" className="font-heading bg-background/50 backdrop-blur hover:bg-background/70 group">
                 <a href={`mailto:${info.email}`}>
                   <span data-icon className="inline-flex items-center justify-center mr-2" style={{ transform: 'scale(0)' }}>
-                    <DynamicIcon name="mail" size={20} />
+                    <Icon name="mail" size="md" />
                   </span>
                   Enviar correo
-                  <DynamicIcon name="arrow-right" size={16} className="ml-2 transition-transform group-hover:translate-x-1" />
+                  <Icon name="arrow-right" size="sm" className="ml-2 transition-transform group-hover:translate-x-1" />
                 </a>
               </Button>
             </div>
