@@ -22,7 +22,13 @@ export const PageWrapper = ({ children }: PageWrapperProps) => {
       });
 
       elements.forEach((el, idx) => {
-        animate(el, { opacity: [0, 1], transform: ['translateY(24px) scale(0.98)', 'translateY(0px) scale(1)'], duration: 800, easing: 'easeOutExpo', delay: 100 + 80 * idx });
+        animate(el, {
+          opacity: [0, 1],
+          transform: ['translateY(24px) scale(0.98)', 'translateY(0px) scale(1)'],
+          duration: 800,
+          easing: 'easeOutExpo',
+          delay: 100 + 80 * idx,
+        });
       });
     }, 100);
 
