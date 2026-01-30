@@ -2,7 +2,8 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ui, getIcon } from './constants';
+import { Icon } from './icon';
+import { ui } from './constants';
 import type { MethodologyResponse } from './types';
 
 interface MethodologySectionProps {
@@ -25,7 +26,9 @@ export const MethodologySection = ({ methodologies }: MethodologySectionProps) =
           <Card key={idx} className={`rounded-3xl ${ui.glassCard} ${ui.hoverLift}`}>
             <CardHeader className="pb-3">
               <div className="flex items-center gap-3">
-                <div className="rounded-2xl bg-tech p-3 text-tech">{getIcon(method.iconName, 'lg')}</div>
+                <div className="rounded-2xl bg-tech p-3 text-tech">
+                  <Icon name={method.iconName} size="lg" />
+                </div>
                 <CardTitle className="text-xl">{method.title}</CardTitle>
               </div>
             </CardHeader>
