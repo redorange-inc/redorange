@@ -4,28 +4,20 @@ import (
 	"net/http"
 	"server/models"
 	"strings"
+	"time"
 
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/pop/v6"
 	"github.com/pquerna/otp/totp"
 )
 
-// -- Regenerate Backup Codes
-
 type RegenerateBackupCodesRequest struct {
 	Code string `json:"code"`
 }
 
-type RegenerateBackupCodesResponse struct {
-	Success bool `json:"success"`
-	Data    struct {
-		BackupCodes []string `json:"backup_codes"`
-	} `json:"data"`
-}
-
 func Auth2FARegenerateBackupCodes(c buffalo.Context) error {
-	user := GetCurrentUser(c)
-	if user == nil {
+	user, err := GetCurrentUser(c)
+	if err != nil {
 		return c.Render(http.StatusUnauthorized, r.JSON(ErrorResponse{
 			Success:   false,
 			Error:     "User not found",
@@ -52,7 +44,6 @@ func Auth2FARegenerateBackupCodes(c buffalo.Context) error {
 		}))
 	}
 
-	// Verificar que tenga 2FA habilitado
 	if !user.TwoFactorEnabled {
 		return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
 			Success:   false,
@@ -61,7 +52,6 @@ func Auth2FARegenerateBackupCodes(c buffalo.Context) error {
 		}))
 	}
 
-	// Verificar que tenga secret
 	if user.TwoFactorSecret == nil {
 		return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
 			Success:   false,
@@ -70,7 +60,6 @@ func Auth2FARegenerateBackupCodes(c buffalo.Context) error {
 		}))
 	}
 
-	// Verificar código TOTP
 	valid := totp.Validate(req.Code, *user.TwoFactorSecret)
 	if !valid {
 		return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
@@ -89,32 +78,28 @@ func Auth2FARegenerateBackupCodes(c buffalo.Context) error {
 		}))
 	}
 
-	// Eliminar backup codes anteriores
-	tx.RawQuery(`
-		DELETE FROM auth.two_factor_backup_codes WHERE user_id = ?
-	`, user.ID).Exec()
+	tx.RawQuery("DELETE FROM auth.two_factor_backup_codes WHERE user_id = ?", user.ID).Exec()
 
-	// Generar nuevos backup codes
 	backupCodes := make([]string, BackupCodesCount)
 	for i := 0; i < BackupCodesCount; i++ {
 		backupCodes[i] = generateBackupCode()
 	}
 
-	// Guardar nuevos backup codes hasheados
 	for _, code := range backupCodes {
 		codeHash := sha256Hex(strings.ReplaceAll(code, "-", ""))
 		backupCode := models.TwoFactorBackupCode{
-			UserID:   user.ID,
-			CodeHash: codeHash,
-			Used:     false,
+			UserID:    user.ID,
+			CodeHash:  codeHash,
+			Used:      false,
+			CreatedAt: time.Now().UTC(),
 		}
 		tx.Create(&backupCode)
 	}
 
-	// Respuesta
-	var resp RegenerateBackupCodesResponse
-	resp.Success = true
-	resp.Data.BackupCodes = backupCodes
-
-	return c.Render(http.StatusOK, r.JSON(resp))
+	return c.Render(http.StatusOK, r.JSON(map[string]interface{}{
+		"success": true,
+		"data": map[string]interface{}{
+			"backup_codes": backupCodes,
+		},
+	}))
 }

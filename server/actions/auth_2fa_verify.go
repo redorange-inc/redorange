@@ -17,22 +17,9 @@ const (
 	Max2FAAttempts = 3
 )
 
-// -- Verify 2FA Code (During Login)
-
 type Verify2FARequest struct {
 	TempToken string `json:"temp_token"`
 	Code      string `json:"code"`
-}
-
-type Verify2FAResponse struct {
-	Success bool `json:"success"`
-	Data    struct {
-		AccessToken  string    `json:"access_token"`
-		RefreshToken string    `json:"refresh_token"`
-		TokenType    string    `json:"token_type"`
-		ExpiresIn    int       `json:"expires_in"`
-		User         LoginUser `json:"user"`
-	} `json:"data"`
 }
 
 type Verify2FAErrorResponse struct {
@@ -63,9 +50,7 @@ func Auth2FAVerify(c buffalo.Context) error {
 		}))
 	}
 
-	// Validar el JWT del temp token
-	claims := &JWTClaims{}
-	token, err := jwt.ParseWithClaims(req.TempToken, claims, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.Parse(req.TempToken, func(token *jwt.Token) (interface{}, error) {
 		return JWTSecret, nil
 	})
 
@@ -77,8 +62,17 @@ func Auth2FAVerify(c buffalo.Context) error {
 		}))
 	}
 
-	// Verificar que sea un temp_2fa token
-	if claims.TokenType != "temp_2fa" {
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return c.Render(http.StatusUnauthorized, r.JSON(ErrorResponse{
+			Success:   false,
+			Error:     "Invalid token claims",
+			ErrorCode: "INVALID_CLAIMS",
+		}))
+	}
+
+	tokenType, _ := claims["token_type"].(string)
+	if tokenType != "temp_2fa" {
 		return c.Render(http.StatusUnauthorized, r.JSON(ErrorResponse{
 			Success:   false,
 			Error:     "Invalid token type",
@@ -95,8 +89,8 @@ func Auth2FAVerify(c buffalo.Context) error {
 		}))
 	}
 
-	// Obtener usuario
-	userID, err := uuid.FromString(claims.UserID)
+	userIDStr, _ := claims["user_id"].(string)
+	userID, err := uuid.FromString(userIDStr)
 	if err != nil {
 		return c.Render(http.StatusUnauthorized, r.JSON(ErrorResponse{
 			Success:   false,
@@ -114,7 +108,6 @@ func Auth2FAVerify(c buffalo.Context) error {
 		}))
 	}
 
-	// Verificar que tenga 2FA habilitado y secret
 	if !user.TwoFactorEnabled || user.TwoFactorSecret == nil {
 		return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
 			Success:   false,
@@ -123,7 +116,6 @@ func Auth2FAVerify(c buffalo.Context) error {
 		}))
 	}
 
-	// Contar intentos fallidos recientes de 2FA
 	var failedAttempts int
 	since := time.Now().UTC().Add(-5 * time.Minute)
 	tx.RawQuery(`
@@ -139,11 +131,9 @@ func Auth2FAVerify(c buffalo.Context) error {
 		}))
 	}
 
-	// Validar código TOTP
 	valid := totp.Validate(req.Code, *user.TwoFactorSecret)
 	if !valid {
-		// Registrar intento fallido
-		logLoginAttempt(tx, user.Email, &user.ID, false, "2fa_failed", c)
+		recordLoginAttempt(tx, &user.ID, user.Email, false, "2fa_failed", c.Request())
 
 		attemptsRemaining := Max2FAAttempts - failedAttempts - 1
 		if attemptsRemaining < 0 {
@@ -158,27 +148,8 @@ func Auth2FAVerify(c buffalo.Context) error {
 		}))
 	}
 
-	// 2FA válido - generar tokens
-	accessToken, err := generateToken(user, "access", AccessTokenDuration)
+	accessToken, refreshToken, err := createSession(tx, user, c.Request())
 	if err != nil {
-		return c.Render(http.StatusInternalServerError, r.JSON(ErrorResponse{
-			Success:   false,
-			Error:     "Failed to generate access token",
-			ErrorCode: "INTERNAL_ERROR",
-		}))
-	}
-
-	refreshToken, err := generateToken(user, "refresh", RefreshTokenDuration)
-	if err != nil {
-		return c.Render(http.StatusInternalServerError, r.JSON(ErrorResponse{
-			Success:   false,
-			Error:     "Failed to generate refresh token",
-			ErrorCode: "INTERNAL_ERROR",
-		}))
-	}
-
-	// Guardar sesión
-	if err := createSession(tx, user.ID, refreshToken, c); err != nil {
 		return c.Render(http.StatusInternalServerError, r.JSON(ErrorResponse{
 			Success:   false,
 			Error:     "Failed to create session",
@@ -186,29 +157,28 @@ func Auth2FAVerify(c buffalo.Context) error {
 		}))
 	}
 
-	// Actualizar last_login_at
 	now := time.Now().UTC()
 	user.LastLoginAt = &now
 	tx.Update(&user)
 
-	// Registrar login exitoso
-	logLoginAttempt(tx, user.Email, &user.ID, true, "", c)
+	recordLoginAttempt(tx, &user.ID, user.Email, true, "", c.Request())
 
-	// Respuesta
-	var resp Verify2FAResponse
-	resp.Success = true
-	resp.Data.AccessToken = accessToken
-	resp.Data.RefreshToken = refreshToken
-	resp.Data.TokenType = "Bearer"
-	resp.Data.ExpiresIn = int(AccessTokenDuration.Seconds())
-	resp.Data.User = LoginUser{
-		ID:               user.ID.String(),
-		Email:            user.Email,
-		FirstName:        user.FirstName,
-		LastNamePaternal: user.LastNamePaternal,
-		Role:             user.Role,
-		TwoFactorEnabled: user.TwoFactorEnabled,
-	}
-
-	return c.Render(http.StatusOK, r.JSON(resp))
+	return c.Render(http.StatusOK, r.JSON(map[string]interface{}{
+		"success": true,
+		"data": map[string]interface{}{
+			"access_token":  accessToken,
+			"refresh_token": refreshToken,
+			"token_type":    "Bearer",
+			"expires_in":    int(AccessTokenDuration.Seconds()),
+			"user": LoginUser{
+				ID:               user.ID.String(),
+				Email:            user.Email,
+				Name:             user.Name,
+				LastName:         user.LastName,
+				Profile:          user.Profile,
+				Role:             user.Role,
+				TwoFactorEnabled: user.TwoFactorEnabled,
+			},
+		},
+	}))
 }

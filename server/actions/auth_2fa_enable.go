@@ -17,11 +17,10 @@ import (
 )
 
 const (
-	TOTPIssuer       = "RedOrange" // Nombre de tu app
+	TOTPIssuer       = "RedOrange"
 	BackupCodesCount = 10
 )
 
-// -- enable 2FA - Step 1: Get QR Code
 type Enable2FAResponse struct {
 	Success bool `json:"success"`
 	Data    struct {
@@ -33,8 +32,8 @@ type Enable2FAResponse struct {
 }
 
 func Auth2FAEnable(c buffalo.Context) error {
-	user := GetCurrentUser(c)
-	if user == nil {
+	user, err := GetCurrentUser(c)
+	if err != nil {
 		return c.Render(http.StatusUnauthorized, r.JSON(ErrorResponse{
 			Success:   false,
 			Error:     "User not found",
@@ -42,7 +41,6 @@ func Auth2FAEnable(c buffalo.Context) error {
 		}))
 	}
 
-	// Verificar si ya tiene 2FA habilitado
 	if user.TwoFactorEnabled {
 		return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
 			Success:   false,
@@ -60,7 +58,6 @@ func Auth2FAEnable(c buffalo.Context) error {
 		}))
 	}
 
-	// Generar TOTP key
 	key, err := totp.Generate(totp.GenerateOpts{
 		Issuer:      TOTPIssuer,
 		AccountName: user.Email,
@@ -73,7 +70,6 @@ func Auth2FAEnable(c buffalo.Context) error {
 		}))
 	}
 
-	// Generar QR code
 	qrCode, err := qrcode.New(key.URL(), qrcode.Medium)
 	if err != nil {
 		return c.Render(http.StatusInternalServerError, r.JSON(ErrorResponse{
@@ -94,34 +90,24 @@ func Auth2FAEnable(c buffalo.Context) error {
 	}
 	qrBase64 := "data:image/png;base64," + base64.StdEncoding.EncodeToString(qrBuf.Bytes())
 
-	// Generar backup codes
 	backupCodes := make([]string, BackupCodesCount)
 	for i := 0; i < BackupCodesCount; i++ {
 		backupCodes[i] = generateBackupCode()
 	}
 
-	// Crear setup token (para verificar en el paso 2)
-	setupToken, err := randomToken(32)
-	if err != nil {
-		return c.Render(http.StatusInternalServerError, r.JSON(ErrorResponse{
-			Success:   false,
-			Error:     "Failed to generate setup token",
-			ErrorCode: "INTERNAL_ERROR",
-		}))
-	}
+	setupToken := randomToken(32)
 	setupTokenHash := sha256Hex(setupToken)
 
-	// Guardar verification token con el secret TOTP y backup codes
-	// Usamos el campo Email para guardar datos temporales (secret|backupCodes)
 	tempData := key.Secret() + "|" + strings.Join(backupCodes, ",")
 
 	vt := models.VerificationToken{
 		UserID:    &user.ID,
-		Email:     &tempData, // Guardamos secret y backup codes temporalmente
+		Email:     &tempData,
 		TokenHash: setupTokenHash,
 		TokenType: "2fa_setup",
 		ExpiresAt: time.Now().UTC().Add(10 * time.Minute),
 		Used:      false,
+		CreatedAt: time.Now().UTC(),
 	}
 
 	if err := tx.Create(&vt); err != nil {
@@ -132,7 +118,6 @@ func Auth2FAEnable(c buffalo.Context) error {
 		}))
 	}
 
-	// Respuesta
 	var resp Enable2FAResponse
 	resp.Success = true
 	resp.Data.Secret = key.Secret()
@@ -143,9 +128,8 @@ func Auth2FAEnable(c buffalo.Context) error {
 	return c.Render(http.StatusOK, r.JSON(resp))
 }
 
-// generateBackupCode genera un código de respaldo en formato XXXX-XXXX
 func generateBackupCode() string {
-	token, _ := randomToken(4) // 8 caracteres hex
+	token := randomToken(4)
 	upper := strings.ToUpper(token)
 	return fmt.Sprintf("%s-%s", upper[:4], upper[4:])
 }

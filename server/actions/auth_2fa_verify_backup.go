@@ -1,6 +1,7 @@
 package actions
 
 import (
+	"fmt"
 	"net/http"
 	"server/models"
 	"strings"
@@ -12,24 +13,9 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-// -- Verify Backup Code (During Login)
-
 type VerifyBackupCodeRequest struct {
 	TempToken  string `json:"temp_token"`
 	BackupCode string `json:"backup_code"`
-}
-
-type VerifyBackupCodeResponse struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
-	Data    struct {
-		AccessToken  string    `json:"access_token"`
-		RefreshToken string    `json:"refresh_token"`
-		TokenType    string    `json:"token_type"`
-		ExpiresIn    int       `json:"expires_in"`
-		User         LoginUser `json:"user"`
-		Warning      string    `json:"warning"`
-	} `json:"data"`
 }
 
 func Auth2FAVerifyBackup(c buffalo.Context) error {
@@ -53,9 +39,7 @@ func Auth2FAVerifyBackup(c buffalo.Context) error {
 		}))
 	}
 
-	// Validar el JWT del temp token
-	claims := &JWTClaims{}
-	token, err := jwt.ParseWithClaims(req.TempToken, claims, func(token *jwt.Token) (interface{}, error) {
+	token, err := jwt.Parse(req.TempToken, func(token *jwt.Token) (interface{}, error) {
 		return JWTSecret, nil
 	})
 
@@ -67,8 +51,17 @@ func Auth2FAVerifyBackup(c buffalo.Context) error {
 		}))
 	}
 
-	// Verificar que sea un temp_2fa token
-	if claims.TokenType != "temp_2fa" {
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return c.Render(http.StatusUnauthorized, r.JSON(ErrorResponse{
+			Success:   false,
+			Error:     "Invalid token claims",
+			ErrorCode: "INVALID_CLAIMS",
+		}))
+	}
+
+	tokenType, _ := claims["token_type"].(string)
+	if tokenType != "temp_2fa" {
 		return c.Render(http.StatusUnauthorized, r.JSON(ErrorResponse{
 			Success:   false,
 			Error:     "Invalid token type",
@@ -85,8 +78,8 @@ func Auth2FAVerifyBackup(c buffalo.Context) error {
 		}))
 	}
 
-	// Obtener usuario
-	userID, err := uuid.FromString(claims.UserID)
+	userIDStr, _ := claims["user_id"].(string)
+	userID, err := uuid.FromString(userIDStr)
 	if err != nil {
 		return c.Render(http.StatusUnauthorized, r.JSON(ErrorResponse{
 			Success:   false,
@@ -104,7 +97,6 @@ func Auth2FAVerifyBackup(c buffalo.Context) error {
 		}))
 	}
 
-	// Verificar que tenga 2FA habilitado
 	if !user.TwoFactorEnabled {
 		return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
 			Success:   false,
@@ -113,17 +105,13 @@ func Auth2FAVerifyBackup(c buffalo.Context) error {
 		}))
 	}
 
-	// Hashear el backup code (sin guiones)
 	codeWithoutDashes := strings.ReplaceAll(req.BackupCode, "-", "")
 	codeHash := sha256Hex(codeWithoutDashes)
 
-	// Buscar backup code válido
 	var backupCode models.TwoFactorBackupCode
 	err = tx.Where("user_id = ? AND code_hash = ? AND used = ?", user.ID, codeHash, false).First(&backupCode)
 	if err != nil {
-		// Registrar intento fallido
-		logLoginAttempt(tx, user.Email, &user.ID, false, "backup_code_invalid", c)
-
+		recordLoginAttempt(tx, &user.ID, user.Email, false, "backup_code_invalid", c.Request())
 		return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
 			Success:   false,
 			Error:     "Invalid or already used backup code",
@@ -131,9 +119,8 @@ func Auth2FAVerifyBackup(c buffalo.Context) error {
 		}))
 	}
 
-	// Marcar backup code como usado
-	backupCode.Used = true
 	now := time.Now().UTC()
+	backupCode.Used = true
 	backupCode.UsedAt = &now
 	if err := tx.Update(&backupCode); err != nil {
 		return c.Render(http.StatusInternalServerError, r.JSON(ErrorResponse{
@@ -143,27 +130,8 @@ func Auth2FAVerifyBackup(c buffalo.Context) error {
 		}))
 	}
 
-	// Generar tokens
-	accessToken, err := generateToken(user, "access", AccessTokenDuration)
+	accessToken, refreshToken, err := createSession(tx, user, c.Request())
 	if err != nil {
-		return c.Render(http.StatusInternalServerError, r.JSON(ErrorResponse{
-			Success:   false,
-			Error:     "Failed to generate access token",
-			ErrorCode: "INTERNAL_ERROR",
-		}))
-	}
-
-	refreshToken, err := generateToken(user, "refresh", RefreshTokenDuration)
-	if err != nil {
-		return c.Render(http.StatusInternalServerError, r.JSON(ErrorResponse{
-			Success:   false,
-			Error:     "Failed to generate refresh token",
-			ErrorCode: "INTERNAL_ERROR",
-		}))
-	}
-
-	// Guardar sesión
-	if err := createSession(tx, user.ID, refreshToken, c); err != nil {
 		return c.Render(http.StatusInternalServerError, r.JSON(ErrorResponse{
 			Success:   false,
 			Error:     "Failed to create session",
@@ -171,42 +139,37 @@ func Auth2FAVerifyBackup(c buffalo.Context) error {
 		}))
 	}
 
-	// Actualizar last_login_at
 	user.LastLoginAt = &now
 	tx.Update(&user)
 
-	// Registrar login exitoso
-	logLoginAttempt(tx, user.Email, &user.ID, true, "backup_code_used", c)
+	recordLoginAttempt(tx, &user.ID, user.Email, true, "", c.Request())
 
-	// Contar backup codes restantes
 	var remainingCodes int
-	tx.RawQuery(`
-		SELECT COUNT(*) FROM auth.two_factor_backup_codes 
-		WHERE user_id = ? AND used = false
-	`, user.ID).First(&remainingCodes)
+	tx.RawQuery("SELECT COUNT(*) FROM auth.two_factor_backup_codes WHERE user_id = ? AND used = false", user.ID).First(&remainingCodes)
 
-	// Respuesta
-	var resp VerifyBackupCodeResponse
-	resp.Success = true
-	resp.Message = "Backup code accepted"
-	resp.Data.AccessToken = accessToken
-	resp.Data.RefreshToken = refreshToken
-	resp.Data.TokenType = "Bearer"
-	resp.Data.ExpiresIn = int(AccessTokenDuration.Seconds())
-	resp.Data.User = LoginUser{
-		ID:               user.ID.String(),
-		Email:            user.Email,
-		FirstName:        user.FirstName,
-		LastNamePaternal: user.LastNamePaternal,
-		Role:             user.Role,
-		TwoFactorEnabled: user.TwoFactorEnabled,
-	}
-	resp.Data.Warning = "This backup code has been used and cannot be reused"
-
-	// Agregar advertencia si quedan pocos códigos
+	warning := "This backup code has been used and cannot be reused"
 	if remainingCodes <= 3 {
-		resp.Data.Warning = resp.Data.Warning + ". Warning: You only have " + string(rune('0'+remainingCodes)) + " backup codes remaining. Please regenerate them soon."
+		warning = fmt.Sprintf("%s. Warning: You only have %d backup codes remaining. Please regenerate them soon.", warning, remainingCodes)
 	}
 
-	return c.Render(http.StatusOK, r.JSON(resp))
+	return c.Render(http.StatusOK, r.JSON(map[string]interface{}{
+		"success": true,
+		"message": "Backup code accepted",
+		"data": map[string]interface{}{
+			"access_token":  accessToken,
+			"refresh_token": refreshToken,
+			"token_type":    "Bearer",
+			"expires_in":    int(AccessTokenDuration.Seconds()),
+			"user": LoginUser{
+				ID:               user.ID.String(),
+				Email:            user.Email,
+				Name:             user.Name,
+				LastName:         user.LastName,
+				Profile:          user.Profile,
+				Role:             user.Role,
+				TwoFactorEnabled: user.TwoFactorEnabled,
+			},
+			"warning": warning,
+		},
+	}))
 }

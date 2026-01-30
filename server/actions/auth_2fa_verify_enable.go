@@ -11,21 +11,14 @@ import (
 	"github.com/pquerna/otp/totp"
 )
 
-// -- Enable 2FA - Step 2: Verify and Activate
-
 type Verify2FAEnableRequest struct {
 	SetupToken string `json:"setup_token"`
 	Code       string `json:"code"`
 }
 
-type Verify2FAEnableResponse struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
-}
-
 func Auth2FAVerifyEnable(c buffalo.Context) error {
-	user := GetCurrentUser(c)
-	if user == nil {
+	user, err := GetCurrentUser(c)
+	if err != nil {
 		return c.Render(http.StatusUnauthorized, r.JSON(ErrorResponse{
 			Success:   false,
 			Error:     "User not found",
@@ -70,10 +63,9 @@ func Auth2FAVerifyEnable(c buffalo.Context) error {
 		}))
 	}
 
-	// Buscar setup token
 	setupTokenHash := sha256Hex(req.SetupToken)
 	var vt models.VerificationToken
-	err := tx.Where("token_hash = ? AND token_type = ? AND used = ? AND user_id = ?",
+	err = tx.Where("token_hash = ? AND token_type = ? AND used = ? AND user_id = ?",
 		setupTokenHash, "2fa_setup", false, user.ID).First(&vt)
 	if err != nil {
 		return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
@@ -83,7 +75,6 @@ func Auth2FAVerifyEnable(c buffalo.Context) error {
 		}))
 	}
 
-	// Verificar expiración
 	if time.Now().UTC().After(vt.ExpiresAt) {
 		return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
 			Success:   false,
@@ -92,7 +83,6 @@ func Auth2FAVerifyEnable(c buffalo.Context) error {
 		}))
 	}
 
-	// Extraer secret y backup codes del campo Email
 	if vt.Email == nil {
 		return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
 			Success:   false,
@@ -114,7 +104,6 @@ func Auth2FAVerifyEnable(c buffalo.Context) error {
 	backupCodesStr := parts[1]
 	backupCodes := strings.Split(backupCodesStr, ",")
 
-	// Validar código TOTP
 	valid := totp.Validate(req.Code, secret)
 	if !valid {
 		return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
@@ -124,10 +113,9 @@ func Auth2FAVerifyEnable(c buffalo.Context) error {
 		}))
 	}
 
-	// Activar 2FA en el usuario
 	user.TwoFactorEnabled = true
 	user.TwoFactorSecret = &secret
-	if err := tx.Update(user); err != nil {
+	if err := tx.Update(&user); err != nil {
 		return c.Render(http.StatusInternalServerError, r.JSON(ErrorResponse{
 			Success:   false,
 			Error:     "Failed to enable 2FA",
@@ -135,25 +123,24 @@ func Auth2FAVerifyEnable(c buffalo.Context) error {
 		}))
 	}
 
-	// Guardar backup codes hasheados
 	for _, code := range backupCodes {
 		codeHash := sha256Hex(strings.ReplaceAll(code, "-", ""))
 		backupCode := models.TwoFactorBackupCode{
-			UserID:   user.ID,
-			CodeHash: codeHash,
-			Used:     false,
+			UserID:    user.ID,
+			CodeHash:  codeHash,
+			Used:      false,
+			CreatedAt: time.Now().UTC(),
 		}
 		tx.Create(&backupCode)
 	}
 
-	// Marcar setup token como usado
 	vt.Used = true
 	now := time.Now().UTC()
 	vt.UsedAt = &now
 	tx.Update(&vt)
 
-	return c.Render(http.StatusOK, r.JSON(Verify2FAEnableResponse{
-		Success: true,
-		Message: "Two-factor authentication enabled successfully",
+	return c.Render(http.StatusOK, r.JSON(map[string]interface{}{
+		"success": true,
+		"message": "Two-factor authentication enabled successfully",
 	}))
 }
