@@ -10,8 +10,6 @@ import (
 	"github.com/gobuffalo/pop/v6"
 )
 
-// -- Get Login History
-
 type LoginAttemptInfo struct {
 	ID            string    `json:"id"`
 	Success       bool      `json:"success"`
@@ -21,19 +19,9 @@ type LoginAttemptInfo struct {
 	CreatedAt     time.Time `json:"created_at"`
 }
 
-type LoginHistoryResponse struct {
-	Success bool `json:"success"`
-	Data    struct {
-		Total    int                `json:"total"`
-		Limit    int                `json:"limit"`
-		Offset   int                `json:"offset"`
-		Attempts []LoginAttemptInfo `json:"attempts"`
-	} `json:"data"`
-}
-
 func AuthSecurityLoginHistory(c buffalo.Context) error {
-	user := GetCurrentUser(c)
-	if user == nil {
+	user, err := GetCurrentUser(c)
+	if err != nil {
 		return c.Render(http.StatusUnauthorized, r.JSON(ErrorResponse{
 			Success:   false,
 			Error:     "User not found",
@@ -41,7 +29,6 @@ func AuthSecurityLoginHistory(c buffalo.Context) error {
 		}))
 	}
 
-	// Obtener query parameters
 	limitStr := c.Param("limit")
 	offsetStr := c.Param("offset")
 
@@ -69,15 +56,11 @@ func AuthSecurityLoginHistory(c buffalo.Context) error {
 		}))
 	}
 
-	// Contar total de intentos
 	var total int
-	tx.RawQuery(`
-		SELECT COUNT(*) FROM auth.login_attempts WHERE user_id = ?
-	`, user.ID).First(&total)
+	tx.RawQuery("SELECT COUNT(*) FROM auth.login_attempts WHERE user_id = ?", user.ID).First(&total)
 
-	// Obtener intentos con paginación
 	var attempts []models.LoginAttempt
-	err := tx.RawQuery(`
+	err = tx.RawQuery(`
 		SELECT * FROM auth.login_attempts 
 		WHERE user_id = ? 
 		ORDER BY created_at DESC 
@@ -92,7 +75,6 @@ func AuthSecurityLoginHistory(c buffalo.Context) error {
 		}))
 	}
 
-	// Construir respuesta
 	attemptInfos := make([]LoginAttemptInfo, len(attempts))
 	for i, attempt := range attempts {
 		attemptInfos[i] = LoginAttemptInfo{
@@ -105,12 +87,13 @@ func AuthSecurityLoginHistory(c buffalo.Context) error {
 		}
 	}
 
-	var resp LoginHistoryResponse
-	resp.Success = true
-	resp.Data.Total = total
-	resp.Data.Limit = limit
-	resp.Data.Offset = offset
-	resp.Data.Attempts = attemptInfos
-
-	return c.Render(http.StatusOK, r.JSON(resp))
+	return c.Render(http.StatusOK, r.JSON(map[string]interface{}{
+		"success": true,
+		"data": map[string]interface{}{
+			"total":    total,
+			"limit":    limit,
+			"offset":   offset,
+			"attempts": attemptInfos,
+		},
+	}))
 }

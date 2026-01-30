@@ -4,26 +4,18 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/alexedwards/argon2id"
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/pop/v6"
 )
-
-// -- Change Password
 
 type ChangePasswordRequest struct {
 	CurrentPassword string `json:"current_password"`
 	NewPassword     string `json:"new_password"`
 }
 
-type ChangePasswordResponse struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
-}
-
 func AuthPasswordChange(c buffalo.Context) error {
-	user := GetCurrentUser(c)
-	if user == nil {
+	user, err := GetCurrentUser(c)
+	if err != nil {
 		return c.Render(http.StatusUnauthorized, r.JSON(ErrorResponse{
 			Success:   false,
 			Error:     "User not found",
@@ -43,7 +35,6 @@ func AuthPasswordChange(c buffalo.Context) error {
 	req.CurrentPassword = strings.TrimSpace(req.CurrentPassword)
 	req.NewPassword = strings.TrimSpace(req.NewPassword)
 
-	// Validar
 	details := map[string]any{}
 	if req.CurrentPassword == "" {
 		details["current_password"] = "Current password is required"
@@ -60,7 +51,6 @@ func AuthPasswordChange(c buffalo.Context) error {
 		}))
 	}
 
-	// Verificar que tenga password actual
 	if user.PasswordHash == nil || *user.PasswordHash == "" {
 		return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
 			Success:   false,
@@ -69,23 +59,11 @@ func AuthPasswordChange(c buffalo.Context) error {
 		}))
 	}
 
-	// Verificar password actual
-	match, err := argon2id.ComparePasswordAndHash(req.CurrentPassword, *user.PasswordHash)
-	if err != nil || !match {
+	if !verifyPassword(req.CurrentPassword, *user.PasswordHash) {
 		return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
 			Success:   false,
 			Error:     "Current password is incorrect",
 			ErrorCode: "INVALID_PASSWORD",
-		}))
-	}
-
-	// Hashear nueva contraseña
-	newHash, err := argon2id.CreateHash(req.NewPassword, argon2id.DefaultParams)
-	if err != nil {
-		return c.Render(http.StatusInternalServerError, r.JSON(ErrorResponse{
-			Success:   false,
-			Error:     "Failed to change password",
-			ErrorCode: "INTERNAL_ERROR",
 		}))
 	}
 
@@ -98,9 +76,9 @@ func AuthPasswordChange(c buffalo.Context) error {
 		}))
 	}
 
-	// Actualizar password
+	newHash := hashPassword(req.NewPassword)
 	user.PasswordHash = &newHash
-	if err := tx.Update(user); err != nil {
+	if err := tx.Update(&user); err != nil {
 		return c.Render(http.StatusInternalServerError, r.JSON(ErrorResponse{
 			Success:   false,
 			Error:     "Failed to change password",
@@ -108,8 +86,8 @@ func AuthPasswordChange(c buffalo.Context) error {
 		}))
 	}
 
-	return c.Render(http.StatusOK, r.JSON(ChangePasswordResponse{
-		Success: true,
-		Message: "Password changed successfully",
+	return c.Render(http.StatusOK, r.JSON(map[string]interface{}{
+		"success": true,
+		"message": "Password changed successfully",
 	}))
 }

@@ -4,25 +4,17 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/alexedwards/argon2id"
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/pop/v6"
 )
-
-// -- Set Password (OAuth users)
 
 type SetPasswordRequest struct {
 	Password string `json:"password"`
 }
 
-type SetPasswordResponse struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
-}
-
 func AuthPasswordSet(c buffalo.Context) error {
-	user := GetCurrentUser(c)
-	if user == nil {
+	user, err := GetCurrentUser(c)
+	if err != nil {
 		return c.Render(http.StatusUnauthorized, r.JSON(ErrorResponse{
 			Success:   false,
 			Error:     "User not found",
@@ -41,7 +33,6 @@ func AuthPasswordSet(c buffalo.Context) error {
 
 	req.Password = strings.TrimSpace(req.Password)
 
-	// Validar
 	if len(req.Password) < 8 {
 		return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
 			Success:   false,
@@ -50,22 +41,11 @@ func AuthPasswordSet(c buffalo.Context) error {
 		}))
 	}
 
-	// Verificar que NO tenga password (solo OAuth users)
 	if user.PasswordHash != nil && *user.PasswordHash != "" {
 		return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
 			Success:   false,
 			Error:     "Password already set. Use change password endpoint instead.",
 			ErrorCode: "PASSWORD_ALREADY_SET",
-		}))
-	}
-
-	// Hashear contraseña
-	pwHash, err := argon2id.CreateHash(req.Password, argon2id.DefaultParams)
-	if err != nil {
-		return c.Render(http.StatusInternalServerError, r.JSON(ErrorResponse{
-			Success:   false,
-			Error:     "Failed to set password",
-			ErrorCode: "INTERNAL_ERROR",
 		}))
 	}
 
@@ -78,9 +58,9 @@ func AuthPasswordSet(c buffalo.Context) error {
 		}))
 	}
 
-	// Actualizar password
+	pwHash := hashPassword(req.Password)
 	user.PasswordHash = &pwHash
-	if err := tx.Update(user); err != nil {
+	if err := tx.Update(&user); err != nil {
 		return c.Render(http.StatusInternalServerError, r.JSON(ErrorResponse{
 			Success:   false,
 			Error:     "Failed to set password",
@@ -88,8 +68,8 @@ func AuthPasswordSet(c buffalo.Context) error {
 		}))
 	}
 
-	return c.Render(http.StatusOK, r.JSON(SetPasswordResponse{
-		Success: true,
-		Message: "Password set successfully",
+	return c.Render(http.StatusOK, r.JSON(map[string]interface{}{
+		"success": true,
+		"message": "Password set successfully",
 	}))
 }
