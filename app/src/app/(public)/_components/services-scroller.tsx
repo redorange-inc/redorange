@@ -3,23 +3,121 @@
 import type { FC } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { ArrowRight, Cpu, Globe, Network, ChevronLeft, ChevronRight, CheckCircle2, Pause, Play } from 'lucide-react';
 import { fn_get_services, type ServiceSlide, type ServiceId } from '@/actions/fn-services';
 import { getThemeClasses } from '@/helpers/theme-helpers';
 
-const AUTOPLAY_INTERVAL = 2000;
+const AUTOPLAY_INTERVAL = 4000;
 
 const prefersReducedMotion = (): boolean => typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-const ICONS: Record<ServiceSlide['id'], FC<{ className?: string }>> = {
-  'ti-solutions': Cpu,
-  'equipment-marketing': Network,
-  'telecom-services': Globe,
-};
+const ICONS: Record<ServiceSlide['id'], FC<{ className?: string }>> = { 'ti-solutions': Cpu, 'equipment-marketing': Network, 'telecom-services': Globe };
+
+const ServicesScrollerSkeleton: FC = () => (
+  <section id="services" className="relative w-full min-h-screen flex items-center overflow-hidden py-10 sm:py-12 md:py-16" aria-busy="true" aria-live="polite">
+    <div className="relative z-10 w-full mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
+      <div className="mb-4 sm:mb-6 text-center">
+        <Skeleton className="mx-auto h-6 w-32 rounded-full" />
+        <Skeleton className="mx-auto mt-3 h-8 w-[min(420px,85%)] rounded-xl" />
+      </div>
+
+      <div className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-border/60 bg-background/80 backdrop-blur-sm min-h-[70vh]">
+        <div className="w-full p-4 sm:p-6 md:p-10 lg:p-12">
+          <div className="grid gap-6 lg:grid-cols-12 lg:gap-10">
+            <div className="lg:col-span-5 space-y-4">
+              <Skeleton className="h-6 w-44 rounded-full" />
+
+              <div className="space-y-2">
+                <Skeleton className="h-9 w-[min(520px,95%)] rounded-xl" />
+                <Skeleton className="h-5 w-[min(480px,90%)] rounded-lg" />
+              </div>
+
+              <ul className="space-y-2">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <li key={i} className="flex items-start gap-2">
+                    <Skeleton className="mt-0.5 h-4 w-4 rounded" />
+                    <Skeleton className="h-4 w-[85%] rounded-lg" />
+                  </li>
+                ))}
+              </ul>
+
+              <div className="flex flex-col gap-3 pt-2 sm:flex-row">
+                <Skeleton className="h-10 w-full sm:w-40 rounded-xl" />
+                <Skeleton className="h-10 w-full sm:w-28 rounded-xl" />
+              </div>
+            </div>
+
+            <div className="hidden lg:flex lg:col-span-4 items-center justify-center">
+              <div className="relative">
+                <Skeleton className="h-[360px] w-[360px] rounded-2xl" />
+                <Skeleton className="absolute -bottom-4 -right-4 h-16 w-16 rounded-2xl" />
+              </div>
+            </div>
+
+            <div className="lg:col-span-3">
+              <div className="rounded-2xl border border-border/60 bg-background/80 p-4 shadow-sm backdrop-blur-md">
+                <div className="mb-3 flex items-center gap-2">
+                  <Skeleton className="h-9 w-9 rounded-xl" />
+                  <div className="space-y-1">
+                    <Skeleton className="h-3.5 w-28 rounded" />
+                    <Skeleton className="h-3.5 w-36 rounded" />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="flex items-center justify-between gap-3 rounded-lg border border-border/40 bg-background/50 px-3 py-2">
+                      <Skeleton className="h-4 w-[70%] rounded" />
+                      <Skeleton className="h-4 w-4 rounded" />
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-3 rounded-xl bg-muted/50 p-3 space-y-2">
+                  <Skeleton className="h-4 w-24 rounded" />
+                  <Skeleton className="h-3.5 w-[90%] rounded" />
+                  <Skeleton className="h-3.5 w-[70%] rounded" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="lg:hidden mt-6 flex justify-center">
+            <Skeleton className="h-[180px] w-[180px] rounded-2xl" />
+          </div>
+        </div>
+
+        <div className="absolute bottom-4 left-0 right-0 z-20">
+          <div className="mx-auto flex max-w-7xl flex-col items-center gap-3 px-4 sm:px-6">
+            <div className="flex items-center gap-2">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Skeleton key={i} className="h-9 w-16 rounded-full" />
+              ))}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-7 w-7 rounded-full" />
+              <Skeleton className="h-7 w-7 rounded-full" />
+              <Skeleton className="h-4 w-16 rounded" />
+              <Skeleton className="h-7 w-7 rounded-full" />
+            </div>
+
+            <div className="flex gap-1">
+              <Skeleton className="h-1 w-6 rounded-full" />
+              <Skeleton className="h-1 w-1.5 rounded-full" />
+              <Skeleton className="h-1 w-1.5 rounded-full" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+);
 
 export const ServicesScroller: FC = () => {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -81,6 +179,7 @@ export const ServicesScroller: FC = () => {
 
   useEffect(() => {
     if (slideCount === 0) return;
+
     if (!isPlaying || isHovered) {
       if (autoplayRef.current) {
         clearInterval(autoplayRef.current);
@@ -103,39 +202,53 @@ export const ServicesScroller: FC = () => {
     };
   }, [isPlaying, isHovered, slideCount, nextSlide]);
 
-  const toggleAutoplay = () => {
-    setIsPlaying((prev) => !prev);
+  const touchStartRef = useRef<number | null>(null);
+  const touchEndRef = useRef<number | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartRef.current = e.targetTouches[0].clientX;
   };
 
-  if (slides.length === 0) {
-    return (
-      <section id="services" className="relative w-full py-16 md:py-20">
-        <div className="mx-auto flex max-w-xl items-center justify-center px-6">
-          <div className="w-full rounded-2xl border border-border/60 bg-background/60 p-6 text-center backdrop-blur">
-            <p className="font-heading text-base font-extrabold">Cargando servicios...</p>
-            <p className="mt-1 text-sm text-muted-foreground">Preparando las líneas de negocio.</p>
-          </div>
-        </div>
-      </section>
-    );
-  }
+  const handleTouchMove = (e: React.TouchEvent) => {
+    touchEndRef.current = e.targetTouches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStartRef.current || !touchEndRef.current) return;
+
+    const distance = touchStartRef.current - touchEndRef.current;
+    const minSwipeDistance = 50;
+
+    if (Math.abs(distance) > minSwipeDistance) {
+      if (distance > 0) nextSlide();
+      else prevSlide();
+    }
+
+    touchStartRef.current = null;
+    touchEndRef.current = null;
+  };
+
+  if (slides.length === 0) return <ServicesScrollerSkeleton />;
 
   const currentTheme = getThemeClasses(slides[currentSlide].colorTheme);
 
   return (
-    <section id="services" className="relative w-full py-12 md:py-16 overflow-hidden" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
-      <div className={`absolute inset-0 transition-all duration-1000 ${currentTheme.gradient}`} />
-
-      <div className="relative z-10 mx-auto max-w-7xl px-4 md:px-8">
-        <div className="mb-6 text-center">
-          <Badge variant="secondary" className="font-heading mb-2">
+    <section id="services" className="relative w-full min-h-screen flex items-center overflow-hidden py-10 sm:py-12 md:py-16" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
+      <div className="relative z-10 w-full mx-auto max-w-7xl px-4 sm:px-6 md:px-8">
+        <div className="mb-4 sm:mb-6 text-center">
+          <Badge variant="secondary" className="font-mono mb-2 text-xs">
             Nuestras Líneas
           </Badge>
-          <h2 className="text-2xl font-extrabold md:text-3xl">Servicios Integrales</h2>
+          <h2 className="text-xl sm:text-2xl font-extrabold md:text-3xl">Servicios Integrales</h2>
         </div>
 
-        <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-background/80 backdrop-blur-sm">
-          <div ref={containerRef} className="flex transition-transform duration-700 ease-out will-change-transform" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
+        <div
+          className="relative overflow-hidden rounded-2xl sm:rounded-3xl border border-border/60 bg-background/80 backdrop-blur-sm min-h-[70vh]"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          <div ref={containerRef} className="flex transition-transform duration-700 ease-out will-change-transform h-full" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
             {slides.map((slide, idx) => {
               const isActive = currentSlide === idx;
               const Icon = ICONS[slide.id];
@@ -143,38 +256,38 @@ export const ServicesScroller: FC = () => {
               const detailHref = `/services/${slide.id}` satisfies `/services/${ServiceId}`;
 
               return (
-                <div key={slide.id} className="w-full shrink-0 p-6 md:p-8">
+                <div key={slide.id} className="w-full shrink-0 p-4 sm:p-6 md:p-10 lg:p-12">
                   <div className={`transition-all duration-500 ${isActive ? 'opacity-100' : 'opacity-0'}`}>
-                    <div className="grid gap-6 lg:grid-cols-12 lg:gap-8">
+                    <div className="grid gap-6 lg:grid-cols-12 lg:gap-10">
                       <div className="lg:col-span-5 space-y-4">
-                        <Badge variant="secondary" className="w-fit font-heading">
+                        <Badge variant="secondary" className="w-fit font-heading text-xs">
                           <Icon className={`mr-1.5 h-3.5 w-3.5 ${theme.text}`} />
                           {slide.badge}
                         </Badge>
 
                         <div className="space-y-2">
-                          <h3 className="text-xl font-extrabold tracking-tight md:text-2xl lg:text-3xl">{slide.title}</h3>
-                          <p className="text-sm text-muted-foreground md:text-base">{slide.subtitle}</p>
+                          <h3 className="text-xl sm:text-2xl font-extrabold tracking-tight md:text-3xl lg:text-4xl leading-tight">{slide.title}</h3>
+                          <p className="text-sm sm:text-base text-muted-foreground md:text-lg">{slide.subtitle}</p>
                         </div>
 
-                        <ul className="space-y-1.5">
+                        <ul className="space-y-2 max-h-40 overflow-y-auto">
                           {slide.bullets.map((bullet) => (
-                            <li key={bullet} className="flex items-start gap-2 text-xs md:text-sm text-muted-foreground">
+                            <li key={bullet} className="flex items-start gap-2 text-sm text-muted-foreground">
                               <CheckCircle2 className={`h-4 w-4 mt-0.5 shrink-0 ${theme.text}`} />
                               <span>{bullet}</span>
                             </li>
                           ))}
                         </ul>
 
-                        <div className="flex flex-col gap-2 pt-2 sm:flex-row">
-                          <Button asChild size="default" className="font-heading group">
+                        <div className="flex flex-col gap-3 pt-2 sm:flex-row">
+                          <Button asChild size="default" className="font-heading group text-sm h-10">
                             <a href={slide.href} target="_blank" rel="noreferrer">
                               {slide.cta}
                               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                             </a>
                           </Button>
 
-                          <Button asChild size="default" variant="secondary" className="font-heading">
+                          <Button asChild size="default" variant="secondary" className="font-heading text-sm h-10">
                             <Link href={detailHref}>
                               Detalle
                               <ArrowRight className="ml-2 h-4 w-4" />
@@ -185,15 +298,13 @@ export const ServicesScroller: FC = () => {
 
                       <div className="hidden lg:flex lg:col-span-4 items-center justify-center">
                         <div className={`relative transition-all duration-700 ${isActive ? 'scale-100 opacity-100' : 'scale-90 opacity-0'}`}>
-                          <div className={`absolute inset-0 blur-3xl opacity-30 ${theme.gradient}`} />
-
                           <div className="relative">
                             <Image
                               src={slide.image}
                               alt={slide.title}
-                              width={400}
-                              height={400}
-                              className={`w-full max-w-[280px] h-auto object-contain drop-shadow-2xl transition-transform duration-700 ${isActive ? 'translate-y-0' : 'translate-y-4'}`}
+                              width={460}
+                              height={460}
+                              className={`w-full max-w-[360px] h-auto object-contain drop-shadow-2xl transition-transform duration-700 ${isActive ? 'translate-y-0' : 'translate-y-4'}`}
                               priority={idx === 0}
                             />
                           </div>
@@ -207,7 +318,7 @@ export const ServicesScroller: FC = () => {
                       <div className="lg:col-span-3">
                         <div className="rounded-2xl border border-border/60 bg-background/80 p-4 shadow-sm backdrop-blur-md">
                           <div className="mb-3 flex items-center gap-2">
-                            <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${theme.bg}`}>
+                            <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${theme.bg}`}>
                               <Icon className={`h-4 w-4 ${theme.text}`} />
                             </div>
                             <div>
@@ -225,16 +336,16 @@ export const ServicesScroller: FC = () => {
                             ))}
                           </Accordion>
 
-                          <div className="mt-3 rounded-lg bg-muted/50 p-2.5">
+                          <div className="mt-3 rounded-xl bg-muted/50 p-3">
                             <p className="font-heading text-xs font-semibold">Modalidad</p>
-                            <p className="mt-0.5 text-[11px] text-muted-foreground leading-relaxed">Por proyecto, mensual o demanda según SLA.</p>
+                            <p className="mt-1 text-xs text-muted-foreground leading-relaxed">Por proyecto, mensual o demanda según SLA.</p>
                           </div>
                         </div>
                       </div>
                     </div>
 
-                    <div className="lg:hidden mt-4 flex justify-center">
-                      <Image src={slide.image} alt={slide.title} width={200} height={200} className="w-full max-w-[160px] h-auto object-contain opacity-80" priority={idx === 0} />
+                    <div className="lg:hidden mt-6 flex justify-center">
+                      <Image src={slide.image} alt={slide.title} width={220} height={220} className="w-full max-w-[180px] h-auto object-contain opacity-90" priority={idx === 0} />
                     </div>
                   </div>
                 </div>
@@ -243,7 +354,7 @@ export const ServicesScroller: FC = () => {
           </div>
 
           <div className="absolute bottom-4 left-0 right-0 z-20">
-            <div className="mx-auto flex max-w-7xl flex-col items-center gap-3 px-6">
+            <div className="mx-auto flex max-w-7xl flex-col items-center gap-3 px-4 sm:px-6">
               <div className="flex items-center gap-2">
                 {slides.map((s, idx) => {
                   const SlideIcon = ICONS[s.id];
@@ -271,7 +382,7 @@ export const ServicesScroller: FC = () => {
                 <button
                   type="button"
                   onClick={prevSlide}
-                  className="flex h-7 w-7 items-center justify-center rounded-full border border-border/60 bg-background/60 text-muted-foreground backdrop-blur transition-all hover:bg-background hover:text-foreground"
+                  className="flex h-7 w-7 items-center justify-center rounded-full border border-border/60 bg-background/60 text-muted-foreground backdrop-blur transition-all hover:bg-background hover:text-foreground active:scale-95"
                   aria-label="Anterior"
                 >
                   <ChevronLeft className="h-4 w-4" />
@@ -279,8 +390,8 @@ export const ServicesScroller: FC = () => {
 
                 <button
                   type="button"
-                  onClick={toggleAutoplay}
-                  className="flex h-7 w-7 items-center justify-center rounded-full border border-border/60 bg-background/60 text-muted-foreground backdrop-blur transition-all hover:bg-background hover:text-foreground"
+                  onClick={() => setIsPlaying((prev) => !prev)}
+                  className="flex h-7 w-7 items-center justify-center rounded-full border border-border/60 bg-background/60 text-muted-foreground backdrop-blur transition-all hover:bg-background hover:text-foreground active:scale-95"
                   aria-label={isPlaying ? 'Pausar' : 'Reproducir'}
                 >
                   {isPlaying ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
@@ -293,7 +404,7 @@ export const ServicesScroller: FC = () => {
                 <button
                   type="button"
                   onClick={nextSlide}
-                  className="flex h-7 w-7 items-center justify-center rounded-full border border-border/60 bg-background/60 text-muted-foreground backdrop-blur transition-all hover:bg-background hover:text-foreground"
+                  className="flex h-7 w-7 items-center justify-center rounded-full border border-border/60 bg-background/60 text-muted-foreground backdrop-blur transition-all hover:bg-background hover:text-foreground active:scale-95"
                   aria-label="Siguiente"
                 >
                   <ChevronRight className="h-4 w-4" />
@@ -308,6 +419,8 @@ export const ServicesScroller: FC = () => {
             </div>
           </div>
         </div>
+
+        <div className="sr-only">{currentTheme.gradient}</div>
       </div>
     </section>
   );
