@@ -17,20 +17,20 @@ export const UserButton = ({ showName = false, className }: UserButtonProps) => 
 
   if (!user) return null;
 
-  const initials = `${user.first_name[0]}${user.last_name_paternal[0]}`.toUpperCase();
-  const fullName = `${user.first_name} ${user.last_name_paternal}`;
+  const initials = `${user.name[0]}${user.last_name[0]}`.toUpperCase();
+  const fullName = `${user.name} ${user.last_name}`;
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <button className={`flex items-center gap-2 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary ${className}`}>
           <Avatar className="h-8 w-8">
-            <AvatarImage src={undefined} alt={fullName} />
+            <AvatarImage src={user.profile} alt={fullName} />
             <AvatarFallback className="bg-primary text-primary-foreground text-xs">{initials}</AvatarFallback>
           </Avatar>
           {showName && (
             <>
-              <span className="text-sm font-medium hidden sm:inline-block">{user.first_name}</span>
+              <span className="text-sm font-medium hidden sm:inline-block">{user.name}</span>
               <ChevronDown className="h-4 w-4 text-muted-foreground" />
             </>
           )}
