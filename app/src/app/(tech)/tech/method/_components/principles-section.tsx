@@ -2,7 +2,8 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ui, getIcon } from './constants';
+import { Icon } from './icon';
+import { ui } from './constants';
 import type { PrinciplesResponse } from './types';
 
 interface PrinciplesSectionProps {
@@ -45,7 +46,9 @@ export const PrinciplesSection = ({ principles }: PrinciplesSectionProps) => {
             <Card key={idx} className={`rounded-2xl ${ui.glassCard} ${ui.hoverLift}`}>
               <CardContent className="p-5">
                 <div className="flex items-center gap-4">
-                  <div className="rounded-xl bg-tech-accent/20 p-3 text-tech">{getIcon(principle.iconName)}</div>
+                  <div className="rounded-xl bg-tech-accent/20 p-3 text-tech">
+                    <Icon name={principle.iconName} size="md" />
+                  </div>
                   <div>
                     <div className="flex items-center gap-2">
                       <span className="text-lg font-bold text-tech">{principle.acronym}</span>

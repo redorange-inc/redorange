@@ -1,7 +1,7 @@
 'use client';
 
-import { FileText } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Icon } from './icon';
 import type { QuoteHero } from './types';
 
 interface HeroQuoteProps {
@@ -10,22 +10,26 @@ interface HeroQuoteProps {
 
 export const HeroQuote = ({ hero }: HeroQuoteProps) => {
   return (
-    <section className="relative py-12 text-center">
-      <div className="absolute inset-0 -z-10 bg-linear-to-b from-infra/5 via-transparent to-transparent" />
-
-      <div className="mx-auto max-w-3xl space-y-4">
-        <div className="flex flex-wrap items-center justify-center gap-2">
-          <Badge variant="outline" className="border-infra/30 bg-background/50 backdrop-blur-sm">
-            <FileText className="mr-1.5 h-3 w-3 text-infra" />
-            {hero.badge}
-          </Badge>
-          <Badge className="bg-linear-to-r from-infra to-infra-muted text-white">{hero.tag}</Badge>
-        </div>
-
-        <h1 className="font-heading text-3xl font-extrabold tracking-tight md:text-4xl lg:text-5xl">{hero.title}</h1>
-
-        <p className="mx-auto max-w-2xl text-sm text-muted-foreground md:text-base">{hero.description}</p>
+    <section data-anim="fade-up" className="mb-10">
+      <div className="flex flex-wrap items-center gap-2 font-mono text-xs mb-4">
+        <Badge className="rounded-full bg-background/60 text-foreground shadow-sm backdrop-blur transition-all hover:scale-105">
+          <Icon name="sparkles" size="sm" className="mr-1 text-infra animate-pulse" />
+          {hero.badge}
+        </Badge>
+        <Badge className="rounded-full bg-infra-solid">{hero.tag}</Badge>
       </div>
+
+      <div className="flex items-center gap-4 mb-4">
+        <div className="rounded-2xl bg-infra p-4 text-infra">
+          <Icon name="file-text" size="xl" />
+        </div>
+        <div>
+          <h1 className="text-3xl font-bold text-foreground md:text-4xl">{hero.title}</h1>
+          <p className="text-muted-foreground mt-1">Equipos y soluciones a tu medida</p>
+        </div>
+      </div>
+
+      <p className="max-w-3xl text-base text-muted-foreground">{hero.description}</p>
     </section>
   );
 };

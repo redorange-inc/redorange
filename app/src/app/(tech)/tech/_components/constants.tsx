@@ -1,4 +1,4 @@
-import { Code2, Database, Server, Settings, Activity, ShieldCheck, Headphones, Zap, Clock, Award, Wrench } from 'lucide-react';
+import { Code2, CodeXml, Database, Server, Settings, Activity, ShieldCheck, Headphones, Zap, Clock, Award, Wrench } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 export const TECH = '#06b6d4';
@@ -17,6 +17,7 @@ export const getIcon = (iconName: string, size: 'sm' | 'md' = 'md'): ReactNode =
 
   const icons: Record<string, ReactNode> = {
     Code2: <Code2 className={sizeClass} />,
+    CodeXml: <CodeXml className={sizeClass} />,
     Database: <Database className={sizeClass} />,
     Server: <Server className={sizeClass} />,
     Settings: <Settings className={sizeClass} />,

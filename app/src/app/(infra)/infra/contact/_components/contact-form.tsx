@@ -1,12 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Send, Mail, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Icon } from './icon';
+import { ui } from './constants';
 import type { FormField, ServiceOption, ContactInfo } from './types';
 
 interface ContactFormProps {
@@ -38,10 +39,10 @@ export const ContactForm = ({ formFields, services, contactInfo }: ContactFormPr
   };
 
   return (
-    <Card className="border-infra/20 bg-card/60 backdrop-blur-md">
+    <Card className={`rounded-3xl ${ui.glassCard}`}>
       <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2 text-xl">
-          <Send className="h-5 w-5 text-infra" />
+        <CardTitle className="flex items-center gap-2 text-xl text-foreground">
+          <Icon name="send" size="md" className="text-infra" />
           Envíanos un Mensaje
         </CardTitle>
       </CardHeader>
@@ -52,7 +53,7 @@ export const ContactForm = ({ formFields, services, contactInfo }: ContactFormPr
               <div key={field.id} className="space-y-1.5">
                 <label htmlFor={field.id} className="text-sm font-medium">
                   {field.label}
-                  {field.required && <span className="text-infra ml-0.5">*</span>}
+                  {field.required && <span className="text-destructive ml-0.5">*</span>}
                 </label>
                 <Input
                   id={field.id}
@@ -61,7 +62,7 @@ export const ContactForm = ({ formFields, services, contactInfo }: ContactFormPr
                   required={field.required}
                   value={formData[field.id] || ''}
                   onChange={(e) => handleInputChange(field.id, e.target.value)}
-                  className="border-infra/20 focus:border-infra focus:ring-infra/20"
+                  className="bg-background/60"
                 />
               </div>
             ))}
@@ -78,17 +79,17 @@ export const ContactForm = ({ formFields, services, contactInfo }: ContactFormPr
                 placeholder="Nombre de tu organización"
                 value={formData.company || ''}
                 onChange={(e) => handleInputChange('company', e.target.value)}
-                className="border-infra/20 focus:border-infra focus:ring-infra/20"
+                className="bg-background/60"
               />
             </div>
 
             <div className="space-y-1.5">
               <label htmlFor="service" className="text-sm font-medium">
                 Servicio de interés
-                <span className="text-infra ml-0.5">*</span>
+                <span className="text-destructive ml-0.5">*</span>
               </label>
               <Select value={formData.service || ''} onValueChange={(value) => handleInputChange('service', value)}>
-                <SelectTrigger className="border-infra/20 focus:border-infra focus:ring-infra/20">
+                <SelectTrigger className="bg-background/60">
                   <SelectValue placeholder="Selecciona un servicio" />
                 </SelectTrigger>
                 <SelectContent>
@@ -105,7 +106,7 @@ export const ContactForm = ({ formFields, services, contactInfo }: ContactFormPr
           <div className="space-y-1.5">
             <label htmlFor="message" className="text-sm font-medium">
               Mensaje
-              <span className="text-infra ml-0.5">*</span>
+              <span className="text-destructive ml-0.5">*</span>
             </label>
             <Textarea
               id="message"
@@ -114,31 +115,28 @@ export const ContactForm = ({ formFields, services, contactInfo }: ContactFormPr
               rows={4}
               value={formData.message || ''}
               onChange={(e) => handleInputChange('message', e.target.value)}
-              className="border-infra/20 focus:border-infra focus:ring-infra/20 resize-none"
+              className="bg-background/60 resize-none"
             />
           </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Button type="submit" disabled={isSubmitting} className="flex-1 bg-infra-accent hover:bg-infra-muted text-white font-heading">
+          <div className="flex flex-col gap-3 sm:flex-row pt-2">
+            <Button type="submit" disabled={isSubmitting} className="flex-1 bg-infra-muted hover:bg-infra-accent text-white font-heading group">
               {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Enviando...
-                </>
+                <span className="animate-pulse">Enviando...</span>
               ) : (
                 <>
                   Enviar mensaje
-                  <Send className="ml-2 h-4 w-4" />
+                  <Icon name="arrow-right" size="sm" className="ml-2 transition-transform group-hover:translate-x-1" />
                 </>
               )}
             </Button>
-            <Button type="button" variant="outline" onClick={handleOpenMailClient} className="flex-1 border-infra/30 hover:bg-infra/10 font-heading">
+            <Button type="button" variant="outline" onClick={handleOpenMailClient} className="flex-1 font-heading group">
               Abrir en cliente de correo
-              <Mail className="ml-2 h-4 w-4" />
+              <Icon name="send" size="sm" className="ml-2" />
             </Button>
           </div>
 
-          <p className="text-xs text-muted-foreground text-center pt-2">Al enviar este formulario, aceptas que nos comuniquemos contigo respecto a tu solicitud.</p>
+          <p className="text-[11px] text-muted-foreground text-center pt-2">Al enviar este formulario, aceptas que nos comuniquemos contigo respecto a tu solicitud.</p>
         </form>
       </CardContent>
     </Card>

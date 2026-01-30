@@ -1,40 +1,67 @@
 'use client';
 
 import Image from 'next/image';
-import { Mail, Phone } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Icon } from './icon';
+import { ui } from './constants';
 import type { ContactInfo } from './types';
 
 interface ContactInfoSectionProps {
   info: ContactInfo;
 }
 
+interface ContactItem {
+  iconName: string;
+  label: string;
+  value: string;
+  href: string | null;
+  external?: boolean;
+  useWhatsappIcon?: boolean;
+}
+
 export const ContactInfoSection = ({ info }: ContactInfoSectionProps) => {
-  const badges = [
-    { icon: Phone, text: info.phone },
-    { icon: Mail, text: info.email },
-    { icon: Phone, text: info.phone },
-    { icon: Mail, text: info.email },
+  const waDigits = info.whatsapp.replace(/[^\d]/g, '');
+  const whatsappHref = `https://wa.me/${waDigits}`;
+
+  const contactItems: ContactItem[] = [
+    { iconName: 'mail', label: 'Correo electrónico', value: info.email, href: `mailto:${info.email}` },
+    { iconName: 'phone', label: 'Teléfono', value: info.phone, href: `tel:${info.phone.replace(/\s/g, '')}` },
+    { iconName: 'message-circle', label: 'WhatsApp', value: info.phone, href: whatsappHref, external: true, useWhatsappIcon: true },
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-center">
-        <Image src="/img/svg/support.svg" alt="Soporte" width={280} height={280} className="w-full max-w-[280px] h-auto" />
-      </div>
+    <section>
+      <h2 className="text-xl font-bold text-foreground mb-4">Información de Contacto</h2>
 
-      <div className="relative overflow-hidden">
-        <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-12 bg-linear-to-r from-background to-transparent" />
-        <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-12 bg-linear-to-l from-background to-transparent" />
-
-        <div className="flex w-max gap-3 animate-marquee-fast hover:paused">
-          {badges.map((badge, index) => (
-            <div key={index} className="flex items-center gap-2 rounded-full border border-infra/20 bg-infra/5 px-4 py-2 text-xs font-medium text-muted-foreground whitespace-nowrap">
-              <badge.icon className="h-4 w-4 text-infra" />
-              {badge.text}
-            </div>
-          ))}
-        </div>
+      <div className="grid gap-3">
+        {contactItems.map((item, idx) => (
+          <Card key={idx} className={`rounded-2xl ${ui.glassCard} ${item.href ? ui.hoverLift : ''} group`}>
+            <CardContent className="p-4">
+              {item.href ? (
+                <a href={item.href} target={item.external ? '_blank' : undefined} rel={item.external ? 'noreferrer' : undefined} className="flex items-center gap-3">
+                  <div className="rounded-full bg-infra/20 p-2.5 text-infra group-hover:scale-110 transition-transform">
+                    {item.useWhatsappIcon ? <Image src="/icons/whatsapp-icon.svg" alt="WhatsApp" width={20} height={20} /> : <Icon name={item.iconName} size="md" />}
+                  </div>
+                  <div>
+                    <div className="text-[10px] text-muted-foreground uppercase tracking-wide">{item.label}</div>
+                    <div className="text-sm font-semibold text-foreground group-hover:text-infra transition-colors">{item.value}</div>
+                  </div>
+                </a>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <div className="rounded-xl bg-infra/20 p-2.5 text-infra">
+                    <Icon name={item.iconName} size="md" />
+                  </div>
+                  <div>
+                    <div className="text-[10px] text-muted-foreground uppercase tracking-wide">{item.label}</div>
+                    <div className="text-sm font-semibold text-foreground">{item.value}</div>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        ))}
       </div>
-    </div>
+    </section>
   );
 };

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { Send, Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 
 import { Button } from '@/components/ui/button';
@@ -9,9 +8,10 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form';
 
+import { Icon } from './icon';
+import { ui } from './constants';
 import type { ProductCategory, PurchaseType } from './types';
 
 interface QuoteFormProps {
@@ -29,16 +29,6 @@ type QuoteFormValues = {
   description: string;
   file?: FileList;
 };
-
-const cardFxGlow =
-  'group relative overflow-hidden rounded-2xl border border-border/50 bg-card/60 ' +
-  'backdrop-blur-md shadow-sm transition-all duration-300 ' +
-  'hover:-translate-y-0.5 hover:shadow-md ' +
-  'after:pointer-events-none after:absolute after:-bottom-24 after:-right-24 ' +
-  'after:h-72 after:w-72 after:rounded-full ' +
-  'after:bg-linear-to-br after:from-infra/25 after:via-infra-muted/15 after:to-transparent ' +
-  'after:blur-3xl after:opacity-60 after:transition-opacity after:duration-300 ' +
-  'group-hover:after:opacity-80';
 
 export const QuoteForm = ({ categories, purchaseTypes }: QuoteFormProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -67,10 +57,10 @@ export const QuoteForm = ({ categories, purchaseTypes }: QuoteFormProps) => {
   };
 
   return (
-    <Card className={cardFxGlow}>
+    <Card className={`rounded-3xl ${ui.glassCard}`}>
       <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-2 text-lg md:text-xl">
-          <Send className="h-5 w-5 text-infra" />
+        <CardTitle className="flex items-center gap-2 text-lg md:text-xl text-foreground">
+          <Icon name="send" size="md" className="text-infra" />
           Formulario de Cotización
         </CardTitle>
       </CardHeader>
@@ -86,10 +76,10 @@ export const QuoteForm = ({ categories, purchaseTypes }: QuoteFormProps) => {
                 render={({ field }) => (
                   <FormItem className="space-y-1.5">
                     <FormLabel className="text-sm font-medium">
-                      Nombre completo<span className="ml-0.5 text-infra">*</span>
+                      Nombre completo<span className="ml-0.5 text-destructive">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Tu nombre" className="border-infra/20 focus:border-infra focus:ring-infra/20" />
+                      <Input {...field} placeholder="Tu nombre" className="bg-background/60" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -109,10 +99,10 @@ export const QuoteForm = ({ categories, purchaseTypes }: QuoteFormProps) => {
                 render={({ field }) => (
                   <FormItem className="space-y-1.5">
                     <FormLabel className="text-sm font-medium">
-                      Correo electrónico<span className="ml-0.5 text-infra">*</span>
+                      Correo electrónico<span className="ml-0.5 text-destructive">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input {...field} type="email" placeholder="tu-correo@empresa.com" className="border-infra/20 focus:border-infra focus:ring-infra/20" />
+                      <Input {...field} type="email" placeholder="tu-correo@empresa.com" className="bg-background/60" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -128,7 +118,7 @@ export const QuoteForm = ({ categories, purchaseTypes }: QuoteFormProps) => {
                   <FormItem className="space-y-1.5">
                     <FormLabel className="text-sm font-medium">Empresa / Entidad</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Nombre de tu organización" className="border-infra/20 focus:border-infra focus:ring-infra/20" />
+                      <Input {...field} placeholder="Nombre de tu organización" className="bg-background/60" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -142,10 +132,10 @@ export const QuoteForm = ({ categories, purchaseTypes }: QuoteFormProps) => {
                 render={({ field }) => (
                   <FormItem className="space-y-1.5">
                     <FormLabel className="text-sm font-medium">
-                      Teléfono<span className="ml-0.5 text-infra">*</span>
+                      Teléfono<span className="ml-0.5 text-destructive">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input {...field} type="tel" placeholder="+51 999 999 999" className="border-infra/20 focus:border-infra focus:ring-infra/20" />
+                      <Input {...field} type="tel" placeholder="+51 999 999 999" className="bg-background/60" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -161,11 +151,11 @@ export const QuoteForm = ({ categories, purchaseTypes }: QuoteFormProps) => {
                 render={({ field }) => (
                   <FormItem className="space-y-1.5">
                     <FormLabel className="text-sm font-medium">
-                      Categoría de producto<span className="ml-0.5 text-infra">*</span>
+                      Categoría de producto<span className="ml-0.5 text-destructive">*</span>
                     </FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
-                        <SelectTrigger className="border-infra/20 focus:border-infra focus:ring-infra/20">
+                        <SelectTrigger className="bg-background/60">
                           <SelectValue placeholder="Selecciona una categoría" />
                         </SelectTrigger>
                       </FormControl>
@@ -189,11 +179,11 @@ export const QuoteForm = ({ categories, purchaseTypes }: QuoteFormProps) => {
                 render={({ field }) => (
                   <FormItem className="space-y-1.5">
                     <FormLabel className="text-sm font-medium">
-                      Tipo de compra<span className="ml-0.5 text-infra">*</span>
+                      Tipo de compra<span className="ml-0.5 text-destructive">*</span>
                     </FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
-                        <SelectTrigger className="border-infra/20 focus:border-infra focus:ring-infra/20">
+                        <SelectTrigger className="bg-background/60">
                           <SelectValue placeholder="Selecciona el tipo" />
                         </SelectTrigger>
                       </FormControl>
@@ -218,14 +208,14 @@ export const QuoteForm = ({ categories, purchaseTypes }: QuoteFormProps) => {
               render={({ field }) => (
                 <FormItem className="space-y-1.5">
                   <FormLabel className="text-sm font-medium">
-                    Descripción del requerimiento<span className="ml-0.5 text-infra">*</span>
+                    Descripción del requerimiento<span className="ml-0.5 text-destructive">*</span>
                   </FormLabel>
                   <FormControl>
                     <Textarea
                       {...field}
                       rows={4}
                       placeholder="Detalla los equipos que necesitas: modelos, especificaciones técnicas, cantidades, plazos de entrega..."
-                      className="resize-none border-infra/20 focus:border-infra focus:ring-infra/20"
+                      className="resize-none bg-background/60"
                     />
                   </FormControl>
                   <FormMessage />
@@ -243,7 +233,7 @@ export const QuoteForm = ({ categories, purchaseTypes }: QuoteFormProps) => {
                     <Input
                       type="file"
                       accept=".pdf,.doc,.docx,.xls,.xlsx"
-                      className="border-infra/20 file:mr-3 file:rounded file:border-0 file:bg-infra/10 file:px-3 file:py-1 file:text-sm file:text-infra"
+                      className="bg-background/60 file:mr-3 file:rounded file:border-0 file:bg-infra/10 file:px-3 file:py-1 file:text-sm file:text-infra"
                       onChange={(e) => field.onChange(e.target.files)}
                     />
                   </FormControl>
@@ -253,21 +243,18 @@ export const QuoteForm = ({ categories, purchaseTypes }: QuoteFormProps) => {
               )}
             />
 
-            <Button type="submit" disabled={isSubmitting} className="w-full bg-infra-accent font-heading text-white hover:bg-infra-muted">
+            <Button type="submit" disabled={isSubmitting} className="w-full bg-infra-muted hover:bg-infra-accent text-white font-heading group">
               {isSubmitting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Enviando...
-                </>
+                <span className="animate-pulse">Enviando...</span>
               ) : (
                 <>
                   Solicitar Cotización
-                  <Send className="ml-2 h-4 w-4" />
+                  <Icon name="send" size="sm" className="ml-2" />
                 </>
               )}
             </Button>
 
-            <p className="pt-2 text-center text-xs text-muted-foreground">Te contactaremos en menos de 24 horas hábiles con una cotización detallada.</p>
+            <p className="pt-2 text-center text-[11px] text-muted-foreground">Te contactaremos en menos de 24 horas hábiles con una cotización detallada.</p>
           </form>
         </Form>
       </CardContent>

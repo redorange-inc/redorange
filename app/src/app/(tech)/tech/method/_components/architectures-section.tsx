@@ -3,8 +3,8 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle } from 'lucide-react';
-import { ui, getIcon } from './constants';
+import { Icon } from './icon';
+import { ui } from './constants';
 import type { ArchitecturesResponse } from './types';
 
 interface ArchitecturesSectionProps {
@@ -27,7 +27,9 @@ export const ArchitecturesSection = ({ architectures }: ArchitecturesSectionProp
           <Card key={idx} className={`rounded-3xl ${ui.glassCard} ${ui.hoverLift}`}>
             <CardHeader className="pb-3">
               <div className="flex items-center gap-3">
-                <div className="rounded-2xl bg-tech p-3 text-tech">{getIcon(arch.iconName, 'lg')}</div>
+                <div className="rounded-2xl bg-tech p-3 text-tech">
+                  <Icon name={arch.iconName} size="lg" />
+                </div>
                 <CardTitle className="text-lg leading-tight">{arch.name}</CardTitle>
               </div>
             </CardHeader>
@@ -36,7 +38,7 @@ export const ArchitecturesSection = ({ architectures }: ArchitecturesSectionProp
               <div className="space-y-2">
                 {arch.features.map((feature, i) => (
                   <div key={i} className="flex items-center gap-2 text-xs">
-                    <CheckCircle className="h-3.5 w-3.5 text-tech shrink-0" />
+                    <Icon name="check-circle" size="sm" className="text-tech shrink-0" />
                     <span className="text-foreground">{feature}</span>
                   </div>
                 ))}

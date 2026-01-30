@@ -3,8 +3,8 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle } from 'lucide-react';
-import { ui, getIcon, statusColors, statusLabels } from './constants';
+import { Icon } from './icon';
+import { ui, statusColors, statusLabels } from './constants';
 import type { ProjectsResponse } from './types';
 
 interface ProjectsSectionProps {
@@ -28,7 +28,9 @@ export const ProjectsSection = ({ projects }: ProjectsSectionProps) => {
             <CardHeader className="pb-3">
               <div className="flex items-start justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="rounded-2xl bg-tech p-3 text-tech">{getIcon(project.iconName, 'lg')}</div>
+                  <div className="rounded-2xl bg-tech p-3 text-tech">
+                    <Icon name={project.iconName} size="lg" />
+                  </div>
                   <div>
                     <CardTitle className="text-lg">{project.name}</CardTitle>
                     <span className="text-xs text-muted-foreground">{project.category}</span>
@@ -56,7 +58,7 @@ export const ProjectsSection = ({ projects }: ProjectsSectionProps) => {
                 <div className="grid grid-cols-1 gap-1.5">
                   {project.features.slice(0, 4).map((feature, i) => (
                     <div key={i} className="flex items-center gap-2 text-xs">
-                      <CheckCircle className="h-3 w-3 text-tech shrink-0" />
+                      <Icon name="check-circle" size="sm" className="text-tech shrink-0" />
                       <span className="text-muted-foreground">{feature}</span>
                     </div>
                   ))}

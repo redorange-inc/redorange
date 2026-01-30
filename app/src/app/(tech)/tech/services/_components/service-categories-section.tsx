@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ChevronRight } from 'lucide-react';
-import { ui, getIcon } from './constants';
+import { Icon } from './icon';
+import { ui } from './constants';
 import type { ServiceCategoriesResponse } from './types';
 
 interface ServiceCategoriesSectionProps {
@@ -34,10 +34,12 @@ export const ServiceCategoriesSection = ({ categories }: ServiceCategoriesSectio
             <CardHeader className="pb-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="rounded-2xl bg-tech p-3 text-tech">{getIcon(category.iconName, 'lg')}</div>
+                  <div className="rounded-2xl bg-tech p-3 text-tech">
+                    <Icon name={category.iconName} size="lg" />
+                  </div>
                   <CardTitle className="text-base">{category.name}</CardTitle>
                 </div>
-                <ChevronRight className={`h-5 w-5 text-muted-foreground transition-transform ${expandedCategory === category.id ? 'rotate-90' : ''}`} />
+                <Icon name="chevron-right" size="md" className={`text-muted-foreground transition-transform ${expandedCategory === category.id ? 'rotate-90' : ''}`} />
               </div>
             </CardHeader>
             <CardContent>

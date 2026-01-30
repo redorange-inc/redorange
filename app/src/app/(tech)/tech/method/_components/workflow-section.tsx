@@ -2,8 +2,8 @@
 
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight } from 'lucide-react';
-import { ui, getIcon } from './constants';
+import { Icon } from './icon';
+import { ui } from './constants';
 import type { WorkflowResponse } from './types';
 
 interface WorkflowSectionProps {
@@ -33,7 +33,9 @@ export const WorkflowSection = ({ workflow }: WorkflowSectionProps) => {
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="text-tech">{getIcon(step.iconName, 'sm')}</span>
+                        <span className="text-tech">
+                          <Icon name={step.iconName} size="sm" />
+                        </span>
                         <h4 className="text-sm font-semibold text-foreground">{step.title}</h4>
                       </div>
                       <p className="text-xs text-muted-foreground leading-relaxed">{step.description}</p>
@@ -42,7 +44,7 @@ export const WorkflowSection = ({ workflow }: WorkflowSectionProps) => {
                 </div>
                 {idx < workflow.length - 1 && idx % 3 !== 2 && (
                   <div className="hidden lg:flex absolute top-1/2 -right-2 transform -translate-y-1/2 z-10">
-                    <ArrowRight className="h-4 w-4 text-tech/50" />
+                    <Icon name="arrow-right" size="sm" className="text-tech/50" />
                   </div>
                 )}
               </div>
