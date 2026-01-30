@@ -2,7 +2,7 @@
 -- PostgreSQL database dump
 --
 
-\restrict Qvc431yLn8nrIcaoQijYHkB2NCMHiy8DKPCpBf3kmnkVGiYDWCyFe07XxpUc3Hs
+\restrict BB9xVKuP8Me2PfLN4pxYhFVJiIoCd6UV9gMFMUQbRDCUrJ54iPZwHfSnmRTaVCV
 
 -- Dumped from database version 18.1
 -- Dumped by pg_dump version 18.1
@@ -61,11 +61,11 @@ ALTER SCHEMA tech OWNER TO postgres;
 
 CREATE FUNCTION auth.update_updated_at_column() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$
-BEGIN
-    NEW.updated_at = NOW();
-    RETURN NEW;
-END;
+    AS $$
+BEGIN
+    NEW.updated_at = NOW();
+    RETURN NEW;
+END;
 $$;
 
 
@@ -94,7 +94,7 @@ ALTER TABLE auth.account_locks OWNER TO postgres;
 -- Name: TABLE account_locks; Type: COMMENT; Schema: auth; Owner: postgres
 --
 
-COMMENT ON TABLE auth.account_locks IS 'Temporary account lock control';
+COMMENT ON TABLE auth.account_locks IS 'temporary account lock control';
 
 
 --
@@ -119,7 +119,7 @@ ALTER TABLE auth.login_attempts OWNER TO postgres;
 -- Name: TABLE login_attempts; Type: COMMENT; Schema: auth; Owner: postgres
 --
 
-COMMENT ON TABLE auth.login_attempts IS 'Login attempts audit';
+COMMENT ON TABLE auth.login_attempts IS 'login attempts audit';
 
 
 --
@@ -131,6 +131,7 @@ CREATE TABLE auth.oauth_providers (
     user_id uuid NOT NULL,
     provider character varying(50) NOT NULL,
     provider_user_id character varying(255) NOT NULL,
+    provider_email character varying(255),
     access_token text,
     refresh_token text,
     expires_at timestamp without time zone,
@@ -145,7 +146,7 @@ ALTER TABLE auth.oauth_providers OWNER TO postgres;
 -- Name: TABLE oauth_providers; Type: COMMENT; Schema: auth; Owner: postgres
 --
 
-COMMENT ON TABLE auth.oauth_providers IS 'OAuth providers linked to users';
+COMMENT ON TABLE auth.oauth_providers IS 'oauth providers linked to users';
 
 
 --
@@ -171,7 +172,7 @@ ALTER TABLE auth.sessions OWNER TO postgres;
 -- Name: TABLE sessions; Type: COMMENT; Schema: auth; Owner: postgres
 --
 
-COMMENT ON TABLE auth.sessions IS 'Active sessions and refresh tokens';
+COMMENT ON TABLE auth.sessions IS 'active sessions and refresh tokens';
 
 
 --
@@ -194,7 +195,7 @@ ALTER TABLE auth.two_factor_backup_codes OWNER TO postgres;
 -- Name: TABLE two_factor_backup_codes; Type: COMMENT; Schema: auth; Owner: postgres
 --
 
-COMMENT ON TABLE auth.two_factor_backup_codes IS 'Backup codes for 2FA';
+COMMENT ON TABLE auth.two_factor_backup_codes IS 'backup codes for 2fa';
 
 
 --
@@ -206,9 +207,9 @@ CREATE TABLE auth.users (
     email character varying(255) NOT NULL,
     email_verified boolean DEFAULT false,
     password_hash character varying(255),
-    first_name character varying(100) NOT NULL,
-    last_name_paternal character varying(100) NOT NULL,
-    last_name_maternal character varying(100),
+    name character varying(100) NOT NULL,
+    last_name character varying(200) NOT NULL,
+    profile character varying(500),
     role character varying(20) NOT NULL,
     active boolean DEFAULT true,
     two_factor_enabled boolean DEFAULT false,
@@ -227,7 +228,7 @@ ALTER TABLE auth.users OWNER TO postgres;
 -- Name: TABLE users; Type: COMMENT; Schema: auth; Owner: postgres
 --
 
-COMMENT ON TABLE auth.users IS 'Main users table';
+COMMENT ON TABLE auth.users IS 'main users table';
 
 
 --
@@ -253,7 +254,7 @@ ALTER TABLE auth.verification_tokens OWNER TO postgres;
 -- Name: TABLE verification_tokens; Type: COMMENT; Schema: auth; Owner: postgres
 --
 
-COMMENT ON TABLE auth.verification_tokens IS 'Tokens for email verification and password reset';
+COMMENT ON TABLE auth.verification_tokens IS 'tokens for email verification and password reset';
 
 
 --
@@ -555,5 +556,5 @@ ALTER TABLE ONLY auth.verification_tokens
 -- PostgreSQL database dump complete
 --
 
-\unrestrict Qvc431yLn8nrIcaoQijYHkB2NCMHiy8DKPCpBf3kmnkVGiYDWCyFe07XxpUc3Hs
+\unrestrict BB9xVKuP8Me2PfLN4pxYhFVJiIoCd6UV9gMFMUQbRDCUrJ54iPZwHfSnmRTaVCV
 
