@@ -1,12 +1,14 @@
 'use client';
 
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 
 interface PageAnimationsProps {
   children: ReactNode;
 }
 
 export const PageAnimations = ({ children }: PageAnimationsProps) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -29,5 +31,9 @@ export const PageAnimations = ({ children }: PageAnimationsProps) => {
     return () => observer.disconnect();
   }, []);
 
-  return <>{children}</>;
+  return (
+    <div ref={containerRef} className="relative min-h-screen overflow-hidden bg-background pt-20">
+      {children}
+    </div>
+  );
 };
