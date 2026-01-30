@@ -2,8 +2,8 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle } from 'lucide-react';
-import { ui, getIcon } from './constants';
+import { Icon } from './icon';
+import { ui } from './constants';
 import type { SupportLevelsResponse } from './types';
 
 interface SupportLevelsSectionProps {
@@ -27,7 +27,9 @@ export const SupportLevelsSection = ({ supportLevels }: SupportLevelsSectionProp
             {idx === 2 && <div className="absolute top-0 right-0 bg-tech text-white text-[10px] font-bold px-3 py-1 rounded-bl-xl">Recomendado</div>}
             <CardHeader className="pb-3">
               <div className="flex items-center gap-3">
-                <div className="rounded-2xl bg-tech p-3 text-tech">{getIcon(level.iconName, 'lg')}</div>
+                <div className="rounded-2xl bg-tech p-3 text-tech">
+                  <Icon name={level.iconName} size="lg" />
+                </div>
                 <div>
                   <CardTitle className="text-lg">{level.name}</CardTitle>
                   <Badge className="mt-1 rounded-full bg-tech/20 text-tech text-[10px]">Respuesta: {level.responseTime}</Badge>
@@ -40,7 +42,7 @@ export const SupportLevelsSection = ({ supportLevels }: SupportLevelsSectionProp
               <div className="space-y-2">
                 {level.features.map((feature, i) => (
                   <div key={i} className="flex items-center gap-2 text-xs">
-                    <CheckCircle className="h-3.5 w-3.5 text-tech shrink-0" />
+                    <Icon name="check-circle" size="sm" className="text-tech shrink-0" />
                     <span className="text-foreground">{feature}</span>
                   </div>
                 ))}

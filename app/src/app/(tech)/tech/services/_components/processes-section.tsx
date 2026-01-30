@@ -2,8 +2,8 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight } from 'lucide-react';
-import { ui, getIcon } from './constants';
+import { Icon } from './icon';
+import { ui } from './constants';
 import type { ProcessesResponse } from './types';
 
 interface ProcessesSectionProps {
@@ -26,7 +26,9 @@ export const ProcessesSection = ({ processes }: ProcessesSectionProps) => {
           <Card key={idx} className={`rounded-3xl ${ui.glassCard} ${ui.hoverLift}`}>
             <CardHeader className="pb-3">
               <div className="flex items-center gap-3">
-                <div className="rounded-2xl bg-tech p-3 text-tech">{getIcon(process.iconName, 'lg')}</div>
+                <div className="rounded-2xl bg-tech p-3 text-tech">
+                  <Icon name={process.iconName} size="lg" />
+                </div>
                 <CardTitle className="text-lg">{process.title}</CardTitle>
               </div>
             </CardHeader>
@@ -38,7 +40,7 @@ export const ProcessesSection = ({ processes }: ProcessesSectionProps) => {
                   <div key={i} className="flex items-center gap-2 text-xs">
                     <div className="flex items-center justify-center h-5 w-5 rounded-full bg-tech/20 text-tech text-[10px] font-bold shrink-0">{i + 1}</div>
                     <span className="text-foreground">{step}</span>
-                    {i < process.steps.length - 1 && <ArrowRight className="h-3 w-3 text-muted-foreground/50 ml-auto" />}
+                    {i < process.steps.length - 1 && <Icon name="arrow-right" size="sm" className="text-muted-foreground/50 ml-auto" />}
                   </div>
                 ))}
               </div>
