@@ -9,7 +9,6 @@ import { NetworkServicesGrid } from './_components/network-services-grid';
 import { NetworkBenefits } from './_components/network-benefits';
 import { ProjectsSection } from './_components/projects-section';
 import { TechnologiesSection } from './_components/technologies-section';
-import { ContactCTA } from './_components/contact-cta';
 
 const NetworksPage = async () => {
   const { data } = await getNetworksData();
@@ -33,10 +32,6 @@ const NetworksPage = async () => {
       <Separator className="my-10" />
 
       <TechnologiesSection technologies={data.technologies} />
-
-      <Separator className="my-10" />
-
-      <ContactCTA phone={data.contactPhone} whatsapp={data.contactWhatsapp} />
     </PageWrapper>
   );
 };
