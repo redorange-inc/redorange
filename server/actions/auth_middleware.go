@@ -7,23 +7,20 @@ import (
 
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/pop/v6"
-	"github.com/gofrs/uuid"
 	"github.com/golang-jwt/jwt/v5"
 )
 
-// AuthMiddleware verifica el JWT en el header Authorization
 func AuthMiddleware(next buffalo.Handler) buffalo.Handler {
 	return func(c buffalo.Context) error {
 		authHeader := c.Request().Header.Get("Authorization")
 		if authHeader == "" {
 			return c.Render(http.StatusUnauthorized, r.JSON(ErrorResponse{
 				Success:   false,
-				Error:     "Authorization header required",
+				Error:     "Authorization header is required",
 				ErrorCode: "MISSING_AUTH_HEADER",
 			}))
 		}
 
-		// Verificar formato "Bearer <token>"
 		parts := strings.Split(authHeader, " ")
 		if len(parts) != 2 || strings.ToLower(parts[0]) != "bearer" {
 			return c.Render(http.StatusUnauthorized, r.JSON(ErrorResponse{
@@ -35,9 +32,7 @@ func AuthMiddleware(next buffalo.Handler) buffalo.Handler {
 
 		tokenString := parts[1]
 
-		// Parsear y validar JWT
-		claims := &JWTClaims{}
-		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			return JWTSecret, nil
 		})
 
@@ -49,8 +44,17 @@ func AuthMiddleware(next buffalo.Handler) buffalo.Handler {
 			}))
 		}
 
-		// Verificar que sea un access token
-		if claims.TokenType != "access" {
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok {
+			return c.Render(http.StatusUnauthorized, r.JSON(ErrorResponse{
+				Success:   false,
+				Error:     "Invalid token claims",
+				ErrorCode: "INVALID_CLAIMS",
+			}))
+		}
+
+		tokenType, _ := claims["token_type"].(string)
+		if tokenType != "access" {
 			return c.Render(http.StatusUnauthorized, r.JSON(ErrorResponse{
 				Success:   false,
 				Error:     "Invalid token type",
@@ -58,22 +62,14 @@ func AuthMiddleware(next buffalo.Handler) buffalo.Handler {
 			}))
 		}
 
-		// Obtener usuario de la BD
+		userID, _ := claims["user_id"].(string)
+
 		tx, ok := c.Value("tx").(*pop.Connection)
 		if !ok || tx == nil {
 			return c.Render(http.StatusInternalServerError, r.JSON(ErrorResponse{
 				Success:   false,
 				Error:     "Database connection not available",
 				ErrorCode: "DB_NOT_AVAILABLE",
-			}))
-		}
-
-		userID, err := uuid.FromString(claims.UserID)
-		if err != nil {
-			return c.Render(http.StatusUnauthorized, r.JSON(ErrorResponse{
-				Success:   false,
-				Error:     "Invalid token",
-				ErrorCode: "INVALID_TOKEN",
 			}))
 		}
 
@@ -86,35 +82,17 @@ func AuthMiddleware(next buffalo.Handler) buffalo.Handler {
 			}))
 		}
 
-		// Verificar que el usuario esté activo
 		if !user.Active {
-			return c.Render(http.StatusUnauthorized, r.JSON(ErrorResponse{
+			return c.Render(http.StatusForbidden, r.JSON(ErrorResponse{
 				Success:   false,
-				Error:     "Account is deactivated",
+				Error:     "Account is inactive",
 				ErrorCode: "ACCOUNT_INACTIVE",
 			}))
 		}
 
-		// Guardar usuario y claims en el contexto
-		c.Set("currentUser", user)
-		c.Set("claims", claims)
+		c.Set("current_user", user)
+		c.Set("user_id", userID)
 
 		return next(c)
 	}
-}
-
-// GetCurrentUser obtiene el usuario del contexto (helper)
-func GetCurrentUser(c buffalo.Context) *models.User {
-	if user, ok := c.Value("currentUser").(models.User); ok {
-		return &user
-	}
-	return nil
-}
-
-// GetClaims obtiene los claims del contexto (helper)
-func GetClaims(c buffalo.Context) *JWTClaims {
-	if claims, ok := c.Value("claims").(*JWTClaims); ok {
-		return claims
-	}
-	return nil
 }

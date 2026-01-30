@@ -57,7 +57,6 @@ func App() *buffalo.App {
 			Env:          ENV,
 			SessionStore: sessions.Null{},
 			PreWares: []buffalo.PreWare{
-				// cors.Default().Handler,
 				corsHandler.Handler,
 			},
 			SessionName: "_server_session",
@@ -76,11 +75,15 @@ func App() *buffalo.App {
 		//   c.Value("tx").(*pop.Connection)
 		// Remove to disable this.
 		app.Use(popmw.Transaction(models.DB))
+
+		// -- home
 		app.GET("/", HomeHandler)
 
-		// API v1
+		// -- api v1
 		api := app.Group("/api")
 		v1 := api.Group("/v1")
+
+		// -- public routes (no auth required)
 		v1.POST("/auth/register", AuthRegister)
 		v1.POST("/auth/verify-email", AuthVerifyEmail)
 		v1.POST("/auth/login", AuthLogin)
@@ -93,22 +96,39 @@ func App() *buffalo.App {
 		v1.GET("/auth/oauth/google/callback", AuthOAuthGoogleCallback)
 		v1.POST("/auth/security/status", AuthSecurityStatus)
 
+		// -- protected routes (auth required)
 		auth := v1.Group("")
 		auth.Use(AuthMiddleware)
+
+		// -- logout
 		auth.POST("/auth/logout", AuthLogout)
+
+		// -- user profile
+		auth.GET("/auth/me", AuthMe)
+		auth.PATCH("/auth/me", AuthMeUpdate)
+		auth.DELETE("/auth/me/profile", AuthProfileDelete)
+
+		// -- 2fa management
 		auth.POST("/auth/2fa/enable", Auth2FAEnable)
 		auth.POST("/auth/2fa/verify-enable", Auth2FAVerifyEnable)
 		auth.POST("/auth/2fa/disable", Auth2FADisable)
 		auth.POST("/auth/2fa/regenerate-backup-codes", Auth2FARegenerateBackupCodes)
-		auth.POST("/auth/oauth/google/link", AuthOAuthGoogleLink)
-		auth.DELETE("/auth/oauth/google/unlink", AuthOAuthGoogleUnlink)
-		auth.GET("/auth/sessions", AuthSessionsList)
-		auth.DELETE("/auth/sessions/all", AuthSessionsRevokeAll)
-		auth.DELETE("/auth/sessions/{session_id}", AuthSessionsRevoke)
-		auth.GET("/auth/me", AuthMe)
-		auth.PATCH("/auth/me", AuthMeUpdate)
+		auth.GET("/auth/2fa/backup-codes/status", Auth2FABackupStatus)
+
+		// -- password management
 		auth.POST("/auth/password/change", AuthPasswordChange)
 		auth.POST("/auth/password/set", AuthPasswordSet)
+
+		// -- oauth management
+		auth.POST("/auth/oauth/google/link", AuthOAuthGoogleLink)
+		auth.DELETE("/auth/oauth/google/unlink", AuthOAuthGoogleUnlink)
+
+		// -- sessions management
+		auth.GET("/auth/sessions", AuthSessionsList)
+		auth.DELETE("/auth/sessions/{session_id}", AuthSessionsRevoke)
+		auth.DELETE("/auth/sessions/all", AuthSessionsRevokeAll)
+
+		// -- security
 		auth.GET("/auth/security/login-history", AuthSecurityLoginHistory)
 	})
 
