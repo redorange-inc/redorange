@@ -20,11 +20,7 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [state, setState] = useState<AuthState>({
-    user: null,
-    isAuthenticated: false,
-    isLoading: true,
-  });
+  const [state, setState] = useState<AuthState>({ user: null, isAuthenticated: false, isLoading: true });
 
   const refreshTimerRef = useRef<NodeJS.Timeout | null>(null);
   const isRefreshingRef = useRef(false);
@@ -117,11 +113,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     if (response.success && response.data) {
       console.log('[AuthProvider] User loaded successfully:', response.data.email);
-      setState({
-        user: response.data,
-        isAuthenticated: true,
-        isLoading: false,
-      });
+      setState({ user: response.data, isAuthenticated: true, isLoading: false });
       // programar refresh automatico
       scheduleTokenRefresh();
     } else {
@@ -144,11 +136,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const login = useCallback(
     (loginUser: User) => {
       console.log('[AuthProvider] Login called with user:', loginUser.email);
-      setState({
-        user: loginUser,
-        isAuthenticated: true,
-        isLoading: false,
-      });
+      setState({ user: loginUser, isAuthenticated: true, isLoading: false });
       scheduleTokenRefresh();
     },
     [scheduleTokenRefresh],
@@ -167,32 +155,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     if (!hasValidSession()) return;
 
     const response = await getCurrentUser();
-    if (response.success && response.data) {
-      setState((prev) => ({
-        ...prev,
-        user: response.data!,
-      }));
-    }
+    if (response.success && response.data) setState((prev) => ({ ...prev, user: response.data! }));
   }, []);
 
-  return (
-    <AuthContext.Provider
-      value={{
-        ...state,
-        login,
-        logout,
-        refreshUser,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={{ ...state, login, logout, refreshUser }}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
+  if (context === undefined) throw new Error('useAuth must be used within an AuthProvider');
+
   return context;
 };
