@@ -10,8 +10,6 @@ import (
 	"github.com/gobuffalo/pop/v6"
 )
 
-// -- Get Active Sessions
-
 type SessionInfo struct {
 	ID             string          `json:"id"`
 	DeviceInfo     json.RawMessage `json:"device_info"`
@@ -20,16 +18,9 @@ type SessionInfo struct {
 	Current        bool            `json:"current"`
 }
 
-type GetSessionsResponse struct {
-	Success bool `json:"success"`
-	Data    struct {
-		Sessions []SessionInfo `json:"sessions"`
-	} `json:"data"`
-}
-
 func AuthSessionsList(c buffalo.Context) error {
-	user := GetCurrentUser(c)
-	if user == nil {
+	user, err := GetCurrentUser(c)
+	if err != nil {
 		return c.Render(http.StatusUnauthorized, r.JSON(ErrorResponse{
 			Success:   false,
 			Error:     "User not found",
@@ -46,22 +37,17 @@ func AuthSessionsList(c buffalo.Context) error {
 		}))
 	}
 
-	// Obtener el refresh token actual del header para identificar sesión actual
-	claims := GetClaims(c)
+	// Identificar sesión actual por la más reciente actividad
 	currentSessionID := ""
-	if claims != nil {
-		// Buscar sesión actual por user_id y que no esté revocada
-		var currentSession models.Session
-		err := tx.Where("user_id = ? AND revoked = ? AND expires_at > ?",
-			user.ID, false, time.Now().UTC()).Order("last_activity_at DESC").First(&currentSession)
-		if err == nil {
-			currentSessionID = currentSession.ID.String()
-		}
+	var currentSession models.Session
+	err = tx.Where("user_id = ? AND revoked = ? AND expires_at > ?",
+		user.ID, false, time.Now().UTC()).Order("last_activity_at DESC").First(&currentSession)
+	if err == nil {
+		currentSessionID = currentSession.ID.String()
 	}
 
-	// Obtener todas las sesiones activas del usuario
 	var sessions []models.Session
-	err := tx.Where("user_id = ? AND revoked = ? AND expires_at > ?",
+	err = tx.Where("user_id = ? AND revoked = ? AND expires_at > ?",
 		user.ID, false, time.Now().UTC()).Order("last_activity_at DESC").All(&sessions)
 	if err != nil {
 		return c.Render(http.StatusInternalServerError, r.JSON(ErrorResponse{
@@ -71,7 +57,6 @@ func AuthSessionsList(c buffalo.Context) error {
 		}))
 	}
 
-	// Construir respuesta
 	sessionInfos := make([]SessionInfo, len(sessions))
 	for i, session := range sessions {
 		sessionInfos[i] = SessionInfo{
@@ -83,9 +68,10 @@ func AuthSessionsList(c buffalo.Context) error {
 		}
 	}
 
-	var resp GetSessionsResponse
-	resp.Success = true
-	resp.Data.Sessions = sessionInfos
-
-	return c.Render(http.StatusOK, r.JSON(resp))
+	return c.Render(http.StatusOK, r.JSON(map[string]interface{}{
+		"success": true,
+		"data": map[string]interface{}{
+			"sessions": sessionInfos,
+		},
+	}))
 }

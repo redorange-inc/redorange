@@ -1,3 +1,5 @@
+// server/actions/auth_sessions_revoke.go
+
 package actions
 
 import (
@@ -10,16 +12,9 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-// -- Revoke Session
-
-type RevokeSessionResponse struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
-}
-
 func AuthSessionsRevoke(c buffalo.Context) error {
-	user := GetCurrentUser(c)
-	if user == nil {
+	user, err := GetCurrentUser(c)
+	if err != nil {
 		return c.Render(http.StatusUnauthorized, r.JSON(ErrorResponse{
 			Success:   false,
 			Error:     "User not found",
@@ -54,7 +49,6 @@ func AuthSessionsRevoke(c buffalo.Context) error {
 		}))
 	}
 
-	// Buscar sesión
 	var session models.Session
 	err = tx.Where("id = ? AND user_id = ?", sessionID, user.ID).First(&session)
 	if err != nil {
@@ -65,7 +59,6 @@ func AuthSessionsRevoke(c buffalo.Context) error {
 		}))
 	}
 
-	// Verificar si ya está revocada
 	if session.Revoked {
 		return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
 			Success:   false,
@@ -74,7 +67,6 @@ func AuthSessionsRevoke(c buffalo.Context) error {
 		}))
 	}
 
-	// Revocar sesión
 	session.Revoked = true
 	now := time.Now().UTC()
 	session.RevokedAt = &now
@@ -87,8 +79,8 @@ func AuthSessionsRevoke(c buffalo.Context) error {
 		}))
 	}
 
-	return c.Render(http.StatusOK, r.JSON(RevokeSessionResponse{
-		Success: true,
-		Message: "Session revoked successfully",
+	return c.Render(http.StatusOK, r.JSON(map[string]interface{}{
+		"success": true,
+		"message": "Session revoked successfully",
 	}))
 }
