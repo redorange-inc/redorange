@@ -22,9 +22,9 @@ export const HeroQuote = ({ hero }: HeroQuoteProps) => {
           <Badge className="bg-linear-to-r from-infra to-infra-muted text-white">{hero.tag}</Badge>
         </div>
 
-        <h1 className="font-heading text-4xl font-extrabold tracking-tight md:text-5xl lg:text-6xl">{hero.title}</h1>
+        <h1 className="font-heading text-3xl font-extrabold tracking-tight md:text-4xl lg:text-5xl">{hero.title}</h1>
 
-        <p className="mx-auto max-w-2xl text-base text-muted-foreground md:text-lg">{hero.description}</p>
+        <p className="mx-auto max-w-2xl text-sm text-muted-foreground md:text-base">{hero.description}</p>
       </div>
     </section>
   );

@@ -12,6 +12,7 @@ import { HeroSection } from './_components/hero-section';
 import { OverviewCard } from './_components/overview-card';
 import { ProductsCarousel } from './_components/products-carousel';
 import { BrandsSection } from './_components/brands-section';
+import { BackgroundEffects } from './_components/background-effects';
 
 const InfraPage = async () => {
   const [heroResponse, statsResponse, highlightsResponse, productsResponse, brandsResponse] = await Promise.all([
@@ -24,6 +25,8 @@ const InfraPage = async () => {
 
   return (
     <PageAnimations>
+      <BackgroundEffects />
+
       <div className="relative mx-auto w-full max-w-6xl px-4 py-14 lg:px-6">
         <section className="grid gap-8 lg:grid-cols-12" data-anim="fade-up">
           <div className="lg:col-span-7">

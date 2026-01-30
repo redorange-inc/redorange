@@ -1,38 +1,37 @@
 'use client';
 
-import { useEffect, type ReactNode } from 'react';
+import React, { useEffect, useRef } from 'react';
+import { animate } from 'animejs';
 
 interface PageWrapperProps {
-  children: ReactNode;
+  children: React.ReactNode;
 }
 
 export const PageWrapper = ({ children }: PageWrapperProps) => {
+  const animationStarted = useRef(false);
+
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('animate-in', 'fade-in', 'slide-in-from-bottom-4');
-            entry.target.classList.remove('opacity-0', 'translate-y-4');
-          }
-        });
-      },
-      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' },
-    );
+    if (animationStarted.current) return;
+    animationStarted.current = true;
 
-    const elements = document.querySelectorAll('[data-anim]');
-    elements.forEach((el) => {
-      el.classList.add('opacity-0', 'translate-y-4', 'transition-all', 'duration-700');
-      observer.observe(el);
-    });
+    const timer = setTimeout(() => {
+      const elements = Array.from(document.querySelectorAll<HTMLElement>('[data-anim="fade-up"]'));
+      elements.forEach((el) => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(24px) scale(0.98)';
+      });
 
-    return () => observer.disconnect();
+      elements.forEach((el, idx) => {
+        animate(el, { opacity: [0, 1], transform: ['translateY(24px) scale(0.98)', 'translateY(0px) scale(1)'], duration: 800, easing: 'easeOutExpo', delay: 100 + 80 * idx });
+      });
+    }, 100);
+
+    return () => clearTimeout(timer);
   }, []);
 
   return (
-    <>
-      <div className="pointer-events-none fixed inset-0 -z-10 bg-linear-to-b from-background/80 via-background/60 to-background/90" />
-      {children}
-    </>
+    <main className="relative min-h-screen bg-background pt-20">
+      <div className="relative mx-auto w-full max-w-6xl px-4 py-14 lg:px-6">{children}</div>
+    </main>
   );
 };

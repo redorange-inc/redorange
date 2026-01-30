@@ -1,0 +1,160 @@
+package actions
+
+import (
+	"sync"
+
+	"server/locales"
+	"server/models"
+
+	"github.com/gobuffalo/buffalo"
+	"github.com/gobuffalo/buffalo-pop/v3/pop/popmw"
+	"github.com/gobuffalo/envy"
+	"github.com/gobuffalo/middleware/contenttype"
+	"github.com/gobuffalo/middleware/forcessl"
+	"github.com/gobuffalo/middleware/i18n"
+	"github.com/gobuffalo/middleware/paramlogger"
+	"github.com/gobuffalo/x/sessions"
+	"github.com/rs/cors"
+	"github.com/unrolled/secure"
+)
+
+// ENV is used to help switch settings based on where the
+// application is being run. Default is "development".
+var ENV = envy.Get("GO_ENV", "development")
+
+var (
+	app     *buffalo.App
+	appOnce sync.Once
+	T       *i18n.Translator
+)
+
+// App is where all routes and middleware for buffalo
+// should be defined. This is the nerve center of your
+// application.
+//
+// Routing, middleware, groups, etc... are declared TOP -> DOWN.
+// This means if you add a middleware to `app` *after* declaring a
+// group, that group will NOT have that new middleware. The same
+// is true of resource declarations as well.
+//
+// It also means that routes are checked in the order they are declared.
+// `ServeFiles` is a CATCH-ALL route, so it should always be
+// placed last in the route declarations, as it will prevent routes
+// declared after it to never be called.
+func App() *buffalo.App {
+	appOnce.Do(func() {
+		// -- cors configuration
+		corsHandler := cors.New(cors.Options{
+			AllowedOrigins:   []string{"http://localhost:3000", "http://localhost:3001"},
+			AllowedMethods:   []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
+			AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+			ExposedHeaders:   []string{"Link"},
+			AllowCredentials: true,
+			MaxAge:           300,
+		})
+
+		app = buffalo.New(buffalo.Options{
+			Env:          ENV,
+			SessionStore: sessions.Null{},
+			PreWares: []buffalo.PreWare{
+				corsHandler.Handler,
+			},
+			SessionName: "_server_session",
+		})
+
+		// Automatically redirect to SSL
+		app.Use(forceSSL())
+
+		// Log request parameters (filters apply).
+		app.Use(paramlogger.ParameterLogger)
+
+		// Set the request content type to JSON
+		app.Use(contenttype.Set("application/json"))
+
+		// Wraps each request in a transaction.
+		//   c.Value("tx").(*pop.Connection)
+		// Remove to disable this.
+		app.Use(popmw.Transaction(models.DB))
+
+		// -- home
+		app.GET("/", HomeHandler)
+
+		// -- api v1
+		api := app.Group("/api")
+		v1 := api.Group("/v1")
+
+		// -- public routes (no auth required)
+		v1.POST("/auth/register", AuthRegister)
+		v1.POST("/auth/verify-email", AuthVerifyEmail)
+		v1.POST("/auth/login", AuthLogin)
+		v1.POST("/auth/refresh", AuthRefresh)
+		v1.POST("/auth/password/request-reset", AuthRequestPasswordReset)
+		v1.POST("/auth/password/reset", AuthResetPassword)
+		v1.POST("/auth/2fa/verify", Auth2FAVerify)
+		v1.POST("/auth/2fa/verify-backup", Auth2FAVerifyBackup)
+		v1.GET("/auth/oauth/google", AuthOAuthGoogleInitiate)
+		v1.GET("/auth/oauth/google/callback", AuthOAuthGoogleCallback)
+		v1.POST("/auth/security/status", AuthSecurityStatus)
+
+		// -- protected routes (auth required)
+		auth := v1.Group("")
+		auth.Use(AuthMiddleware)
+
+		// -- logout
+		auth.POST("/auth/logout", AuthLogout)
+
+		// -- user profile
+		auth.GET("/auth/me", AuthMe)
+		auth.PATCH("/auth/me", AuthMeUpdate)
+		auth.DELETE("/auth/me/profile", AuthProfileDelete)
+
+		// -- 2fa management
+		auth.POST("/auth/2fa/enable", Auth2FAEnable)
+		auth.POST("/auth/2fa/verify-enable", Auth2FAVerifyEnable)
+		auth.POST("/auth/2fa/disable", Auth2FADisable)
+		auth.POST("/auth/2fa/regenerate-backup-codes", Auth2FARegenerateBackupCodes)
+		auth.GET("/auth/2fa/backup-codes/status", Auth2FABackupStatus)
+
+		// -- password management
+		auth.POST("/auth/password/change", AuthPasswordChange)
+		auth.POST("/auth/password/set", AuthPasswordSet)
+
+		// -- oauth management
+		auth.POST("/auth/oauth/google/link", AuthOAuthGoogleLink)
+		auth.DELETE("/auth/oauth/google/unlink", AuthOAuthGoogleUnlink)
+
+		// -- sessions management
+		auth.GET("/auth/sessions", AuthSessionsList)
+		auth.DELETE("/auth/sessions/{session_id}", AuthSessionsRevoke)
+		auth.DELETE("/auth/sessions/all", AuthSessionsRevokeAll)
+
+		// -- security
+		auth.GET("/auth/security/login-history", AuthSecurityLoginHistory)
+	})
+
+	return app
+}
+
+// translations will load locale files, set up the translator `actions.T`,
+// and will return a middleware to use to load the correct locale for each
+// request.
+// for more information: https://gobuffalo.io/en/docs/localization
+func translations() buffalo.MiddlewareFunc {
+	var err error
+	if T, err = i18n.New(locales.FS(), "en-US"); err != nil {
+		app.Stop(err)
+	}
+	return T.Middleware()
+}
+
+// forceSSL will return a middleware that will redirect an incoming request
+// if it is not HTTPS. "http://example.com" => "https://example.com".
+// This middleware does **not** enable SSL. for your application. To do that
+// we recommend using a proxy: https://gobuffalo.io/en/docs/proxy
+// for more information: https://github.com/unrolled/secure/
+func forceSSL() buffalo.MiddlewareFunc {
+	return forcessl.Middleware(secure.Options{
+		SSLRedirect:     ENV == "production",
+		SSLProxyHeaders: map[string]string{"X-Forwarded-Proto": "https"},
+	})
+}

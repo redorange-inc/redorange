@@ -21,7 +21,7 @@ export const BrandsSection = ({ brands }: BrandsSectionProps) => {
         <div className="pointer-events-none absolute left-0 top-0 z-10 h-full w-24 bg-linear-to-r from-background to-transparent" />
         <div className="pointer-events-none absolute right-0 top-0 z-10 h-full w-24 bg-linear-to-l from-background to-transparent" />
 
-        <div className="marquee-container flex w-max gap-4">
+        <div className="flex w-max gap-4 animate-marquee hover:paused">
           {duplicatedBrands.map((brand, index) => (
             <div
               key={`${brand.id}-${index}`}
@@ -33,25 +33,6 @@ export const BrandsSection = ({ brands }: BrandsSectionProps) => {
           ))}
         </div>
       </div>
-
-      <style jsx global>{`
-        @keyframes marquee-scroll {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-50%);
-          }
-        }
-
-        .marquee-container {
-          animation: marquee-scroll 20s linear infinite;
-        }
-
-        .marquee-container:hover {
-          animation-play-state: paused;
-        }
-      `}</style>
     </div>
   );
 };

@@ -7,8 +7,9 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/theme-toggle';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/hooks/use-auth';
+import { AuthStatus } from '@/components/auth/auth-status';
 
 const navItems = [
   { href: '/infra', label: 'Inicio', exact: true },
@@ -22,6 +23,8 @@ const navItems = [
 export const Navbar: FC = () => {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+  const { isAuthenticated, isLoading } = useAuth();
 
   const isActive = (item: (typeof navItems)[number]) => {
     if (item.exact) {
@@ -76,9 +79,7 @@ export const Navbar: FC = () => {
 
         <div className="flex items-center gap-2">
           <div className="hidden md:block">
-            <Button asChild className="font-heading bg-infra-muted text-white hover:bg-infra-accent">
-              <Link href="/auth/sign-in">Iniciar Sesión</Link>
-            </Button>
+            <AuthStatus signInVariant="default" signInClassName="font-heading bg-infra-muted text-white hover:bg-infra-accent" showUserName={false} />
           </div>
           <ThemeToggle />
           <button
@@ -123,11 +124,7 @@ export const Navbar: FC = () => {
           })}
 
           <div className="mt-4 pt-4 border-t border-border/50">
-            <Button asChild className="w-full font-heading bg-infra-muted text-white hover:bg-infra-accent">
-              <Link href="/auth/sign-in" onClick={() => setIsMenuOpen(false)}>
-                Iniciar Sesión
-              </Link>
-            </Button>
+            <AuthStatus signInVariant="default" signInClassName="w-full font-heading bg-infra-muted text-white hover:bg-infra-accent" showUserName={true} />
           </div>
         </nav>
       </div>

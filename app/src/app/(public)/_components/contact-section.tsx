@@ -184,24 +184,13 @@ const EllipsisMarquee: FC<{ text: string; className?: string; speed?: number }> 
   return (
     <div ref={containerRef} className="w-[80%] overflow-hidden">
       <div className="inline-flex whitespace-nowrap will-change-transform">
-        <span ref={textRef} className={`inline-block pr-8 ${className}`} style={{ animation: `marquee ${speed}s linear infinite` }}>
+        <span ref={textRef} className={`inline-block pr-8 ${className}`} style={{ animation: `marquee-scroll ${speed}s linear infinite` }}>
           {text}
         </span>
-        <span className={`inline-block pr-8 ${className}`} style={{ animation: `marquee ${speed}s linear infinite` }}>
+        <span className={`inline-block pr-8 ${className}`} style={{ animation: `marquee-scroll ${speed}s linear infinite` }}>
           {text}
         </span>
       </div>
-
-      <style jsx global>{`
-        @keyframes marquee {
-          from {
-            transform: translateX(0);
-          }
-          to {
-            transform: translateX(-50%);
-          }
-        }
-      `}</style>
     </div>
   );
 };

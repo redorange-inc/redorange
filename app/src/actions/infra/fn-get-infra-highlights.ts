@@ -7,7 +7,6 @@ export const getInfraHighlights = async (): Promise<ApiResponse<HighlightsData>>
 
   const data: HighlightsData = {
     items: [
-      { text: 'Importación directa', iconName: 'globe' },
       { text: 'Garantía extendida', iconName: 'shield' },
       { text: 'Soporte técnico', iconName: 'headphones' },
       { text: 'Instalación profesional', iconName: 'wrench' },
