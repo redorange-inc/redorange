@@ -11,7 +11,7 @@ import (
 var (
 	GoogleClientID     = envy.Get("GOOGLE_CLIENT_ID", "")
 	GoogleClientSecret = envy.Get("GOOGLE_CLIENT_SECRET", "")
-	GoogleRedirectURI  = envy.Get("GOOGLE_REDIRECT_URI", "http://localhost:3000/api/v1/auth/oauth/google/callback")
+	GoogleRedirectURI  = envy.Get("GOOGLE_REDIRECT_URI", "http://localhost:8000/api/v1/auth/oauth/google/callback")
 )
 
 const (
@@ -19,8 +19,6 @@ const (
 	GoogleTokenURL = "https://oauth2.googleapis.com/token"
 	GoogleUserURL  = "https://www.googleapis.com/oauth2/v2/userinfo"
 )
-
-// -- Initiate Google OAuth
 
 func AuthOAuthGoogleInitiate(c buffalo.Context) error {
 	redirectURI := c.Param("redirect_uri")
@@ -35,16 +33,7 @@ func AuthOAuthGoogleInitiate(c buffalo.Context) error {
 	}
 
 	if state == "" {
-		// Generar state si no se proporciona
-		var err error
-		state, err = randomToken(16)
-		if err != nil {
-			return c.Render(http.StatusInternalServerError, r.JSON(ErrorResponse{
-				Success:   false,
-				Error:     "Failed to generate state",
-				ErrorCode: "INTERNAL_ERROR",
-			}))
-		}
+		state = randomToken(16)
 	}
 
 	if GoogleClientID == "" {
@@ -55,11 +44,9 @@ func AuthOAuthGoogleInitiate(c buffalo.Context) error {
 		}))
 	}
 
-	// Guardar redirect_uri en state (encoded)
 	stateData := state + "|" + redirectURI
 	encodedState := url.QueryEscape(stateData)
 
-	// Construir URL de Google OAuth
 	params := url.Values{}
 	params.Set("client_id", GoogleClientID)
 	params.Set("redirect_uri", GoogleRedirectURI)

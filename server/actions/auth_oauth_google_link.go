@@ -10,24 +10,13 @@ import (
 	"github.com/gobuffalo/pop/v6"
 )
 
-// -- Link Google Account
-
 type LinkGoogleRequest struct {
 	GoogleAuthCode string `json:"google_auth_code"`
 }
 
-type LinkGoogleResponse struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
-	Data    struct {
-		Provider      string `json:"provider"`
-		ProviderEmail string `json:"provider_email"`
-	} `json:"data"`
-}
-
 func AuthOAuthGoogleLink(c buffalo.Context) error {
-	user := GetCurrentUser(c)
-	if user == nil {
+	user, err := GetCurrentUser(c)
+	if err != nil {
 		return c.Render(http.StatusUnauthorized, r.JSON(ErrorResponse{
 			Success:   false,
 			Error:     "User not found",
@@ -63,9 +52,8 @@ func AuthOAuthGoogleLink(c buffalo.Context) error {
 		}))
 	}
 
-	// Verificar si ya tiene Google vinculado
 	var existingProvider models.OAuthProvider
-	err := tx.Where("user_id = ? AND provider = ?", user.ID, "google").First(&existingProvider)
+	err = tx.Where("user_id = ? AND provider = ?", user.ID, "google").First(&existingProvider)
 	if err == nil {
 		return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
 			Success:   false,
@@ -74,7 +62,6 @@ func AuthOAuthGoogleLink(c buffalo.Context) error {
 		}))
 	}
 
-	// Intercambiar code por tokens
 	googleTokens, err := exchangeGoogleCode(req.GoogleAuthCode)
 	if err != nil {
 		return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
@@ -84,7 +71,6 @@ func AuthOAuthGoogleLink(c buffalo.Context) error {
 		}))
 	}
 
-	// Obtener info del usuario de Google
 	googleUser, err := getGoogleUserInfo(googleTokens.AccessToken)
 	if err != nil {
 		return c.Render(http.StatusInternalServerError, r.JSON(ErrorResponse{
@@ -94,7 +80,6 @@ func AuthOAuthGoogleLink(c buffalo.Context) error {
 		}))
 	}
 
-	// Verificar que este Google ID no esté vinculado a otra cuenta
 	var otherProvider models.OAuthProvider
 	err = tx.Where("provider = ? AND provider_user_id = ?", "google", googleUser.ID).First(&otherProvider)
 	if err == nil {
@@ -105,15 +90,17 @@ func AuthOAuthGoogleLink(c buffalo.Context) error {
 		}))
 	}
 
-	// Crear OAuth provider link
 	expiresAt := time.Now().UTC().Add(time.Duration(googleTokens.ExpiresIn) * time.Second)
 	oauthProvider := models.OAuthProvider{
 		UserID:         user.ID,
 		Provider:       "google",
 		ProviderUserID: googleUser.ID,
+		ProviderEmail:  &googleUser.Email,
 		AccessToken:    &googleTokens.AccessToken,
 		RefreshToken:   &googleTokens.RefreshToken,
 		ExpiresAt:      &expiresAt,
+		CreatedAt:      time.Now().UTC(),
+		UpdatedAt:      time.Now().UTC(),
 	}
 
 	if err := tx.Create(&oauthProvider); err != nil {
@@ -124,12 +111,12 @@ func AuthOAuthGoogleLink(c buffalo.Context) error {
 		}))
 	}
 
-	// Respuesta
-	var resp LinkGoogleResponse
-	resp.Success = true
-	resp.Message = "Google account linked successfully"
-	resp.Data.Provider = "google"
-	resp.Data.ProviderEmail = googleUser.Email
-
-	return c.Render(http.StatusOK, r.JSON(resp))
+	return c.Render(http.StatusOK, r.JSON(map[string]interface{}{
+		"success": true,
+		"message": "Google account linked successfully",
+		"data": map[string]interface{}{
+			"provider":       "google",
+			"provider_email": googleUser.Email,
+		},
+	}))
 }

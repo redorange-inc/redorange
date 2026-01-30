@@ -5,25 +5,17 @@ import (
 	"server/models"
 	"strings"
 
-	"github.com/alexedwards/argon2id"
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/pop/v6"
 )
-
-// -- Unlink Google Account
 
 type UnlinkGoogleRequest struct {
 	Password string `json:"password"`
 }
 
-type UnlinkGoogleResponse struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
-}
-
 func AuthOAuthGoogleUnlink(c buffalo.Context) error {
-	user := GetCurrentUser(c)
-	if user == nil {
+	user, err := GetCurrentUser(c)
+	if err != nil {
 		return c.Render(http.StatusUnauthorized, r.JSON(ErrorResponse{
 			Success:   false,
 			Error:     "User not found",
@@ -51,9 +43,8 @@ func AuthOAuthGoogleUnlink(c buffalo.Context) error {
 		}))
 	}
 
-	// Verificar si tiene Google vinculado
 	var oauthProvider models.OAuthProvider
-	err := tx.Where("user_id = ? AND provider = ?", user.ID, "google").First(&oauthProvider)
+	err = tx.Where("user_id = ? AND provider = ?", user.ID, "google").First(&oauthProvider)
 	if err != nil {
 		return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
 			Success:   false,
@@ -62,14 +53,10 @@ func AuthOAuthGoogleUnlink(c buffalo.Context) error {
 		}))
 	}
 
-	// Verificar que tenga otra forma de autenticación (password u otro OAuth)
 	hasPassword := user.PasswordHash != nil && *user.PasswordHash != ""
 
 	var otherProviders int
-	tx.RawQuery(`
-		SELECT COUNT(*) FROM auth.oauth_providers 
-		WHERE user_id = ? AND provider != 'google'
-	`, user.ID).First(&otherProviders)
+	tx.RawQuery("SELECT COUNT(*) FROM auth.oauth_providers WHERE user_id = ? AND provider != 'google'", user.ID).First(&otherProviders)
 
 	if !hasPassword && otherProviders == 0 {
 		return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
@@ -79,7 +66,6 @@ func AuthOAuthGoogleUnlink(c buffalo.Context) error {
 		}))
 	}
 
-	// Si tiene password, verificarlo
 	if hasPassword {
 		if req.Password == "" {
 			return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
@@ -89,8 +75,7 @@ func AuthOAuthGoogleUnlink(c buffalo.Context) error {
 			}))
 		}
 
-		match, err := argon2id.ComparePasswordAndHash(req.Password, *user.PasswordHash)
-		if err != nil || !match {
+		if !verifyPassword(req.Password, *user.PasswordHash) {
 			return c.Render(http.StatusUnauthorized, r.JSON(ErrorResponse{
 				Success:   false,
 				Error:     "Invalid password",
@@ -99,7 +84,6 @@ func AuthOAuthGoogleUnlink(c buffalo.Context) error {
 		}
 	}
 
-	// Eliminar OAuth provider
 	if err := tx.Destroy(&oauthProvider); err != nil {
 		return c.Render(http.StatusInternalServerError, r.JSON(ErrorResponse{
 			Success:   false,
@@ -108,8 +92,8 @@ func AuthOAuthGoogleUnlink(c buffalo.Context) error {
 		}))
 	}
 
-	return c.Render(http.StatusOK, r.JSON(UnlinkGoogleResponse{
-		Success: true,
-		Message: "Google account unlinked successfully",
+	return c.Render(http.StatusOK, r.JSON(map[string]interface{}{
+		"success": true,
+		"message": "Google account unlinked successfully",
 	}))
 }

@@ -13,8 +13,6 @@ import (
 	"github.com/gobuffalo/pop/v6"
 )
 
-// -- Google OAuth Callback
-
 type GoogleTokenResponse struct {
 	AccessToken  string `json:"access_token"`
 	RefreshToken string `json:"refresh_token"`
@@ -38,16 +36,14 @@ func AuthOAuthGoogleCallback(c buffalo.Context) error {
 	state := c.Param("state")
 	errorParam := c.Param("error")
 
-	// Decodificar state para obtener redirect_uri original
 	decodedState, _ := url.QueryUnescape(state)
 	stateParts := strings.Split(decodedState, "|")
 
-	frontendRedirect := "http://localhost:3001/auth/callback" // Default
+	frontendRedirect := "http://localhost:3000/auth/callback"
 	if len(stateParts) >= 2 {
 		frontendRedirect = stateParts[1]
 	}
 
-	// Si Google devolvió error
 	if errorParam != "" {
 		redirectURL := frontendRedirect + "?error=" + url.QueryEscape(errorParam)
 		return c.Redirect(http.StatusTemporaryRedirect, redirectURL)
@@ -58,14 +54,12 @@ func AuthOAuthGoogleCallback(c buffalo.Context) error {
 		return c.Redirect(http.StatusTemporaryRedirect, redirectURL)
 	}
 
-	// Intercambiar code por tokens de Google
 	googleTokens, err := exchangeGoogleCode(code)
 	if err != nil {
 		redirectURL := frontendRedirect + "?error=token_exchange_failed"
 		return c.Redirect(http.StatusTemporaryRedirect, redirectURL)
 	}
 
-	// Obtener info del usuario de Google
 	googleUser, err := getGoogleUserInfo(googleTokens.AccessToken)
 	if err != nil {
 		redirectURL := frontendRedirect + "?error=user_info_failed"
@@ -78,39 +72,44 @@ func AuthOAuthGoogleCallback(c buffalo.Context) error {
 		return c.Redirect(http.StatusTemporaryRedirect, redirectURL)
 	}
 
-	// Buscar si ya existe OAuth provider con este Google ID
 	var oauthProvider models.OAuthProvider
 	err = tx.Where("provider = ? AND provider_user_id = ?", "google", googleUser.ID).First(&oauthProvider)
 
 	var user models.User
 
 	if err == nil {
-		// Usuario ya existe con este Google - login
 		if err := tx.Find(&user, oauthProvider.UserID); err != nil {
 			redirectURL := frontendRedirect + "?error=user_not_found"
 			return c.Redirect(http.StatusTemporaryRedirect, redirectURL)
 		}
 	} else {
-		// Buscar si existe usuario con este email
 		err = tx.Where("email = ?", strings.ToLower(googleUser.Email)).First(&user)
 
 		if err != nil {
-			// Crear nuevo usuario
+			name := googleUser.GivenName
+			if name == "" {
+				name = googleUser.Name
+			}
+			if name == "" {
+				name = "User"
+			}
+
+			lastName := googleUser.FamilyName
+			if lastName == "" {
+				lastName = "Google"
+			}
+
 			user = models.User{
 				Email:            strings.ToLower(googleUser.Email),
 				EmailVerified:    googleUser.VerifiedEmail,
-				FirstName:        googleUser.GivenName,
-				LastNamePaternal: googleUser.FamilyName,
-				Role:             "support", // Role por defecto
+				Name:             name,
+				LastName:         lastName,
+				Profile:          &googleUser.Picture,
+				Role:             "support",
 				Active:           true,
 				TwoFactorEnabled: false,
-			}
-
-			if user.FirstName == "" {
-				user.FirstName = googleUser.Name
-			}
-			if user.LastNamePaternal == "" {
-				user.LastNamePaternal = "User"
+				CreatedAt:        time.Now().UTC(),
+				UpdatedAt:        time.Now().UTC(),
 			}
 
 			if err := tx.Create(&user); err != nil {
@@ -119,15 +118,17 @@ func AuthOAuthGoogleCallback(c buffalo.Context) error {
 			}
 		}
 
-		// Crear OAuth provider link
 		expiresAt := time.Now().UTC().Add(time.Duration(googleTokens.ExpiresIn) * time.Second)
 		newOAuthProvider := models.OAuthProvider{
 			UserID:         user.ID,
 			Provider:       "google",
 			ProviderUserID: googleUser.ID,
+			ProviderEmail:  &googleUser.Email,	
 			AccessToken:    &googleTokens.AccessToken,
 			RefreshToken:   &googleTokens.RefreshToken,
 			ExpiresAt:      &expiresAt,
+			CreatedAt:      time.Now().UTC(),
+			UpdatedAt:      time.Now().UTC(),
 		}
 
 		if err := tx.Create(&newOAuthProvider); err != nil {
@@ -136,13 +137,11 @@ func AuthOAuthGoogleCallback(c buffalo.Context) error {
 		}
 	}
 
-	// Verificar si la cuenta está activa
 	if !user.Active {
 		redirectURL := frontendRedirect + "?error=account_inactive"
 		return c.Redirect(http.StatusTemporaryRedirect, redirectURL)
 	}
 
-	// Si tiene 2FA habilitado, devolver temp_token
 	if user.TwoFactorEnabled {
 		tempToken, err := generateToken(user, "temp_2fa", TempTokenDuration)
 		if err != nil {
@@ -154,34 +153,18 @@ func AuthOAuthGoogleCallback(c buffalo.Context) error {
 		return c.Redirect(http.StatusTemporaryRedirect, redirectURL)
 	}
 
-	// Generar tokens JWT
-	accessToken, err := generateToken(user, "access", AccessTokenDuration)
+	accessToken, refreshToken, err := createSession(tx, user, c.Request())
 	if err != nil {
-		redirectURL := frontendRedirect + "?error=token_generation_failed"
-		return c.Redirect(http.StatusTemporaryRedirect, redirectURL)
-	}
-
-	refreshToken, err := generateToken(user, "refresh", RefreshTokenDuration)
-	if err != nil {
-		redirectURL := frontendRedirect + "?error=token_generation_failed"
-		return c.Redirect(http.StatusTemporaryRedirect, redirectURL)
-	}
-
-	// Crear sesión
-	if err := createSession(tx, user.ID, refreshToken, c); err != nil {
 		redirectURL := frontendRedirect + "?error=session_creation_failed"
 		return c.Redirect(http.StatusTemporaryRedirect, redirectURL)
 	}
 
-	// Actualizar last_login_at
 	now := time.Now().UTC()
 	user.LastLoginAt = &now
 	tx.Update(&user)
 
-	// Registrar login
-	logLoginAttempt(tx, user.Email, &user.ID, true, "oauth_google", c)
+	recordLoginAttempt(tx, &user.ID, user.Email, true, "oauth_google", c.Request())
 
-	// Redirect con tokens
 	redirectURL := frontendRedirect + "?access_token=" + url.QueryEscape(accessToken) + "&refresh_token=" + url.QueryEscape(refreshToken)
 	return c.Redirect(http.StatusTemporaryRedirect, redirectURL)
 }
