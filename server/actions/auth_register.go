@@ -1,43 +1,32 @@
+// server/actions/auth_register.go
+
 package actions
 
 import (
-	"crypto/rand"
 	"crypto/sha256"
 	"encoding/hex"
+	"fmt"
 	"net/http"
 	"server/models"
 	"strings"
 	"time"
 
-	"github.com/alexedwards/argon2id"
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/pop/v6"
 )
 
 type RegisterRequest struct {
-	Email            string `json:"email"`
-	Password         string `json:"password"`
-	FirstName        string `json:"first_name"`
-	LastNamePaternal string `json:"last_name_paternal"`
-	LastNameMaternal string `json:"last_name_maternal"`
-	Role             string `json:"role"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+	Name     string `json:"name"`
+	LastName string `json:"last_name"`
+	Role     string `json:"role"`
 }
 
 type RegisterResponse struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
-	Data    struct {
-		UserID        string `json:"user_id"`
-		Email         string `json:"email"`
-		EmailVerified bool   `json:"email_verified"`
-	} `json:"data"`
-}
-
-type ErrorResponse struct {
-	Success   bool           `json:"success"`
-	Error     string         `json:"error"`
-	ErrorCode string         `json:"error_code,omitempty"`
-	Details   map[string]any `json:"details,omitempty"`
+	UserID        string `json:"user_id"`
+	Email         string `json:"email"`
+	EmailVerified bool   `json:"email_verified"`
 }
 
 func AuthRegister(c buffalo.Context) error {
@@ -50,43 +39,33 @@ func AuthRegister(c buffalo.Context) error {
 		}))
 	}
 
-	req.Email = strings.ToLower(strings.TrimSpace(req.Email))
-	req.FirstName = strings.TrimSpace(req.FirstName)
-	req.LastNamePaternal = strings.TrimSpace(req.LastNamePaternal)
-	req.LastNameMaternal = strings.TrimSpace(req.LastNameMaternal)
-	req.Role = strings.TrimSpace(req.Role)
-
-	details := map[string]any{}
-	if req.Email == "" {
-		details["email"] = "Email is required"
-	}
-	if len(req.Password) < 8 {
-		details["password"] = "Password must be at least 8 characters"
-	}
-	if req.FirstName == "" {
-		details["first_name"] = "First name is required"
-	}
-	if req.LastNamePaternal == "" {
-		details["last_name_paternal"] = "Last name (paternal) is required"
-	}
-	if req.Role == "" || !isAllowedRole(req.Role) {
-		details["role"] = "Role must be one of: support, admin, dev"
-	}
-	if len(details) > 0 {
+	if req.Email == "" || req.Password == "" || req.Name == "" || req.LastName == "" {
 		return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
 			Success:   false,
-			Error:     "Validation error",
+			Error:     "Email, password, name and last_name are required",
 			ErrorCode: "VALIDATION_ERROR",
-			Details:   details,
 		}))
 	}
 
-	pwHash, err := argon2id.CreateHash(req.Password, argon2id.DefaultParams)
-	if err != nil {
-		return c.Render(http.StatusInternalServerError, r.JSON(ErrorResponse{
+	req.Email = strings.ToLower(strings.TrimSpace(req.Email))
+
+	if len(req.Password) < 8 {
+		return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
 			Success:   false,
-			Error:     "Failed to create user",
-			ErrorCode: "INTERNAL_ERROR",
+			Error:     "Password must be at least 8 characters",
+			ErrorCode: "PASSWORD_TOO_SHORT",
+		}))
+	}
+
+	validRoles := map[string]bool{"support": true, "admin": true, "dev": true}
+	if req.Role == "" {
+		req.Role = "support"
+	}
+	if !validRoles[req.Role] {
+		return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
+			Success:   false,
+			Error:     "Invalid role. Must be: support, admin, or dev",
+			ErrorCode: "INVALID_ROLE",
 		}))
 	}
 
@@ -99,97 +78,70 @@ func AuthRegister(c buffalo.Context) error {
 		}))
 	}
 
+	var existingUser models.User
+	err := tx.Where("email = ?", req.Email).First(&existingUser)
+	if err == nil {
+		return c.Render(http.StatusConflict, r.JSON(ErrorResponse{
+			Success:   false,
+			Error:     "Email already registered",
+			ErrorCode: "EMAIL_ALREADY_EXISTS",
+		}))
+	}
+
+	passwordHash := hashPassword(req.Password)
+
 	user := models.User{
 		Email:            req.Email,
 		EmailVerified:    false,
-		PasswordHash:     &pwHash,
-		FirstName:        req.FirstName,
-		LastNamePaternal: req.LastNamePaternal,
+		PasswordHash:     &passwordHash,
+		Name:             strings.TrimSpace(req.Name),
+		LastName:         strings.TrimSpace(req.LastName),
 		Role:             req.Role,
 		Active:           true,
 		TwoFactorEnabled: false,
-	}
-
-	if req.LastNameMaternal != "" {
-		user.LastNameMaternal = &req.LastNameMaternal
+		CreatedAt:        time.Now().UTC(),
+		UpdatedAt:        time.Now().UTC(),
 	}
 
 	if err := tx.Create(&user); err != nil {
-		if strings.Contains(strings.ToLower(err.Error()), "duplicate") || strings.Contains(strings.ToLower(err.Error()), "unique") {
-			return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
-				Success:   false,
-				Error:     "Email already registered",
-				ErrorCode: "EMAIL_ALREADY_EXISTS",
-			}))
-		}
 		return c.Render(http.StatusInternalServerError, r.JSON(ErrorResponse{
 			Success:   false,
 			Error:     "Failed to create user",
-			ErrorCode: "INTERNAL_ERROR",
+			ErrorCode: "CREATE_FAILED",
 		}))
 	}
 
-	rawToken, err := randomToken(32)
-	if err != nil {
-		return c.Render(http.StatusInternalServerError, r.JSON(ErrorResponse{
-			Success:   false,
-			Error:     "Failed to create verification token",
-			ErrorCode: "INTERNAL_ERROR",
-		}))
-	}
-	tokenHash := sha256Hex(rawToken)
+	verificationToken := generateSecureToken(32)
+	hash := sha256.Sum256([]byte(verificationToken))
+	tokenHash := hex.EncodeToString(hash[:])
 
-	vt := models.VerificationToken{
+	verificationTokenModel := models.VerificationToken{
 		UserID:    &user.ID,
 		TokenHash: tokenHash,
 		TokenType: "email_verification",
-		ExpiresAt: time.Now().UTC().Add(2 * time.Hour),
+		ExpiresAt: time.Now().UTC().Add(24 * time.Hour),
 		Used:      false,
+		CreatedAt: time.Now().UTC(),
 	}
 
-	if err := tx.Create(&vt); err != nil {
+	if err := tx.Create(&verificationTokenModel); err != nil {
 		return c.Render(http.StatusInternalServerError, r.JSON(ErrorResponse{
 			Success:   false,
 			Error:     "Failed to create verification token",
-			ErrorCode: "INTERNAL_ERROR",
+			ErrorCode: "TOKEN_CREATE_FAILED",
 		}))
 	}
 
-	response := map[string]any{
+	fmt.Printf("[DEV] Verification token for %s: %s\n", user.Email, verificationToken)
+
+	return c.Render(http.StatusCreated, r.JSON(map[string]interface{}{
 		"success": true,
 		"message": "User registered successfully. Please verify your email.",
-		"data": map[string]any{
-			"user_id":        user.ID.String(),
-			"email":          user.Email,
-			"email_verified": user.EmailVerified,
+		"data": RegisterResponse{
+			UserID:        user.ID.String(),
+			Email:         user.Email,
+			EmailVerified: user.EmailVerified,
 		},
-	}
-
-	if ENV == "development" {
-		response["_dev_verification_token"] = rawToken
-	}
-
-	return c.Render(http.StatusCreated, r.JSON(response))
-}
-
-func isAllowedRole(role string) bool {
-	switch role {
-	case "support", "admin", "dev":
-		return true
-	default:
-		return false
-	}
-}
-
-func randomToken(nBytes int) (string, error) {
-	b := make([]byte, nBytes)
-	if _, err := rand.Read(b); err != nil {
-		return "", err
-	}
-	return hex.EncodeToString(b), nil
-}
-
-func sha256Hex(s string) string {
-	sum := sha256.Sum256([]byte(s))
-	return hex.EncodeToString(sum[:])
+		"_dev_verification_token": verificationToken,
+	}))
 }
