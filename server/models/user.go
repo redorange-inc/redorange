@@ -12,12 +12,11 @@ type User struct {
 	Email         string `db:"email" json:"email"`
 	EmailVerified bool   `db:"email_verified" json:"email_verified"`
 
-	// No exponer en JSON
 	PasswordHash *string `db:"password_hash" json:"-"`
 
-	FirstName        string  `db:"first_name" json:"first_name"`
-	LastNamePaternal string  `db:"last_name_paternal" json:"last_name_paternal"`
-	LastNameMaternal *string `db:"last_name_maternal" json:"last_name_maternal,omitempty"`
+	Name     string  `db:"name" json:"name"`
+	LastName string  `db:"last_name" json:"last_name"`
+	Profile  *string `db:"profile" json:"profile,omitempty"`
 
 	Role   string `db:"role" json:"role"`
 	Active bool   `db:"active" json:"active"`

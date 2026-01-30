@@ -11,12 +11,13 @@ type OAuthProvider struct {
 
 	UserID uuid.UUID `db:"user_id" json:"user_id"`
 
-	Provider       string `db:"provider" json:"provider"`                 // google, github, etc.
-	ProviderUserID string `db:"provider_user_id" json:"provider_user_id"` // id externo
+	Provider       string  `db:"provider" json:"provider"`                       // google, github, etc.
+	ProviderUserID string  `db:"provider_user_id" json:"provider_user_id"`       // id externo
+	ProviderEmail  *string `db:"provider_email" json:"provider_email,omitempty"` // correo externo
 
 	// Tokens NO se exponen en JSON por seguridad
-	AccessToken  *string `db:"access_token" json:"-"`
-	RefreshToken *string `db:"refresh_token" json:"-"`
+	AccessToken  *string    `db:"access_token" json:"-"`
+	RefreshToken *string    `db:"refresh_token" json:"-"`
 	ExpiresAt    *time.Time `db:"expires_at" json:"expires_at,omitempty"`
 
 	CreatedAt time.Time `db:"created_at" json:"created_at"`
