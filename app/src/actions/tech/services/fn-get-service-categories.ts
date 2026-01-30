@@ -23,7 +23,7 @@ export const getServiceCategories = async (): Promise<ApiResponse<ServiceCategor
         id: 'desarrollo',
         name: 'Desarrollo de Software',
         description: 'Creación de sistemas, aplicaciones y soluciones a medida.',
-        iconName: 'Code2',
+        iconName: 'CodeXml',
         services: [
           { title: 'Aplicaciones web', description: 'Sistemas con Next.js, React y tecnologías modernas' },
           { title: 'APIs y microservicios', description: 'Backend con Go, Fiber y arquitectura hexagonal' },

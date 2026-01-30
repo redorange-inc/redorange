@@ -40,7 +40,7 @@ export const getTrainings = async (): Promise<ApiResponse<TrainingsResponse>> =>
         description: 'Fundamentos de desarrollo con React y Next.js.',
         duration: '24 horas',
         level: 'avanzado',
-        iconName: 'Code2',
+        iconName: 'CodeXml',
       },
       {
         title: 'Base de Datos',
