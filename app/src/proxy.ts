@@ -6,7 +6,7 @@ const authRoutes = ['/auth/sign-in', '/auth/sign-up', '/auth/forgot-password'];
 
 const ORIGIN_ROUTES: Record<string, string> = { tech: '/tech', infra: '/infra', digital: '/digital' };
 
-export const middleware = (request: NextRequest) => {
+export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const accessToken = request.cookies.get('access_token')?.value;
 
@@ -28,6 +28,8 @@ export const middleware = (request: NextRequest) => {
   }
 
   return NextResponse.next();
-};
+}
 
-export const config = { matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\..*|api).*)'] };
+export const config = {
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\..*|api).*)'],
+};
