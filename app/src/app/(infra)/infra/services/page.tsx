@@ -1,5 +1,3 @@
-'use server';
-
 import { Separator } from '@/components/ui/separator';
 import { getServicesData } from '@/actions/infra/services/fn-get-services-data';
 
@@ -16,37 +14,25 @@ const ServicesPage = async () => {
 
   return (
     <PageWrapper>
-      <div data-anim="fade-up">
-        <HeroServices hero={data.hero} />
-      </div>
+      <HeroServices hero={data.hero} />
 
-      <div data-anim="fade-up" className="mt-8">
-        <BenefitsStats benefits={data.benefits} />
-      </div>
+      <BenefitsStats benefits={data.benefits} />
 
       <Separator className="my-10" />
 
-      <div data-anim="fade-up">
-        <ServicesGrid services={data.services} />
-      </div>
+      <ServicesGrid services={data.services} />
 
       <Separator className="my-10" />
 
-      <div data-anim="fade-up">
-        <ProcessSection process={data.process} />
-      </div>
+      <ProcessSection process={data.process} />
 
       <Separator className="my-10" />
 
-      <div data-anim="fade-up">
-        <FAQSection faqs={data.faqs} />
-      </div>
+      <FAQSection faqs={data.faqs} />
 
       <Separator className="my-10" />
 
-      <div data-anim="fade-up">
-        <ContactCTA phone={data.contactPhone} whatsapp={data.contactWhatsapp} />
-      </div>
+      <ContactCTA phone={data.contactPhone} whatsapp={data.contactWhatsapp} />
     </PageWrapper>
   );
 };
