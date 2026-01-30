@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Rocket } from 'lucide-react';
+import { Icon } from './icon';
 import { ui } from './constants';
 import type { FutureResponse } from './types';
 
@@ -49,7 +49,7 @@ export const FutureTechSection = ({ futureTech }: FutureTechSectionProps) => {
           <p className="mt-1 text-sm text-muted-foreground">Tecnologías en roadmap de adopción</p>
         </div>
         <Badge className="rounded-full bg-background/60 text-foreground backdrop-blur">
-          <Rocket className="mr-1 h-3 w-3" />
+          <Icon name="rocket" size="sm" className="mr-1" />
           Roadmap
         </Badge>
       </div>
