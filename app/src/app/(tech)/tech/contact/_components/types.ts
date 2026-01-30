@@ -1,7 +1,3 @@
-import type { IconName } from 'lucide-react/dynamic';
-
-export type { IconName };
-
 export interface ApiResponse<T> {
   data: T;
   meta: {
@@ -38,7 +34,7 @@ export interface ServiceOption {
 export interface Feature {
   title: string;
   description: string;
-  iconName: IconName;
+  iconName: string;
 }
 
 export interface ContactPageData {

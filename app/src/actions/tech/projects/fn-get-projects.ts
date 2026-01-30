@@ -62,7 +62,7 @@ export const getProjects = async (): Promise<ApiResponse<ProjectsResponse>> => {
         category: 'Desarrollo',
         status: 'in-progress',
         technologies: ['Next.js', 'React', 'Go', 'PostgreSQL'],
-        iconName: 'Code2',
+        iconName: 'CodeXml',
         features: [
           'Gestión de trámites digitales',
           'Flujos de trabajo automatizados',

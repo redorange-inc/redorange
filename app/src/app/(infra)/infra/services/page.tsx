@@ -1,52 +1,30 @@
-'use server';
-
 import { Separator } from '@/components/ui/separator';
 import { getServicesData } from '@/actions/infra/services/fn-get-services-data';
 
 import { PageWrapper } from './_components/page-wrapper';
 import { HeroServices } from './_components/hero-services';
-import { BenefitsStats } from './_components/benefits-stats';
 import { ServicesGrid } from './_components/services-grid';
 import { ProcessSection } from './_components/process-section';
 import { FAQSection } from './_components/faq-section';
-import { ContactCTA } from './_components/contact-cta';
 
 const ServicesPage = async () => {
   const { data } = await getServicesData();
 
   return (
     <PageWrapper>
-      <div data-anim="fade-up">
-        <HeroServices hero={data.hero} />
-      </div>
-
-      <div data-anim="fade-up" className="mt-8">
-        <BenefitsStats benefits={data.benefits} />
-      </div>
+      <HeroServices hero={data.hero} />
 
       <Separator className="my-10" />
 
-      <div data-anim="fade-up">
-        <ServicesGrid services={data.services} />
-      </div>
+      <ServicesGrid services={data.services} />
 
       <Separator className="my-10" />
 
-      <div data-anim="fade-up">
-        <ProcessSection process={data.process} />
-      </div>
+      <ProcessSection process={data.process} />
 
       <Separator className="my-10" />
 
-      <div data-anim="fade-up">
-        <FAQSection faqs={data.faqs} />
-      </div>
-
-      <Separator className="my-10" />
-
-      <div data-anim="fade-up">
-        <ContactCTA phone={data.contactPhone} whatsapp={data.contactWhatsapp} />
-      </div>
+      <FAQSection faqs={data.faqs} />
     </PageWrapper>
   );
 };

@@ -1,14 +1,14 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
-import { Settings, Sparkles } from 'lucide-react';
+import { Icon } from './icon';
 
 export const HeroServices = () => {
   return (
     <section data-anim="fade-up" className="mb-10">
       <div className="flex flex-wrap items-center gap-2 font-mono text-xs mb-4">
         <Badge className="rounded-full bg-background/60 text-foreground shadow-sm backdrop-blur transition-all hover:scale-105">
-          <Sparkles className="mr-1 h-3.5 w-3.5 text-tech animate-pulse" />
+          <Icon name="sparkles" size="sm" className="mr-1 text-tech animate-pulse" />
           Servicios TI
         </Badge>
         <Badge className="rounded-full bg-tech-solid">Soporte • Desarrollo • Capacitación</Badge>
@@ -16,7 +16,7 @@ export const HeroServices = () => {
 
       <div className="flex items-center gap-4 mb-4">
         <div className="rounded-2xl bg-tech p-4 text-tech">
-          <Settings className="h-8 w-8" />
+          <Icon name="settings" size="xl" />
         </div>
         <div>
           <h1 className="text-3xl font-bold text-foreground md:text-4xl">Catálogo de Servicios</h1>

@@ -23,7 +23,7 @@ export const getWorkflow = async (): Promise<ApiResponse<WorkflowResponse>> => {
         step: 3,
         title: 'Desarrollo Iterativo',
         description: 'Implementación en sprints con revisiones de código y pruebas continuas.',
-        iconName: 'Code2',
+        iconName: 'CodeXml',
       },
       {
         step: 4,

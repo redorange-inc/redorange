@@ -2,12 +2,13 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import { animate } from 'animejs';
-import { DynamicIcon } from 'lucide-react/dynamic';
+import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Icon } from './icon';
 import { ui } from './constants';
 import type { ServiceOption, ContactInfo } from './types';
 
@@ -84,7 +85,7 @@ export const ContactForm = ({ services, info }: ContactFormProps) => {
         <CardContent className="p-8">
           <div ref={successRef} className="text-center py-8">
             <div className="mx-auto w-16 h-16 rounded-full bg-tech/20 flex items-center justify-center mb-4">
-              <DynamicIcon name="circle-check" size={32} className="text-tech" />
+              <Icon name="circle-check" size="xl" className="text-tech" />
             </div>
             <h3 className="text-xl font-bold text-foreground mb-2">¡Mensaje Recibido!</h3>
             <p className="text-sm text-muted-foreground mb-6">Gracias por contactarnos. Nuestro equipo revisará tu solicitud y te responderá a la brevedad.</p>
@@ -95,7 +96,7 @@ export const ContactForm = ({ services, info }: ContactFormProps) => {
               <Button asChild className="font-heading bg-tech-muted hover:bg-tech-accent text-white">
                 <a href={whatsappHref} target="_blank" rel="noreferrer">
                   Contactar por WhatsApp
-                  <DynamicIcon name="message-circle" size={16} className="ml-2" />
+                  <Image src="/icons/whatsapp-icon.svg" alt="WhatsApp" width={16} height={16} className="ml-2" />
                 </a>
               </Button>
             </div>
@@ -109,7 +110,7 @@ export const ContactForm = ({ services, info }: ContactFormProps) => {
     <Card className={`rounded-3xl ${ui.glassCard}`}>
       <CardHeader className="pb-4">
         <CardTitle className="flex items-center gap-2 text-xl text-foreground">
-          <DynamicIcon name="send" size={20} className="text-tech" />
+          <Icon name="send" size="md" className="text-tech" />
           Envíanos un Mensaje
         </CardTitle>
       </CardHeader>
@@ -161,7 +162,7 @@ export const ContactForm = ({ services, info }: ContactFormProps) => {
           {selectedService && (
             <div className="rounded-xl bg-tech/10 border border-tech/20 p-3 text-sm" data-field>
               <div className="flex items-center gap-2 text-tech font-medium">
-                <DynamicIcon name="circle-check" size={16} />
+                <Icon name="circle-check" size="sm" />
                 {services.find((s) => s.value === selectedService)?.label}
               </div>
               <p className="mt-1 text-xs text-muted-foreground">{services.find((s) => s.value === selectedService)?.description}</p>
@@ -182,7 +183,7 @@ export const ContactForm = ({ services, info }: ContactFormProps) => {
               ) : (
                 <>
                   Enviar mensaje
-                  <DynamicIcon name="arrow-right" size={16} className="ml-2 transition-transform group-hover:translate-x-1" />
+                  <Icon name="arrow-right" size="sm" className="ml-2 transition-transform group-hover:translate-x-1" />
                 </>
               )}
             </Button>
@@ -191,7 +192,7 @@ export const ContactForm = ({ services, info }: ContactFormProps) => {
               {/* eslint-disable-next-line react-hooks/refs */}
               <a href={generateMailto()}>
                 Abrir en cliente de correo
-                <DynamicIcon name="send" size={16} className="ml-2" />
+                <Icon name="send" size="sm" className="ml-2" />
               </a>
             </Button>
           </div>
