@@ -19,9 +19,8 @@ const signUpSchema = z
     email: z.string().email('Email inválido'),
     password: z.string().min(8, 'La contraseña debe tener al menos 8 caracteres'),
     confirmPassword: z.string(),
-    first_name: z.string().min(1, 'El nombre es requerido'),
-    last_name_paternal: z.string().min(1, 'El apellido paterno es requerido'),
-    last_name_maternal: z.string().optional(),
+    name: z.string().min(1, 'El nombre es requerido'),
+    last_name: z.string().min(1, 'El apellido es requerido'),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: 'Las contraseñas no coinciden',
@@ -50,18 +49,15 @@ export const SignUpForm = () => {
       const response = await registerApi({
         email: data.email,
         password: data.password,
-        first_name: data.first_name,
-        last_name_paternal: data.last_name_paternal,
-        last_name_maternal: data.last_name_maternal,
+        name: data.name,
+        last_name: data.last_name,
         role: 'support',
       });
 
       if (!response.success) {
-        if (response.error_code === 'EMAIL_ALREADY_EXISTS') {
-          setError('Este email ya está registrado');
-        } else {
-          setError(response.error || 'Error al registrar');
-        }
+        if (response.error_code === 'EMAIL_ALREADY_EXISTS') setError('Este email ya está registrado');
+        else setError(response.error || 'Error al registrar');
+
         return;
       }
 
@@ -107,24 +103,19 @@ export const SignUpForm = () => {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="first_name">Nombre</Label>
+              <Label htmlFor="name">Nombre</Label>
               <div className="relative">
                 <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input id="first_name" placeholder="Juan" className="pl-10" {...register('first_name')} disabled={isLoading} />
+                <Input id="name" placeholder="Juan" className="pl-10" {...register('name')} disabled={isLoading} />
               </div>
-              {errors.first_name && <p className="text-sm text-destructive">{errors.first_name.message}</p>}
+              {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="last_name_paternal">Apellido Paterno</Label>
-              <Input id="last_name_paternal" placeholder="Pérez" {...register('last_name_paternal')} disabled={isLoading} />
-              {errors.last_name_paternal && <p className="text-sm text-destructive">{errors.last_name_paternal.message}</p>}
+              <Label htmlFor="last_name">Apellido</Label>
+              <Input id="last_name" placeholder="Pérez" {...register('last_name')} disabled={isLoading} />
+              {errors.last_name && <p className="text-sm text-destructive">{errors.last_name.message}</p>}
             </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="last_name_maternal">Apellido Materno (Opcional)</Label>
-            <Input id="last_name_maternal" placeholder="García" {...register('last_name_maternal')} disabled={isLoading} />
           </div>
 
           <div className="space-y-2">
