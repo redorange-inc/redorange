@@ -3,11 +3,9 @@ import { getServicesData } from '@/actions/infra/services/fn-get-services-data';
 
 import { PageWrapper } from './_components/page-wrapper';
 import { HeroServices } from './_components/hero-services';
-import { BenefitsStats } from './_components/benefits-stats';
 import { ServicesGrid } from './_components/services-grid';
 import { ProcessSection } from './_components/process-section';
 import { FAQSection } from './_components/faq-section';
-import { ContactCTA } from './_components/contact-cta';
 
 const ServicesPage = async () => {
   const { data } = await getServicesData();
@@ -15,8 +13,6 @@ const ServicesPage = async () => {
   return (
     <PageWrapper>
       <HeroServices hero={data.hero} />
-
-      <BenefitsStats benefits={data.benefits} />
 
       <Separator className="my-10" />
 
@@ -29,10 +25,6 @@ const ServicesPage = async () => {
       <Separator className="my-10" />
 
       <FAQSection faqs={data.faqs} />
-
-      <Separator className="my-10" />
-
-      <ContactCTA phone={data.contactPhone} whatsapp={data.contactWhatsapp} />
     </PageWrapper>
   );
 };
