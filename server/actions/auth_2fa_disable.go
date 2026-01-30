@@ -4,27 +4,19 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/alexedwards/argon2id"
 	"github.com/gobuffalo/buffalo"
 	"github.com/gobuffalo/pop/v6"
 	"github.com/pquerna/otp/totp"
 )
-
-// -- Disable 2FA
 
 type Disable2FARequest struct {
 	Password string `json:"password"`
 	Code     string `json:"code"`
 }
 
-type Disable2FAResponse struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
-}
-
 func Auth2FADisable(c buffalo.Context) error {
-	user := GetCurrentUser(c)
-	if user == nil {
+	user, err := GetCurrentUser(c)
+	if err != nil {
 		return c.Render(http.StatusUnauthorized, r.JSON(ErrorResponse{
 			Success:   false,
 			Error:     "User not found",
@@ -52,7 +44,6 @@ func Auth2FADisable(c buffalo.Context) error {
 		}))
 	}
 
-	// Verificar que tenga 2FA habilitado
 	if !user.TwoFactorEnabled {
 		return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
 			Success:   false,
@@ -61,7 +52,6 @@ func Auth2FADisable(c buffalo.Context) error {
 		}))
 	}
 
-	// Verificar que tenga password
 	if user.PasswordHash == nil || *user.PasswordHash == "" {
 		return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
 			Success:   false,
@@ -70,9 +60,7 @@ func Auth2FADisable(c buffalo.Context) error {
 		}))
 	}
 
-	// Verificar password
-	match, err := argon2id.ComparePasswordAndHash(req.Password, *user.PasswordHash)
-	if err != nil || !match {
+	if !verifyPassword(req.Password, *user.PasswordHash) {
 		return c.Render(http.StatusUnauthorized, r.JSON(ErrorResponse{
 			Success:   false,
 			Error:     "Invalid password",
@@ -80,7 +68,6 @@ func Auth2FADisable(c buffalo.Context) error {
 		}))
 	}
 
-	// Verificar código TOTP
 	if user.TwoFactorSecret == nil {
 		return c.Render(http.StatusBadRequest, r.JSON(ErrorResponse{
 			Success:   false,
@@ -107,10 +94,9 @@ func Auth2FADisable(c buffalo.Context) error {
 		}))
 	}
 
-	// Deshabilitar 2FA
 	user.TwoFactorEnabled = false
 	user.TwoFactorSecret = nil
-	if err := tx.Update(user); err != nil {
+	if err := tx.Update(&user); err != nil {
 		return c.Render(http.StatusInternalServerError, r.JSON(ErrorResponse{
 			Success:   false,
 			Error:     "Failed to disable 2FA",
@@ -118,13 +104,10 @@ func Auth2FADisable(c buffalo.Context) error {
 		}))
 	}
 
-	// Eliminar backup codes
-	tx.RawQuery(`
-		DELETE FROM auth.two_factor_backup_codes WHERE user_id = ?
-	`, user.ID).Exec()
+	tx.RawQuery("DELETE FROM auth.two_factor_backup_codes WHERE user_id = ?", user.ID).Exec()
 
-	return c.Render(http.StatusOK, r.JSON(Disable2FAResponse{
-		Success: true,
-		Message: "Two-factor authentication disabled",
+	return c.Render(http.StatusOK, r.JSON(map[string]interface{}{
+		"success": true,
+		"message": "Two-factor authentication disabled",
 	}))
 }
