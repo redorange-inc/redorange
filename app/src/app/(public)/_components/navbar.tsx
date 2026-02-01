@@ -15,6 +15,7 @@ const navItems = [
   { href: '/#services', label: 'Líneas', sectionId: 'services' },
   { href: '/#about', label: 'Sobre Nosotros', sectionId: 'about' },
   { href: '/team', label: 'Nuestro Equipo', sectionId: 'team' },
+  { href: '/clients', label: 'Clientes', sectionId: 'clients' },
   { href: '/#contact', label: 'Contacto', sectionId: 'contact' },
 ] as const;
 
@@ -48,6 +49,11 @@ export const Navbar: FC = () => {
       return;
     }
 
+    if (pathname === '/clients') {
+      setActiveSection('clients');
+      return;
+    }
+
     if (pathname === '/') {
       handleScroll();
       window.addEventListener('scroll', handleScroll, { passive: true });
@@ -73,6 +79,7 @@ export const Navbar: FC = () => {
 
   const isActive = (sectionId: string) => {
     if (pathname === '/team' && sectionId === 'team') return true;
+    if (pathname === '/clients' && sectionId === 'clients') return true;
     if (pathname === '/' && activeSection === sectionId) return true;
     return false;
   };
